@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from "vue-router"
 import { isTokenValid } from "@/services/authentication"
-import { can, loadCurrentPermissions } from "@/services/permissions"
+import { can, loadCurrentPermissions, permissionState } from "@/services/permissions"
 
 import Home from "@/views/home.vue"
 import Login from "@/views/login.vue"
@@ -26,25 +26,17 @@ const routes = [
   { path: "/", component: Login, meta: { auth: false } },
   { path: "/home", component: Home, meta: { auth: true } },
   { path: "/sem-permissao", component: Forbidden, meta: { auth: true } },
-
-  // Usuários
   { path: "/administrador/usuarios/listar", component: UserList, meta: { auth: true, permission: { entity: "users", action: "read" } } },
   { path: "/administrador/usuarios/visualizar/:id", component: UserView, meta: { auth: true, permission: { entity: "users", action: "read" } } },
   { path: "/administrador/usuarios/novo", component: UserNew, meta: { auth: true, permission: { entity: "users", action: "create" } } },
-  { path: "/administrador/usuarios/permissoes/:id/", component: UserPermissions, meta: { auth: true, permission: { entity: "users", action: "update" } } },
+  { path: "/administrador/usuarios/permissoes/:id/", component: UserPermissions, meta: { auth: true, permission: { entity: "users", action: "update", adminOnly: true } } },
   { path: "/administrador/usuarios/trocar-senha", component: ChangePassword, meta: { auth: true } },
-
-  // Estudantes
   { path: "/administrador/estudantes/listar", component: StudentList, meta: { auth: true, permission: { entity: "students", action: "read" } } },
   { path: "/administrador/estudantes/novo", component: StudentNew, meta: { auth: true, permission: { entity: "students", action: "create" } } },
   { path: "/administrador/estudantes/visualizar/:id", component: StudentView, meta: { auth: true, permission: { entity: "students", action: "read" } } },
   { path: "/administrador/estudantes/editar/:id", component: StudentEdit, meta: { auth: true, permission: { entity: "students", action: "update" } } },
-
-  // Cursos e Turmas
   { path: "/administrador/cursos/listar", component: CourseList, meta: { auth: true, permission: { entity: "courses", action: "read" } } },
   { path: "/administrador/turmas/listar", component: SchoolGroupsList, meta: { auth: true, permission: { entity: "classes", action: "read" } } },
-
-  // Ocorrências
   { path: "/ocorrencias/ocorrencias/listar", component: IncidentsList, meta: { auth: true, permission: { entity: "occurrences", action: "read" } } },
   { path: "/ocorrencias/ocorrencias/novo", component: IncidentsNew, meta: { auth: true, permission: { entity: "occurrences", action: "create" } } },
   { path: "/ocorrencias/ocorrencias/visualizar/:id", component: IncidentsView, meta: { auth: true, permission: { entity: "occurrences", action: "read" } } },
@@ -52,26 +44,15 @@ const routes = [
   { path: "/ocorrencias/relatorio", component: IncidentsReport, meta: { auth: true, permission: { entity: "occurrences", action: "read" } } },
 ]
 
-const router = createRouter({
-  history: createWebHistory(),
-  routes,
-})
+const router = createRouter({ history: createWebHistory(), routes })
 
 router.beforeEach(async (to, _from, next) => {
-  if (!to.meta.auth) {
-    next()
-    return
-  }
-
-  if (!(await isTokenValid())) {
-    next({ path: "/" })
-    return
-  }
-
+  if (!to.meta.auth) { next(); return }
+  if (!(await isTokenValid())) { next({ path: "/" }); return }
   await loadCurrentPermissions()
 
   const permission = to.meta.permission
-  if (permission && !can(permission.entity, permission.action)) {
+  if (permission && (permission.adminOnly && !permissionState.admin || !can(permission.entity, permission.action))) {
     next({ path: "/sem-permissao" })
     return
   }
