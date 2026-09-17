@@ -84,7 +84,11 @@ class Api::PermissionsController < ApplicationController
     seen = {}
 
     requested_permissions.map do |permission|
-      attributes = permission.to_h.stringify_keys
+      attributes = if permission.respond_to?(:permit)
+                     permission.permit(:entity, *ACTIONS).to_h.stringify_keys
+                   else
+                     permission.to_h.stringify_keys
+                   end
       entity_key = attributes['entity'].to_s
       config = ENTITIES[entity_key]
 
