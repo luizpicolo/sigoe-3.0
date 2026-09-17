@@ -45,6 +45,52 @@ export const find = async (id) => {
   }
 }
 
+export const create = async (student) => {
+  const token = localStorage.getItem('jwt')
+  if (!token) return false
+
+  try {
+    const response = await axios.post(
+      `${BASE_URL}/api/students`,
+      { student },
+      authConfig()
+    );
+
+    return {
+      student: response.data.student,
+      error: null
+    };
+  } catch (error) {
+    console.error('Erro ao cadastrar estudante:', error);
+    return {
+      student: null,
+      error: error.response?.data?.errors || ['Erro ao cadastrar estudante.']
+    };
+  }
+}
+
+export const options = async () => {
+  const token = localStorage.getItem('jwt')
+  if (!token) return false
+
+  try {
+    const response = await axios.get(`${BASE_URL}/api/students/options`, authConfig());
+
+    return {
+      courses: response.data.courses,
+      school_groups: response.data.school_groups,
+      course_situations: response.data.course_situations
+    };
+  } catch (error) {
+    console.error('Erro ao buscar opções para cadastro de estudante:', error);
+    return {
+      courses: [],
+      school_groups: [],
+      course_situations: []
+    };
+  }
+}
+
 export const update = async (id, student) => {
   const token = localStorage.getItem('jwt')
   if (!token) return false
