@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import Sidebar from '@/components/sidebar.vue'
 import Button from '@/components/ui/button.vue'
@@ -8,7 +8,7 @@ import Card from '@/components/ui/card.vue'
 import Input from '@/components/ui/input.vue'
 import Alert from '@/components/ui/alert.vue'
 import Header from '@/components/header.vue'
-import { create as createStudent, options as studentOptions } from '@/services/students'
+import { create as createStudent } from '@/services/students'
 
 const router = useRouter()
 
@@ -23,39 +23,14 @@ const student = ref({
   name: "",
   cpf: "",
   birthdate: "",
-  ra: "",
-  enrollment: "",
-  courseSituation: "Em curso",
-  courseId: "",
-  schoolGroupId: "",
   password: "",
   confirmPassword: "",
   responsible: "",
   contact: ""
 })
 
-const courses = ref([])
-const schoolGroups = ref([])
-const courseSituations = ref([])
-const isLoading = ref(false)
 const isSubmitting = ref(false)
 const errorMessage = ref('')
-
-const loadOptions = async () => {
-  isLoading.value = true
-  errorMessage.value = ''
-
-  try {
-    const response = await studentOptions()
-    courses.value = response?.courses || []
-    schoolGroups.value = response?.school_groups || []
-    courseSituations.value = response?.course_situations || []
-  } catch (error) {
-    errorMessage.value = 'Não foi possível carregar os dados para o cadastro.'
-  } finally {
-    isLoading.value = false
-  }
-}
 
 const handleSubmit = async (event) => {
   event.preventDefault()
@@ -72,11 +47,6 @@ const handleSubmit = async (event) => {
     name: student.value.name,
     cpf: student.value.cpf,
     birth_date: student.value.birthdate,
-    ra: student.value.ra,
-    enrollment: student.value.enrollment,
-    course_situation: student.value.courseSituation,
-    course_id: student.value.courseId,
-    school_group_id: student.value.schoolGroupId,
     password: student.value.password,
     password_confirmation: student.value.confirmPassword,
     responsible: student.value.responsible,
@@ -97,8 +67,6 @@ const handleSubmit = async (event) => {
 const dismissError = () => {
   errorMessage.value = ''
 }
-
-onMounted(loadOptions)
 </script>
 
 <template>
@@ -122,11 +90,7 @@ onMounted(loadOptions)
           class="mb-4"
         />
 
-        <div v-if="isLoading" class="bg-white rounded-lg shadow-sm p-6 text-center">
-          Carregando dados...
-        </div>
-
-        <form v-else @submit="handleSubmit" class="space-y-6">
+        <form @submit="handleSubmit" class="space-y-6">
           <Card customClass="mb-4">
             <div class="border-b border-gray-200 pb-2 mb-4">
               <h2 class="text-sm font-medium text-gray-500">Dados pessoais</h2>
@@ -164,71 +128,6 @@ onMounted(loadOptions)
               </div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">RA</label>
-                <Input
-                  v-model="student.ra"
-                  type="number"
-                  placeholder="Registro acadêmico"
-                  required
-                />
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Matrícula</label>
-                <Input
-                  v-model="student.enrollment"
-                  type="text"
-                  placeholder="Número da matrícula"
-                  required
-                />
-              </div>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Curso</label>
-                <select
-                  v-model="student.courseId"
-                  class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700 focus:border-green-500 focus:outline-none focus:ring-green-500"
-                  required
-                >
-                  <option value="" disabled>Selecione o curso</option>
-                  <option v-for="course in courses" :key="course.id" :value="course.id">
-                    {{ course.name }}{{ course.initial ? ` (${course.initial})` : '' }}
-                  </option>
-                </select>
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Turma</label>
-                <select
-                  v-model="student.schoolGroupId"
-                  class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700 focus:border-green-500 focus:outline-none focus:ring-green-500"
-                  required
-                >
-                  <option value="" disabled>Selecione a turma</option>
-                  <option v-for="schoolGroup in schoolGroups" :key="schoolGroup.id" :value="schoolGroup.id">
-                    {{ schoolGroup.identifier || schoolGroup.name }}
-                  </option>
-                </select>
-              </div>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Situação</label>
-                <select
-                  v-model="student.courseSituation"
-                  class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700 focus:border-green-500 focus:outline-none focus:ring-green-500"
-                  required
-                >
-                  <option v-for="situation in courseSituations" :key="situation" :value="situation">
-                    {{ situation }}
-                  </option>
-                </select>
-              </div>
-            </div>
-
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Senha para assinatura digital</label>
@@ -256,7 +155,7 @@ onMounted(loadOptions)
               <h2 class="text-sm font-medium text-gray-500">Dados responsável</h2>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Responsável</label>
                 <Input
