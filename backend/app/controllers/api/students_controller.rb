@@ -29,7 +29,9 @@ class Api::StudentsController < ApplicationController
   private
 
   def set_student
-    @student = Student.includes(course: :polo, school_group: :polo).find(params[:id])
+    @student = Student.includes(course: :polo, school_group: :polo)
+                      .where(params_return)
+                      .find(params[:id])
   end
 
   def student_json(student, detailed: false)
