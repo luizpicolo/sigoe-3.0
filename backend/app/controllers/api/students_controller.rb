@@ -49,18 +49,6 @@ class Api::StudentsController < ApplicationController
     end
   end
 
-  # GET /api/students/options
-  def options
-    courses = Course.where(set_polo).order(:name)
-    school_groups = SchoolGroup.where(polo_id: courses.select(:polo_id)).order(:identifier, :name)
-
-    render json: {
-      courses: courses.as_json(only: %i[id name initial]),
-      school_groups: school_groups.as_json(only: %i[id name identifier polo_id]),
-      course_situations: Student.course_situations.keys
-    }
-  end
-
   private
 
   def set_student
@@ -114,15 +102,9 @@ class Api::StudentsController < ApplicationController
       :cpf,
       :birth_date,
       :responsible,
-      :responsible_contact,
       :contact,
       :password,
-      :password_confirmation,
-      :ra,
-      :enrollment,
-      :course_situation,
-      :course_id,
-      :school_group_id
+      :password_confirmation
     )
   end
 
