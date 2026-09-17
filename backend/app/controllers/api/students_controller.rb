@@ -16,47 +16,51 @@ class Api::StudentsController < ApplicationController
                       .per(set_amount_return)
 
     render json: {
-      students: students.as_json(
-        only: %i[id name ra enrollment photo course_situation],
-        include: {
-          course: {
-            only: %i[id name initial polo_id],
-            include: { polo: { only: %i[id name] } }
-          },
-          school_group: {
-            only: %i[id name identifier polo_id],
-            include: { polo: { only: %i[id name] } }
-          }
-        }
-      ),
+      students: students.map { |student| student_json(student) },
       total: students.total_count
     }
   end
 
   # GET /api/students/:id
   def show
-    render json: {
-      student: @student.as_json(
-        only: %i[id name cpf birth_date responsible responsible_contact contact ra enrollment course_situation created_at updated_at photo],
-        methods: :course_situation,
-        include: {
-          course: {
-            only: %i[id name initial polo_id],
-            include: { polo: { only: %i[id name] } }
-          },
-          school_group: {
-            only: %i[id name identifier polo_id],
-            include: { polo: { only: %i[id name] } }
-          }
-        }
-      )
-    }
+    render json: { student: student_json(@student, detailed: true) }
   end
 
   private
 
   def set_student
     @student = Student.includes(course: :polo, school_group: :polo).find(params[:id])
+  end
+
+  def student_json(student, detailed: false)
+    attributes = detailed ? %i[id name cpf birth_date responsible responsible_contact contact ra enrollment course_situation created_at updated_at] : %i[id name ra enrollment course_situation]
+    attributes << :photo unless detailed
+
+    data = student.as_json(
+      only: attributes,
+      methods: detailed ? :course_situation : nil,
+      include: {
+        course: {
+          only: %i[id name initial polo_id],
+          include: { polo: { only: %i[id name] } }
+        },
+        school_group: {
+          only: %i[id name identifier polo_id],
+          include: { polo: { only: %i[id name] } }
+        }
+      }
+    )
+
+    data['photo'] = photo_url(student)
+    data
+  end
+
+  def photo_url(student)
+    photo = student.photo.to_s
+    return nil if photo.empty?
+    return photo if photo.start_with?('http://', 'https://')
+
+    "#{request.base_url}#{photo.start_with?('/') ? '' : '/'}#{photo}"
   end
 
   def params_return
