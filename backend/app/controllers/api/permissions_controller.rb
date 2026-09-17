@@ -35,10 +35,9 @@ class Api::PermissionsController < ApplicationController
     return if performed?
 
     Permission.transaction do
-      user.permissions.delete_all
-      normalized.each do |attributes|
-        user.permissions.create!(attributes)
-      end
+      supported_entities = ENTITIES.values.map { |config| config[:model].name }
+      user.permissions.where(entity: supported_entities).delete_all
+      normalized.each { |attributes| user.permissions.create!(attributes) }
     end
 
     render json: permission_payload(user)
@@ -58,10 +57,10 @@ class Api::PermissionsController < ApplicationController
 
   def permission_payload(user)
     permissions = user.permissions.each_with_object({}) do |permission, result|
-      entity = entity_key(permission.entity)
-      next unless entity
+      key = entity_key(permission.entity)
+      next unless key
 
-      result[entity] = ACTIONS.index_with { |attribute| permission.public_send(\"#{attribute}?\") }
+      result[key] = ACTIONS.index_with { |attribute| permission.public_send("#{attribute}?") }
     end
 
     {
@@ -87,12 +86,12 @@ class Api::PermissionsController < ApplicationController
       config = ENTITIES[entity_key]
 
       unless config
-        render json: { error: \"Entidade inválida: #{entity_key}\" }, status: :unprocessable_entity
+        render json: { error: "Entidade inválida: #{entity_key}" }, status: :unprocessable_entity
         return
       end
 
       if seen[entity_key]
-        render json: { error: \"Entidade duplicada: #{entity_key}\" }, status: :unprocessable_entity
+        render json: { error: "Entidade duplicada: #{entity_key}" }, status: :unprocessable_entity
         return
       end
 
@@ -105,6 +104,13 @@ class Api::PermissionsController < ApplicationController
   end
 
   def entity_key(entity_name)
-    ENTITIES.find { |_key, config| config[:model].name == entity_name }&.first
+    found = ENTITIES.find { |_key, config| config[:model].name == entity_name }
+    return found.first if found
+
+    return unless entity_name.present?
+    return unless entity_name.safe_constantize&.is_a?(Class)
+    return unless entity_name.safe_constantize <= ApplicationRecord
+
+    entity_name.underscore
   end
 end
