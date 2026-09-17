@@ -8,9 +8,11 @@ import Card from '@/components/ui/card.vue'
 import Header from '@/components/header.vue'
 
 import { formatDate } from '@/utils'
+import { find as findStudent } from '@/services/students'
 
 const route = useRoute()
 const studentId = ref(route.params.id)
+const loading = ref(false)
 
 const breadcrumbItems = [
   { label: "Home", href: "/" },
@@ -21,47 +23,62 @@ const breadcrumbItems = [
 
 const student = ref({
   id: studentId.value,
-  name: "NAIANY GOMES DA SILVA",
-  cpf: "080.184.921-74",
-  birthdate: "2011-01-17",
-  registration: "IF2023001245",
-  status: "Ativo",
-  course: "Curso Técnico em Informática",
-  class: "20251301201A",
-  campus: "Nova Andradina",
-  responsible: "Maria da Silva",
-  contact: "maria.silva@email.com / (67) 99999-8888",
-  address: "Rua das Flores, 123 - Centro, Nova Andradina - MS",
+  name: "",
+  cpf: "",
+  birthdate: null,
+  registration: "",
+  status: "",
+  course: "",
+  class: "",
+  campus: "",
+  responsible: "",
+  contact: "",
+  address: "",
   avatar: "/placeholder.svg?height=200&width=200",
-  created_at: "2023-02-15T10:30:00Z",
-  updated_at: "2025-05-30T14:45:00Z",
+  created_at: null,
+  updated_at: null,
   attendance: {
-    present: 85,
-    absent: 15,
-    total: 100
+    present: 0,
+    absent: 0,
+    total: 0
   },
   grades: {
-    average: 8.5,
-    status: "Aprovado"
+    average: "-",
+    status: "Não informado"
   },
-  occurrences: [
-    { id: 1, date: "2025-04-15T08:30:00Z", type: "Disciplinar", description: "Atraso na aula" },
-    { id: 2, date: "2025-05-10T09:45:00Z", type: "Acadêmica", description: "Não entrega de atividade" }
-  ]
+  occurrences: []
 })
 
-onMounted(() => {
-  // fetchStudent(studentId.value)
-})
+const loadStudent = async (id) => {
+  loading.value = true
+  const response = await findStudent(id)
+  const data = response?.student
 
-// const fetchStudent = async (id) => {
-//   try {
-//     const response = await findStudent(id)
-//     student.value = response.student
-//   } catch (error) {
-//     console.error('Erro ao buscar dados do estudante:', error)
-//   }
-// }
+  if (data) {
+    student.value = {
+      ...student.value,
+      id: data.id,
+      name: data.name || "-",
+      cpf: data.cpf || "-",
+      birthdate: data.birth_date,
+      registration: data.enrollment || "-",
+      status: data.course_situation || "-",
+      course: data.course?.name || "-",
+      class: data.school_group?.identifier || data.school_group?.name || "-",
+      campus: data.course?.polo?.name || "-",
+      responsible: data.responsible || data.responsible_contact || "-",
+      contact: data.contact || "-",
+      address: "-",
+      avatar: data.photo || "/placeholder.svg?height=200&width=200",
+      created_at: data.created_at,
+      updated_at: data.updated_at
+    }
+  }
+
+  loading.value = false
+}
+
+onMounted(() => loadStudent(studentId.value))
 </script>
 
 <template>
@@ -69,11 +86,9 @@ onMounted(() => {
     <Header />
 
     <div class="flex flex-col md:flex-row flex-1">
-      <!-- Sidebar -->
       <Sidebar :activePage="'estudantes'" />
 
-      <!-- Main Content -->
-      <main class="flex-1 p-6">
+      <main class="flex-1 p-6 min-w-0">
         <Breadcrumb :items="breadcrumbItems" />
 
         <h1 class="text-2xl font-bold mb-1">Detalhes do Estudante</h1>
@@ -85,7 +100,11 @@ onMounted(() => {
           </Button>
         </div>
 
-        <div class="grid grid-cols-4 gap-4 mb-6 mt-4 rounded-lg shadow-sm">
+        <div v-if="loading" class="bg-white rounded-lg shadow-sm p-6 mt-4 text-center">
+          Carregando estudante...
+        </div>
+
+        <div v-else class="grid grid-cols-4 gap-4 mb-6 mt-4 rounded-lg shadow-sm">
           <!-- Student Photo -->
           <Card customClass="col-span-1" title="Foto">
             <div class="flex justify-center items-center mt-5 pt-2 pb-5">
@@ -106,7 +125,7 @@ onMounted(() => {
               </div>
               <div class="py-3 grid grid-cols-3">
                 <dt class="text-sm font-medium text-gray-500">Data de Nascimento</dt>
-                <dd class="text-sm text-gray-900 col-span-2">{{ formatDate(student.birthdate) }}</dd>
+                <dd class="text-sm text-gray-900 col-span-2">{{ student.birthdate ? formatDate(student.birthdate) : '-' }}</dd>
               </div>
               <div class="py-3 grid grid-cols-3">
                 <dt class="text-sm font-medium text-gray-500">Responsável</dt>
@@ -172,11 +191,11 @@ onMounted(() => {
               </div>
               <div class="py-3 grid grid-cols-3">
                 <dt class="text-sm font-medium text-gray-500">Data de cadastro</dt>
-                <dd class="text-sm text-gray-900 col-span-2">{{ formatDate(student.created_at) }}</dd>
+                <dd class="text-sm text-gray-900 col-span-2">{{ student.created_at ? formatDate(student.created_at) : '-' }}</dd>
               </div>
               <div class="py-3 grid grid-cols-3">
                 <dt class="text-sm font-medium text-gray-500">Última atualização</dt>
-                <dd class="text-sm text-gray-900 col-span-2">{{ formatDate(student.updated_at) }}</dd>
+                <dd class="text-sm text-gray-900 col-span-2">{{ student.updated_at ? formatDate(student.updated_at) : '-' }}</dd>
               </div>
             </dl>
           </Card>
