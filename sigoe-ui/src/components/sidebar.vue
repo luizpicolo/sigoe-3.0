@@ -1,23 +1,25 @@
 <script setup>
+import { computed, onMounted } from 'vue'
 import UserProfile from '@/components/userprofile.vue'
+import { can, loadCurrentPermissions, permissionState } from '@/services/permissions'
 
 defineProps({
   activePage: {
     type: String,
     required: true
   }
-});
+})
+
+onMounted(() => loadCurrentPermissions())
+
+const profileName = computed(() => permissionState.user?.name || permissionState.user?.username || 'Usuário')
+const profileEmail = computed(() => permissionState.user?.email || '')
 </script>
 
 <template>
   <aside class="w-full md:w-64 bg-white border-r border-gray-200">
-    <!-- User Profile -->
-    <UserProfile 
-      name="Luiz Picolo" 
-      email="luiz.picolo@ifms.edu.br"
-    />
+    <UserProfile :name="profileName" :email="profileEmail" />
 
-    <!-- Navigation -->
     <nav class="p-4">
       <div class="mb-6">
         <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">MINHAS INFORMAÇÕES</h3>
@@ -34,10 +36,10 @@ defineProps({
         </ul>
       </div>
 
-      <div class="mb-6">
+      <div v-if="can('users', 'read') || can('students', 'read') || can('courses', 'read') || can('classes', 'read')" class="mb-6">
         <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">ADMINISTRADOR</h3>
         <ul class="space-y-1">
-          <li>
+          <li v-if="can('users', 'read')">
             <router-link
               to="/administrador/usuarios/listar"
               class="block px-2 py-1 text-sm hover:bg-gray-100 rounded"
@@ -45,7 +47,7 @@ defineProps({
               Usuários
             </router-link>
           </li>
-          <li>
+          <li v-if="can('students', 'read')">
             <router-link
               to="/administrador/estudantes/listar"
               class="block px-2 py-1 text-sm hover:bg-gray-100 rounded"
@@ -54,7 +56,7 @@ defineProps({
               Estudantes
             </router-link>
           </li>
-          <li>
+          <li v-if="can('courses', 'read')">
             <router-link
               to="/administrador/cursos/listar"
               class="block px-2 py-1 text-sm hover:bg-gray-100 rounded"
@@ -63,7 +65,7 @@ defineProps({
               Cursos
             </router-link>
           </li>
-          <li>
+          <li v-if="can('classes', 'read')">
             <router-link
               to="/administrador/turmas/listar"
               class="block px-2 py-1 text-sm hover:bg-gray-100 rounded"
@@ -75,7 +77,7 @@ defineProps({
         </ul>
       </div>
 
-      <div>
+      <div v-if="can('occurrences', 'read')">
         <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">OCORRÊNCIAS</h3>
         <ul class="space-y-1">
           <li>
