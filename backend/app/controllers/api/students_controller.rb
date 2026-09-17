@@ -8,6 +8,8 @@ class Api::StudentsController < ApplicationController
 
   # GET /api/students
   def index
+    authorize! :read, Student
+
     students = Student.joins(:course)
                       .where(params_return)
                       .order("#{set_order}": :desc)
@@ -23,11 +25,13 @@ class Api::StudentsController < ApplicationController
 
   # GET /api/students/:id
   def show
+    authorize! :read, Student
     render json: { student: student_json(@student, detailed: true) }
   end
 
   # POST /api/students
   def create
+    authorize! :create, Student
     student = Student.new(student_params)
 
     if student.save
@@ -39,6 +43,7 @@ class Api::StudentsController < ApplicationController
 
   # PATCH/PUT /api/students/:id
   def update
+    authorize! :update, Student
     attributes = student_params
     attributes = check_password(attributes)
 
@@ -51,6 +56,7 @@ class Api::StudentsController < ApplicationController
 
   # GET /api/students/options
   def options
+    authorize! :read, Student
     courses = Course.where(set_polo).order(:name)
     school_groups = SchoolGroup.where(polo_id: courses.select(:polo_id)).order(:identifier, :name)
 
