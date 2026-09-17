@@ -56,10 +56,12 @@ class Api::PermissionsController < ApplicationController
   end
 
   def permission_payload(user)
-    permissions = entity_options.each_with_object({}) do |entity, result|
-      permission = user.permissions.find { |item| entity_key(item.entity) == entity[:id] }
-      result[entity[:id]] = ACTIONS.index_with do |attribute|
-        permission ? permission.public_send("#{attribute}?") : false
+    permissions = user.permissions.each_with_object({}) do |permission, result|
+      entity = entity_key(permission.entity)
+      next unless entity
+
+      result[entity] = ACTIONS.index_with do |attribute|
+        permission.public_send("#{attribute}?")
       end
     end
 
