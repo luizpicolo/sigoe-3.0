@@ -21,6 +21,15 @@ Rails.application.routes.draw do
       collection do
         get :validation
       end
+      member do
+        get :permissions, to: 'permissions#show'
+        put :permissions, to: 'permissions#update'
+      end
+    end
+    resources :permissions, only: [] do
+      collection do
+        get :current
+      end
     end
     resources :students, only: [:index, :show, :create, :update] do
       collection do
