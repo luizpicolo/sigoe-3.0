@@ -50,7 +50,7 @@ onMounted(loadStudents);
 </script>
 
 <template>
-  <div class="min-h-screen flex flex-col">
+  <div class="min-h-screen flex flex-col overflow-x-hidden">
     <header class="bg-white border-b border-gray-200 py-2 px-4 flex justify-between items-center">
       <div class="flex items-center">
         <img src="/logo_ifms.png" width="160">
@@ -60,16 +60,16 @@ onMounted(loadStudents);
       </div>
     </header>
 
-    <div class="flex flex-col md:flex-row flex-1">
+    <div class="flex flex-col md:flex-row flex-1 min-w-0">
       <Sidebar :activePage="'estudantes'" />
 
-      <main class="flex-1 p-6">
+      <main class="flex-1 min-w-0 p-6">
         <Breadcrumb :items="breadcrumbItems" />
         <h1 class="text-2xl font-bold mb-6">Estudantes</h1>
 
         <div class="bg-white rounded-md shadow p-4 mb-6">
           <div class="flex flex-wrap gap-2">
-            <Button customClass="bg-green-600 hover:bg-green-700 focus:ring-green-500" to="/administrador/usuarios/novo">
+            <Button customClass="bg-green-600 hover:bg-green-700 focus:ring-green-500" to="/administrador/estudantes/novo">
               <i class="fa-solid fa-user"></i>
               Novo Estudante
             </Button>
@@ -102,27 +102,31 @@ onMounted(loadStudents);
           </div>
         </div>
 
-        <div class="bg-white rounded-md shadow overflow-hidden">
+        <div class="bg-white rounded-md shadow overflow-hidden w-full">
           <div v-if="loading" class="p-6 text-center">Carregando estudantes...</div>
-          <table v-else class="min-w-full divide-y divide-gray-200">
+          <table v-else class="w-full table-fixed divide-y divide-gray-200">
             <thead class="bg-gray-100">
               <tr>
-                <th v-for="heading in ['ID', 'Foto', 'Nome', 'Campus', 'Turma', 'Polo', 'Ações']" :key="heading" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  {{ heading }}
-                </th>
+                <th class="w-[8%] px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+                <th class="w-[12%] px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Foto</th>
+                <th class="w-[20%] px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nome</th>
+                <th class="w-[17%] px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Campus</th>
+                <th class="w-[15%] px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Turma</th>
+                <th class="w-[13%] px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Polo</th>
+                <th class="w-[15%] px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ações</th>
               </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200">
               <tr v-for="student in students" :key="student.id">
-                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ student.id }}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  <img :src="student.photo || '/placeholder.svg'" width="100" alt="Foto do estudante">
+                <td class="px-3 py-4 text-sm font-medium text-gray-900 break-words">{{ student.id }}</td>
+                <td class="px-3 py-4 text-sm text-gray-500">
+                  <img :src="student.photo || '/placeholder.svg?height=100&width=100'" width="56" height="56" alt="Foto do estudante" class="rounded-md object-cover">
                 </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ student.name }}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ student.course?.name || '-' }}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ student.enrollment || '-' }}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ student.school_group?.name || '-' }}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                <td class="px-3 py-4 text-sm text-gray-500 break-words">{{ student.name }}</td>
+                <td class="px-3 py-4 text-sm text-gray-500 break-words">{{ student.course?.polo?.name || '-' }}</td>
+                <td class="px-3 py-4 text-sm text-gray-500 break-words">{{ student.school_group?.identifier || student.school_group?.name || '-' }}</td>
+                <td class="px-3 py-4 text-sm text-gray-500 break-words">{{ student.school_group?.polo?.name || student.course?.polo?.name || '-' }}</td>
+                <td class="px-3 py-4 text-sm text-gray-500">
                   <Button customClass="w-full bg-green-600 hover:bg-green-700 focus:ring-green-500" :to="`/administrador/estudantes/visualizar/${student.id}`">
                     <i class="fa-solid fa-eye"></i>
                     Visualizar
