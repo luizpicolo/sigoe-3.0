@@ -105,14 +105,12 @@ onMounted(() => loadStudent(studentId.value))
         </div>
 
         <div v-else class="grid grid-cols-4 gap-4 mb-6 mt-4 rounded-lg shadow-sm">
-          <!-- Student Photo -->
           <Card customClass="col-span-1" title="Foto">
             <div class="flex justify-center items-center mt-5 pt-2 pb-5">
               <img :src="student.avatar" width="200" alt="Foto do estudante" class="rounded-md" />
             </div>
           </Card>
 
-          <!-- Personal Information -->
           <Card customClass="col-span-3" title="Informações Pessoais">
             <dl class="divide-y divide-gray-200">
               <div class="py-3 grid grid-cols-3">
@@ -142,9 +140,12 @@ onMounted(() => loadStudent(studentId.value))
             </dl>
           </Card>
 
-          <!-- Actions -->
           <Card customClass="col-span-1" title="Ações">
-            <Button variant="info" :to="`/administrador/estudantes/editar/${student.id}`">
+            <Button
+              variant="info"
+              :to="`/administrador/estudantes/editar/${student.id}`"
+              customClass="w-full"
+            >
               <i class="fa-solid fa-edit"></i>
               Editar Estudante
             </Button>
@@ -162,7 +163,6 @@ onMounted(() => loadStudent(studentId.value))
             </Button>
           </Card>
 
-          <!-- Academic Information -->
           <Card customClass="col-span-3" title="Informações Acadêmicas">
             <dl class="divide-y divide-gray-200">
               <div class="py-3 grid grid-cols-3">
@@ -200,7 +200,6 @@ onMounted(() => loadStudent(studentId.value))
             </dl>
           </Card>
 
-          <!-- Academic Performance -->
           <Card customClass="col-span-2" title="Desempenho Acadêmico">
             <div class="mb-4">
               <h3 class="text-sm font-medium text-gray-700 mb-2">Frequência</h3>
@@ -225,7 +224,6 @@ onMounted(() => loadStudent(studentId.value))
             </div>
           </Card>
 
-          <!-- Recent Occurrences -->
           <Card customClass="col-span-2" title="Ocorrências Recentes">
             <div v-if="student.occurrences.length > 0">
               <div v-for="occurrence in student.occurrences" :key="occurrence.id" class="mb-3 pb-3 border-b border-gray-100 last:border-0">
@@ -245,7 +243,7 @@ onMounted(() => loadStudent(studentId.value))
               Nenhuma ocorrência registrada.
             </div>
             <div class="mt-3 text-right">
-              <Button to="/ocorrencias/ocorrencias/listar" customClass="text-sm bg-white border-gray-200 !text-gray-700 hover:bg-gray-50 !focus:ring-gray-300">
+              <Button to="/ocorrencias/ocorrencias/listar" customClass="text-sm bg-white border-gray-200 !text-gray-700 hover:bg-gray-50 !focus:ring-green-300">
                 Ver todas
               </Button>
             </div>
