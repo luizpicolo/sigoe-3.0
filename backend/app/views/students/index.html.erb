@@ -1,0 +1,79 @@
+<div class="columns">
+  <div class="column no-print">
+    <% if can? :create, Student %>
+      <%= link_to new_student_path, class: "button is-success in-mobile-expand" do %>
+        <span class="icon">
+          <i class="fas fa-plus"></i>
+        </span>
+        <span>Novo Estudante</span>
+      <% end %>
+    <% end %>
+    <% if current_user.admin? %>
+      <%= link_to import_xls_students_path, class: "button is-success in-mobile-expand" do %>
+        <span class="icon">
+          <i class="ion-ios-upload-outline"></i>
+        </span>
+        <span>Importar xls</span>
+      <% end %>
+    <% end %>
+  </div>
+  <div class="column no-print">
+    <% show_search_error_message(@students, params) %>
+    <%= render 'layouts/search', path: students_path, v: attr_order(@students) %>
+  </div>
+</div>
+
+<table class="table is-striped is-fullwidth">
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Foto</th>
+      <th>Nome</th>
+      <% if current_user.super_admin? %>
+        <th>Campus</th>  
+      <% end %> 
+      <th class="is-hidden-mobile">Turma</th>
+      <th class="is-hidden-mobile">Polo</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @students.each do |student| %>
+    <tr>
+      <td><%= student.id %></td>
+      <td><%= image_tag student&.photo.thumb.to_s %></td>
+      <td><%= student.name %></td>
+      <% if current_user.super_admin? %>
+        <td><%= student.course.polo.name %></td>
+      <% end %> 
+      <td><%= student.school_group&.identification %></td>
+      <td class="is-hidden-mobile"><%= student.course_initial %></td>
+      <td class="has-text-right no-print">
+        <div class="dropdown">
+          <span class="button is-danger in-mobile-expand">Ações</span>
+          <div class="dropdown-content">
+            <% if can? :update, Student %>
+              <%= link_to edit_student_path(student), class: 'button is-success in-mobile-expand' do %>
+                <span class="icon">
+                  <i class="fas fa-edit"></i>
+                </span>
+                <span>Editar</span>
+              <% end %>
+            <% end %>
+            <% if can? :destroy, Student %>
+              <%= link_to student_path(student), method: :delete, data: { confirm: 'Tem certeza que deseja excluir?' }, class: 'button is-danger in-mobile-expand' do %>
+                <span class="icon">
+                  <i class="far fa-trash-alt"></i>
+                </span>
+                <span>Excluir</span>
+              <% end %>
+            <% end %>
+          </div>
+      </td>
+    </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<%= paginate @students %>
+<br />

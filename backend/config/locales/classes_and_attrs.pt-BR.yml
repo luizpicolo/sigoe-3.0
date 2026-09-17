@@ -1,0 +1,48 @@
+pt-BR:
+  activerecord:
+    models:
+      user: "Usuários"
+      student: "Estudantes"
+      course: "Cursos"
+      incident: "Ocorrências"
+      incident/prohibition_and_responsibility: "Proibições e responsabilidades"
+      incident/type_incident: "Tipo de ocorrências"
+      incident/student_duty: "Deveres dos estudantes"
+      permission: "Permissões"
+      school_group: "Turmas"
+      institution: "Instituições"
+      sector: "Setores"
+      Schoolgroup: "Turmas"
+      
+    attributes:
+      user:
+        name: "Nome"
+        password: "Senha"
+        password_confirmation: "Confirmar senha"
+        created_at: "Criado em"
+        updated_at: "Atualizado em"
+      course:
+        name: 'Nome'
+      incident:
+        student: 'Estudante'
+        institution: 'Instituição'
+        description: 'Descrição'
+        date_incident: 'Data ocorrência'
+        time_incident: 'Hora ocorrência'
+        course: 'Curso'
+        user: 'Usuário'
+        is_resolved:
+          no_: 'Não'
+          yes_: 'Sim'
+        type_student:
+          non_resident: 'Não residente'
+          resident: 'Residente'
+        sanction:
+          one: 'Sanção aplicada'
+          verbal_warning: 'Advertência Verbal'
+          written_warning: 'Advertência escrita'
+          suspension: 'Suspensão'
+          quitting_school: 'Desligamento'
+        sector:
+          name: 'Nome'
+          polo: 'Polo'

@@ -1,0 +1,79 @@
+// Modifications
+
+.in-mobile-expand {
+  @media(max-width: 767px) {
+    width: 100% !important;
+    margin-bottom: 10px;
+  }
+}
+
+.select:after {
+  border-color: $green !important;
+}
+
+.title, .subtitle {
+  @media(max-width: 767px) {
+     text-align: center
+  }
+}
+
+.profile {
+  margin: 20px 0;
+}
+
+fieldset {
+    font-family: sans-serif;
+    border: 1px solid $green !important;
+    border-radius: 5px;
+    padding: 15px !important;
+}
+
+fieldset legend {
+    padding: 5px 10px ;
+    font-size: 14px;
+    margin-left: 20px;
+}
+
+.is-64x64 {
+  height: 64px;
+  width: 64px;
+  overflow: hidden;
+}
+
+.margin-top-20px {
+  margin-top: 20px;
+}
+
+.margin-top-40px {
+  margin-top: 40px
+}
+
+.margin-top-32px {
+  margin-top: 32px;
+}
+
+.fa-check {
+  color: $green;
+}
+
+.fa-times {
+  color: $red;
+}
+
+.field_with_errors {
+  label {
+    color: $red;
+  }
+
+  input {
+    border-color: $red;
+  }
+}
+
+.padding-top-40 {
+  padding-top: 40px;
+}
+
+.display-none {
+  display: none;
+}

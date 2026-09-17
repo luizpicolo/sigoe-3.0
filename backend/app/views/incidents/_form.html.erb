@@ -1,0 +1,190 @@
+<!-- filepath: /Users/luizpicolo/Programacao/Ruby/sigoe/app/views/incidents/_form.html.erb -->
+<%= form_for model do |f| %>
+  <fieldset>
+    <legend>Estudante</legend>
+    <div class="columns">
+      <div class="column">
+        <div class="field">
+          <%= f.label :student_id, 'Estudante', class: 'label' %>
+          <p class="control">
+            <div class="select">
+              <%= f.select :student_id, Student.get_all(@params_return), { prompt: "Selecione o estudante" }, { :class => "select2 is-medium", required: true } %>
+            </div>
+          </p>
+        </div>  
+        <div class="field">
+          <%= f.label :type_student, 'Estudante é?', class: 'label' %>
+          <p class="control">
+            <span class="select">
+              <%= f.select :type_student, human_enum_name('incident.type_student', Incident.type_students.keys), {}, { :class => "select select2 is-medium"} %>
+            </span>
+          </p>
+        </div>
+      </div>
+      <div class="column has-text-centered">
+        <% if !model.student&.photo.nil? %>
+          <%= link_to model.student.photo.to_s, class: 'fancybox' do %>
+            <%= image_tag model.student.photo.thumb.to_s %>
+            <p>Clique para ampliar</p>
+          <% end %>
+        <% end %>
+      </div>
+    </div>
+  </fieldset>
+
+  <fieldset>
+    <legend>Assistente</legend>
+    <div class="field is-horizontal">
+      <div class="field-body">
+        <div class="field">
+          <%= f.label :assistant_id, 'Assistente', class: 'label' %>
+          <p class="control">
+            <span class="select">
+              <%= f.select :assistant_id, User.get_all(@polo), { selected: current_user.id }, { :class => "select select2 is-medium", required: true } %>
+            </span>
+          </p>
+        </div>
+        <div class="field">
+          <%= f.label :sector_id, 'Encaminhar para', class: 'label' %>
+          <p class="control">
+            <span class="select">
+              <%= f.select :sector_id, Sector.get_all(@polo), {:include_blank => 'Não enviar notificação'}, { :class => "select select2 is-medium" } %>
+            </span>
+          </p>
+        </div>
+      </div>
+    </div>
+  </fieldset>
+
+  <fieldset>
+    <legend>Ocorrência</legend>
+    <div class="field is-horizontal">
+      <div class="field-body">
+        <div class="field">
+          <p class="control">
+            <%= f.label :date_incident, 'Data ocorrência', class: 'label' %>
+            <%= f.text_field :date_incident, class: 'input date calendar', value: extract_and_format_date(model.date_incident), placeholder: 'Data ocorrência', required: true %>
+          </p>
+        </div>
+        
+        <div class="field">
+          <p class="control">
+            <%= f.label :time_incident, 'Hora ocorrência', class: 'label' %>
+            <%= f.text_field :time_incident, class: 'input time', value: extract_and_format_time(model.time_incident), placeholder: 'Hora ocorrência', required: true %>
+          </p>
+        </div>
+
+        <div class="field">
+          <%= f.label :type_incident_id, 'Tipos da Ocorrência ', class: 'label' %>
+          <p class="control">
+            <span class="select">
+              <%= f.select :type_incident_id, Incident::TypeIncident.get_all, {:include_blank => 'Tipo de Ocorrência'}, { :class => "select select2 is-medium" } %>
+            </span>
+          </p>
+        </div>
+
+        <div class="field">
+          <%= f.label :visibility, 'Tipo de Acesso', class: 'label' %>
+          <p class="control">
+          <span class="select">
+            <%= f.select :visibility, [['Público', 'public'], ['Privado', 'private']], {}, { class: 'select select2', required: true } %>
+          </span>
+          </p>
+        </div>
+      </div>
+    </div>
+    <div class="field">
+      <p>
+        * <b>Observação:</b> Ocorrências com tipo de acesso privado somente serão visualizadas por aqueles(as) que as criaram. Caso seja necessário que elas sejam acessadas por outros, devem ser marcadas como públicas.
+      </p>
+      <div class="field">
+        <p class="control">
+          <%= f.label :description, 'Ocorrência', class: 'label' %>
+          <%= f.text_area :description, class: 'textarea is-medium', placeholder: 'Ocorrência', required: true %>
+        </p>
+      </div>
+    </div>
+
+    <% if can? :sanction, Incident %>
+      <div class="field is-horizontal">
+        <div class="field-body">
+          <div class="field">
+            <%= f.label :sanction, 'Sanção aplicada', class: 'label' %>
+            <p class="control">
+              <span class="select">
+                <%= f.select :sanction, human_enum_name('incident.sanction', Incident.sanctions.keys), { prompt: "Sanção aplicada" }, { :class => "select2 select is-medium" } %>
+              </span>
+            </p>
+          </div>
+          <% if can? :sanction, Incident %>
+          <div class="field">
+            <%= f.label :is_resolved, 'Ocorrências resolvida?', class: 'label' %>
+            <p class="control">
+              <span class="select">
+                <%= f.select :is_resolved, human_enum_name('incident.is_resolved', Incident.is_resolveds.keys), {}, { :class => "is-medium" } %>
+              </span>
+            </p>
+          </div>
+          <% end %>      
+        </div>
+      </div>
+
+      <div class="field">
+        <div class="field">
+          <label class="label">
+            Segundo o Capítulo III, Art 4º que trata sobre os direitos e deveres do estudante
+            (<a href="http://www.ifms.edu.br/centrais-de-conteudo/documentos-institucionais/regulamentos/regulamento-disciplinar-do-estudante.pdf" target="_blank">
+              Acesse aqui o Regulamento Disciplinar Discente
+            </a>)
+          </label>
+          <div class="lista-sancoes">
+            <%= f.collection_check_boxes :student_duty_ids, Incident::StudentDuty.where(status: true), :id, :item, checked: @incident.student_duties.where(status: true).map(&:id) do |b| %>
+              <p class="control">
+                <label class="checkbox">
+                  <%= b.check_box %>
+                  <%= b.label %>
+                </label>
+              </p>
+            <% end %>
+          </div>
+        </div>
+      </div>
+
+      <div class="field">
+        <div class="field">
+          <label class="label">
+            Segundo o Capítulo IV que trata sobre as proibições e responsabilidades
+            (<a href="http://www.ifms.edu.br/centrais-de-conteudo/documentos-institucionais/regulamentos/regulamento-disciplinar-do-estudante.pdf" target="_blank">
+              Acesse aqui o Regulamento Disciplinar Discente
+            </a>)
+          </label>
+          <div class="lista-sancoes">
+            <%= f.collection_check_boxes :prohibition_and_responsibility_ids, Incident::ProhibitionAndResponsibility.where(status: true), :id, :item, checked: @incident.prohibition_and_responsibilities.where(status: true).map(&:id) do |b| %>
+              <p class="control">
+                <label class="checkbox">
+                  <%= b.check_box %>
+                  <%= b.label %>
+                </label>
+              </p>
+            <% end %>
+          </div>
+        </div>
+      </div>
+
+      <div class="field">
+        <div class="field">
+          <p class="control">
+            <%= f.label :soluction, 'Descrição da solução', class: 'label' %>
+            <%= f.text_area :soluction, class: 'textarea is-medium', placeholder: 'Solução' %>
+          </p>
+        </div>
+      </div>
+    <% end %>
+  </fieldset>
+
+  <div class="margin-top-20px">
+    <p class="control">
+      <%= f.submit "Salvar", class: "button is-success is-medium in-mobile-expand"%>
+    </p>
+  </div>
+<% end %>

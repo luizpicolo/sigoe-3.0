@@ -1,0 +1,26 @@
+/*
+//  *= require_self
+ *= require select2/dist/css/select2
+ *= require jquery-ui
+ *= require alert_message
+*/
+
+// IFMS Colors
+$green: hsl(130, 54%, 40%) !default;
+$red: hsl(358, 78%, 45%) !default;
+
+// All Imports
+@import "font-awesome";
+@import "modification";
+@import "icons";
+@import "bulma/bulma";
+@import "fancybox/dist/css/jquery.fancybox";
+@import "body";
+@import "breadcrumb";
+@import "devise/devise";
+@import "header";
+@import "main";
+@import "menu";
+@import "pagination";
+@import "select2";
+@import "table";

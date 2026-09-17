@@ -1,0 +1,49 @@
+.main {
+  //max-width: 920px;
+
+  @media(max-width: 767px) {
+    padding: 0 10px;
+  }
+
+  section {
+    border: 1px solid $grey-lighter;
+    border-radius: 5px;
+    text-align: center;
+
+    h1 {
+      font-size: 1.4em;
+    }
+
+    i {
+      font-size: 7em;
+    }
+  }
+}
+
+.shortcuts {
+  a {
+    color: $green !important;
+  }
+}
+
+.main-data {
+  margin-top: 20px;
+}
+
+.media.profile {
+  .media-content {
+    overflow: hidden;
+  }
+}
+
+.lista-sancoes {
+  overflow-y: scroll;
+  height: 200px;
+  border: 1px solid $green;
+  border-radius: 5px;
+  padding: 10px;
+
+  .checkbox label{
+    cursor: pointer;
+  }
+}

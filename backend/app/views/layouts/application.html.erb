@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html class="no-js" lang="pt-br">
+    <head>
+    <%= favicon_link_tag 'favicon.ico' %>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+
+    <title>SIGOE - Sistema para o controle de ocorrências escolares</title>    
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,300,600,700,800' rel='stylesheet' type='text/css'>
+    
+    <%= stylesheet_link_tag 'application', media: 'all', 'data-turbolinks-track': 'reload' %>
+    <%= stylesheet_link_tag 'print', media: 'print', 'data-turbolinks-track' => true %>
+    <%= javascript_include_tag 'application', 'data-turbolinks-track' => true %>
+    <%= javascript_include_tag "//code.highcharts.com/highcharts.js" %>
+    <%= javascript_packs_with_chunks_tag 'application', 'data-turbolinks-track' => true %>
+    <%= javascript_include_tag :modernizr %>
+  </head>
+
+  <body>
+    <%= render 'layouts/alerts' %>
+  <header class="header no-print">
+    <div class="container">
+      <div class="columns">
+        <div class="column">
+          <a href="/">
+            <h1>Institulo Federal de Mato Grosso do Sul - Campus Nova Andradina</h1>
+          </a>
+          <div class="menu-mobile">
+            <div></div>
+            <div></div>
+            <div></div>
+          </div>
+        </div>
+        <div class="column">
+          <p>
+            SIGOE - Controle de ocorrências escolares - <%= link_to('Sair', destroy_user_session_path, :method => :delete) %>
+          </p>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="main">
+    <div class="container">
+      <div class="no-print breadcrumb_nav"><%= render_breadcrumbs %></div>
+      <div class="columns">
+        <div class="column is-one-quarter no-print menu-aside">
+            <%= render 'layouts/image' %>
+            <%= render 'layouts/nav' %>
+        </div>
+        <div class="column main-data"><%= yield %></div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="has-text-centered">
+  </footer>
+  </body>
+</html>

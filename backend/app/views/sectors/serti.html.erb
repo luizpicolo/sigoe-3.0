@@ -1,0 +1,15 @@
+<div class="columns shortcuts">
+  <% if can? :read, User %>
+  <div class="column">
+    <%= link_to users_path do %>
+      <section>
+        <i class="fas fa-user-friends"></i>
+        <h1>Usuários</h1>
+      </section>
+    <% end %>
+  </div>
+  <% end %>
+  
+  <div class="column">
+  </div>
+</div>

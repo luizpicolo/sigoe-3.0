@@ -1,0 +1,55 @@
+<div class="columns">
+  <div class="column">
+    <% if can? :create, Incident %>
+      <%= link_to new_incident_path, class: "button is-success in-mobile-expand" do %>
+        <span class="icon">
+          <i class="fas fa-plus"></i>
+        </span>
+        <span>Nova ocorrência</span>
+      <% end %>
+    <% end %>
+  </div>
+  <div class="column">
+    <% show_search_error_message(@incidents, params) %>
+    <%= render 'layouts/search', path: incidents_path, v: attr_order(@incidents) %>
+  </div>
+</div>
+
+<table class="table is-striped is-fullwidth">
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Data</th>
+      <th>Estudante</th>
+      <th>Curso</th>
+      <% if current_user.super_admin? %>
+        <th>Campus</th>  
+      <% end %>      
+      <th>Assinado?</th>
+      <th>Visibilidade</th>
+      <th>Verificado?</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @incidents.each do |_incident| %>
+      <% if _incident.visibility == 'private' && !current_user.super_admin? %>
+        <% if _incident.user == current_user %>
+          <%= render partial: 'incident_partial', locals: { incident: _incident } %>
+        <% end %>
+      <% else %>
+        <%= render partial: 'incident_partial', locals: { incident: _incident } %>
+      <% end %>
+    <% end %>
+  </tbody>
+</table>
+
+<div class="modal">
+  <div class="modal-background"></div>
+  <div class="modal-content">
+    <!-- Any other Bulma elements you want -->
+  </div>
+  <button class="modal-close is-large"></button>
+</div>
+
+<%= paginate @incidents %>

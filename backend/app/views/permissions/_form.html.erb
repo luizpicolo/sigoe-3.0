@@ -1,0 +1,79 @@
+<%= form_for [:user, permission] do |f| %>
+  <fieldset>
+    <legend>Permissões</legend>
+    <div class="field is-horizontal">
+      <div class="field-body">
+        <div class="field">
+          <p class="control">
+            <%= f.label :entity, "Entidade", class: 'label' %>
+            <span class="select is-normal">
+                <%= f.select :entity, models.map { |model| [I18n.t("activerecord.models.#{model.downcase}", default: model.humanize), model] }, { prompt: "Entidade" }, { class: "", id: "entity-select"  } %>
+            </span>
+          </p>
+        </div>
+        <div class="field margin-top-40px">
+          <div class="control">
+            <label class="checkbox label">
+              <%= f.check_box :can_extras, class: 'checkbox' %>
+              Opções extras
+            </label>
+          </div>
+        </div>
+        <div class="field margin-top-40px">
+          <div class="control">
+            <label class="checkbox label">
+              <%= f.check_box :can_create, class: 'checkbox' %>
+              Criar
+            </label>
+          </div>
+        </div>
+        <div class="field margin-top-40px">
+          <div class="control">
+            <label class="checkbox label">
+              <%= f.check_box :can_read, class: 'checkbox' %>
+              Ler
+            </label>
+          </div>
+        </div>
+        <div class="field margin-top-40px">
+          <div class="control">
+            <label class="checkbox label">
+              <%= f.check_box :can_read_restricted, class: 'checkbox' %>
+              Ler restrita
+            </label>
+          </div>
+        </div>
+        <div class="field margin-top-40px">
+          <div class="control">
+            <label class="checkbox label">
+              <%= f.check_box :can_export_to_academic_system, class: 'checkbox' %>
+              Exportar
+            </label>
+          </div>
+        </div>
+        <div class="field margin-top-40px">
+          <div class="control">
+            <label class="checkbox label">
+              <%= f.check_box :can_update, class: 'checkbox' %>
+              Atualizar
+            </label>
+          </div>
+        </div>
+        <div class="field margin-top-40px">
+          <div class="control">
+            <label class="checkbox label">
+              <%= f.check_box :can_destroy, class: 'checkbox' %>
+              Deletar
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+  </fieldset>
+
+  <div class="margin-top-20px">
+    <p class="control">
+      <%= f.submit "Salvar", class: "button is-success is-medium in-mobile-expand"%>
+    </p>
+  </div>
+<% end %>
