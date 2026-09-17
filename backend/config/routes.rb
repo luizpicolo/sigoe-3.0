@@ -22,7 +22,11 @@ Rails.application.routes.draw do
         get :validation
       end
     end
-    resources :students, only: [:index, :show, :update]
+    resources :students, only: [:index, :show, :create, :update] do
+      collection do
+        get :options
+      end
+    end
   end
 
   # Devise Routes

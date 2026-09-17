@@ -9,6 +9,7 @@ import UserNew from "@/views/users/new.vue"
 import UserPermissions from "@/views/users/permissions.vue"
 import StudentList from "@/views/students/list.vue"
 import StudentView from "@/views/students/show.vue"
+import StudentNew from "@/views/students/new.vue"
 import StudentEdit from "@/views/students/edit.vue"
 import CourseList from "@/views/courses/list.vue"
 import SchoolGroupsList from "@/views/school_groups/list.vue"
@@ -32,6 +33,7 @@ const routes = [
 
   // Estudantes
   { path: "/administrador/estudantes/listar", component: StudentList, meta: { auth: true } },
+  { path: "/administrador/estudantes/novo", component: StudentNew, meta: { auth: true } },
   { path: "/administrador/estudantes/visualizar/:id", component: StudentView, meta: { auth: true } },
   { path: "/administrador/estudantes/editar/:id", component: StudentEdit, meta: { auth: true } },
 
