@@ -17,21 +17,32 @@ class Api::UsersController < ApplicationController
 
   def validation
     user = get_user_from_token
-    render json: {
+
+    if user
+      render json: {
         message: "If you see this, you're in!",
         user: user
-    }
+      }, status: :ok
+    else
+      render json: { error: 'Token inválido ou ausente' }, status: :unauthorized
+    end
   end
 
   private
 
   def get_user_from_token
     token = request.headers['Authorization']&.split(' ')&.last
-    return nil unless token
+    return nil if token.blank?
 
-    jwt_payload, = JWT.decode(token, Rails.application.credentials.jwt_secret_key, true,
-                              { algorithm: 'HS256' })
-    user_id = jwt_payload['sub']
-    User.find(user_id.to_s)
+    jwt_payload, = JWT.decode(
+      token,
+      Rails.application.credentials.jwt_secret_key,
+      true,
+      { algorithm: 'HS256' }
+    )
+
+    User.find_by(id: jwt_payload['sub'])
+  rescue JWT::DecodeError, ActiveRecord::RecordNotFound
+    nil
   end
 end
