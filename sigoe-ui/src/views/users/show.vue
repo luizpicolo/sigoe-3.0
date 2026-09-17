@@ -84,7 +84,7 @@ const fetchUser = async (id) => {
             </dl>
           </Card>
           <Card customClass="col-span-1" title="Ações">
-            <Button v-if="can('users', 'update')" variant="info" :to="`/administrador/usuarios/permissoes/${userId}`" customClass="w-full">
+            <Button v-if="can('users', 'update')" variant="info" :to="`/administrador/usuarios/visualizar/${userId}/permissoes`" customClass="w-full">
               <i class="fa-solid fa-shield-halved"></i>
               Gerenciar Permissões
             </Button>

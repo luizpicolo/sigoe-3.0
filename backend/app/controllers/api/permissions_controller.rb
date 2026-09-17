@@ -18,13 +18,14 @@ class Api::PermissionsController < ApplicationController
   end
 
   def show
+    p params[:id]
     authorize_permission_management!
-    render json: permission_payload(User.find(params[:user_id]))
+    render json: permission_payload(User.find(params[:id]))
   end
 
   def update
     authorize_permission_management!
-    user = User.find(params[:user_id])
+    user = User.find(params[:id])
     requested_permissions = params.require(:permissions)
 
     unless requested_permissions.is_a?(Array)

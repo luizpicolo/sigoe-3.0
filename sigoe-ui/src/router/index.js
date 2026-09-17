@@ -29,7 +29,7 @@ const routes = [
   { path: "/administrador/usuarios/listar", component: UserList, meta: { auth: true, permission: { entity: "users", action: "read" } } },
   { path: "/administrador/usuarios/visualizar/:id", component: UserView, meta: { auth: true, permission: { entity: "users", action: "read" } } },
   { path: "/administrador/usuarios/novo", component: UserNew, meta: { auth: true, permission: { entity: "users", action: "create" } } },
-  { path: "/administrador/usuarios/permissoes/:id/", component: UserPermissions, meta: { auth: true, permission: { entity: "users", action: "update", adminOnly: true } } },
+  { path: "/administrador/usuarios/visualizar/:id/permissoes", component: UserPermissions, meta: { auth: true, permission: { entity: "users", action: "update", adminOnly: true } } },
   { path: "/administrador/usuarios/trocar-senha", component: ChangePassword, meta: { auth: true } },
   { path: "/administrador/estudantes/listar", component: StudentList, meta: { auth: true, permission: { entity: "students", action: "read" } } },
   { path: "/administrador/estudantes/novo", component: StudentNew, meta: { auth: true, permission: { entity: "students", action: "create" } } },
