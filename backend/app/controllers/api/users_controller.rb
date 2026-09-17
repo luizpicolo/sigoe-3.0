@@ -2,39 +2,42 @@ class Api::UsersController < ApplicationController
   include ParamsSearch
   before_action :authenticate_user!
 
-  # GET /api/users
   def index
     authorize! :read, User
-
-    users = User.where(set_polo)
-                .order("#{set_order}": :asc)
-                .search(params[:search])
-                .page(params[:page])
-
-    render json: {
-      users: users.as_json(include: User.reflect_on_all_associations.map(&:name), except: [:password, :created_at]),
-      total: users.total_count
-    }
+    users = User.where(set_polo).order("#{set_order}": :asc).search(params[:search]).page(params[:page])
+    render json: { users: users.as_json(include: User.reflect_on_all_associations.map(&:name), except: [:password, :created_at]), total: users.total_count }
   end
 
-  # GET /api/users/:id
   def show
     authorize! :read, User
     user = User.find(params[:id])
+    render json: { user: user.as_json(include: User.reflect_on_all_associations.map(&:name), except: [:password, :created_at]) }
+  end
 
-    render json: {
-      user: user.as_json(include: User.reflect_on_all_associations.map(&:name), except: [:password, :created_at])
-    }
+  def update
+    authorize! :update, User
+    user = User.find(params[:id])
+    attributes = params.require(:user).permit(:name, :email, :username, :siape, :polo_id, :admin, :status, :password, :password_confirmation)
+    attributes.delete(:password) if attributes[:password].blank?
+    attributes.delete(:password_confirmation) if attributes[:password_confirmation].blank?
+    user.update!(attributes)
+    render json: { user: user }, status: :ok
+  rescue ActiveRecord::RecordInvalid => e
+    render json: { errors: e.record.errors.full_messages }, status: :unprocessable_entity
+  end
+
+  def destroy
+    authorize! :destroy, User
+    user = User.find(params[:id])
+    return render json: { error: 'Não é possível excluir o próprio usuário' }, status: :unprocessable_entity if user.id == current_user.id
+    user.destroy!
+    head :no_content
   end
 
   def validation
     user = get_user_from_token
-
     if user
-      render json: {
-        message: "If you see this, you're in!",
-        user: user
-      }, status: :ok
+      render json: { message: "If you see this, you're in!", user: user }, status: :ok
     else
       render json: { error: 'Token inválido ou ausente' }, status: :unauthorized
     end
@@ -45,14 +48,7 @@ class Api::UsersController < ApplicationController
   def get_user_from_token
     token = request.headers['Authorization']&.split(' ')&.last
     return nil if token.blank?
-
-    jwt_payload, = JWT.decode(
-      token,
-      Rails.application.credentials.jwt_secret_key,
-      true,
-      { algorithm: 'HS256' }
-    )
-
+    jwt_payload, = JWT.decode(token, Rails.application.credentials.jwt_secret_key, true, { algorithm: 'HS256' })
     User.find_by(id: jwt_payload['sub'])
   rescue JWT::DecodeError, ActiveRecord::RecordNotFound
     nil
