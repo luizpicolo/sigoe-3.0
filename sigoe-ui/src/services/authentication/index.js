@@ -1,6 +1,7 @@
-import axios from 'axios';
+import axios from 'axios'
+import { loadCurrentPermissions, clearPermissions } from '@/services/permissions'
 
-const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
+const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3000"
 
 const authorizationHeaders = () => {
   const token = localStorage.getItem('jwt')
@@ -15,9 +16,11 @@ export const isTokenValid = async () => {
     await axios.get(`${BASE_URL}/api/users/validation`, {
       headers: authorizationHeaders()
     })
+    await loadCurrentPermissions()
     return true
   } catch {
     localStorage.removeItem('jwt')
+    clearPermissions()
     return false
   }
 }
@@ -28,6 +31,7 @@ export const logout = async () => {
       headers: authorizationHeaders()
     })
     localStorage.removeItem('jwt')
+    clearPermissions()
     return true
   } catch {
     return false
