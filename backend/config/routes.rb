@@ -3,46 +3,26 @@
 Rails.application.routes.draw do
   devise_for :admin_users, ActiveAdmin::Devise.config
   ActiveAdmin.routes(self)
-  # mount RailsAdmin::Engine => '/admin', as: 'rails_admin'
   root 'home#index'
 
-  # Rotas para API
   namespace :api, defaults: { format: :json } do
-    devise_for :user, path: 'auth', path_names: {
-        sign_in: 'login',
-        sign_out: 'logout',
-        registration: 'register',
-        sign_up: 'signup'
-    }, controllers: {
-        sessions: 'api/sessions',
-        registrations: 'api/registrations'
-    }
-    resources :users, only: [:index, :show] do
-      collection do
-        get :validation
-      end
+    devise_for :user, path: 'auth', path_names: { sign_in: 'login', sign_out: 'logout', registration: 'register', sign_up: 'signup' }, controllers: { sessions: 'api/sessions', registrations: 'api/registrations' }
+    resources :users, only: [:index, :show, :update, :destroy] do
+      collection { get :validation }
       member do
         get :permissions, to: 'permissions#show'
         put :permissions, to: 'permissions#update'
       end
     end
     resources :permissions, only: [] do
-      collection do
-        get :current
-      end
+      collection { get :current }
     end
     resources :students, only: [:index, :show, :create, :update] do
-      collection do
-        get :options
-      end
+      collection { get :options }
     end
   end
 
-  # Devise Routes
-  devise_for :user, path: 'auth', path_names: {
-    sign_in: 'login', sign_out: 'logout', registration: 'register', sign_up: 'signup'
-  }, controllers: { sessions: 'sessions' }
-
+  devise_for :user, path: 'auth', path_names: { sign_in: 'login', sign_out: 'logout', registration: 'register', sign_up: 'signup' }, controllers: { sessions: 'sessions' }
   resources :users, except: [:show] do
     get :change_password
     resources :permissions, except: [:show]
