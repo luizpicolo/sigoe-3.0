@@ -20,6 +20,8 @@ Rails.application.routes.draw do
     resources :students, only: [:index, :show, :create, :update] do
       collection { get :options }
     end
+    resources :courses, only: [:index, :show, :create, :update, :destroy]
+    resources :school_groups, only: [:index, :show, :create, :update, :destroy]
   end
 
   devise_for :user, path: 'auth', path_names: { sign_in: 'login', sign_out: 'logout', registration: 'register', sign_up: 'signup' }, controllers: { sessions: 'sessions' }
