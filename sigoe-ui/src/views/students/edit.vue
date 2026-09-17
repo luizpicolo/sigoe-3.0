@@ -8,6 +8,7 @@ import Card from '@/components/ui/card.vue'
 import Input from '@/components/ui/input.vue'
 import Alert from '@/components/ui/alert.vue'
 import Header from '@/components/header.vue'
+import { find as findStudent, update as updateStudent } from '@/services/students'
 
 const route = useRoute()
 const router = useRouter()
@@ -22,44 +23,83 @@ const breadcrumbItems = [
 
 const student = ref({
   id: studentId.value,
-  name: "NAIANY GOMES DA SILVA",
-  cpf: "080.184.921-74",
-  birthdate: "2011-01-17",
+  name: "",
+  cpf: "",
+  birthdate: "",
   password: "",
   confirmPassword: "",
   responsible: "",
   contact: ""
 })
 
+const isLoading = ref(false)
 const isSubmitting = ref(false)
 const successMessage = ref('')
 const errorMessage = ref('')
 
+const loadStudent = async () => {
+  isLoading.value = true
+  errorMessage.value = ''
+
+  try {
+    const response = await findStudent(studentId.value)
+    const data = response?.student
+
+    if (!data) {
+      errorMessage.value = 'Não foi possível carregar os dados do estudante.'
+      return
+    }
+
+    student.value = {
+      id: data.id,
+      name: data.name || '',
+      cpf: data.cpf || '',
+      birthdate: data.birth_date || '',
+      password: '',
+      confirmPassword: '',
+      responsible: data.responsible || data.responsible_contact || '',
+      contact: data.contact || ''
+    }
+  } catch (error) {
+    errorMessage.value = 'Não foi possível carregar os dados do estudante.'
+  } finally {
+    isLoading.value = false
+  }
+}
+
 const handleSubmit = async (event) => {
   event.preventDefault()
-  
+
   errorMessage.value = ''
   successMessage.value = ''
-  
-  // Validações
+
   if (student.value.password && student.value.password !== student.value.confirmPassword) {
     errorMessage.value = 'As senhas não coincidem.'
     return
   }
-  
+
   isSubmitting.value = true
-  
-  try {
-    // Simulação de chamada de API
-    await new Promise(resolve => setTimeout(resolve, 1000))
-    
+
+  const response = await updateStudent(student.value.id, {
+    name: student.value.name,
+    cpf: student.value.cpf,
+    birth_date: student.value.birthdate,
+    responsible: student.value.responsible,
+    contact: student.value.contact,
+    password: student.value.password,
+    password_confirmation: student.value.confirmPassword
+  })
+
+  if (response?.student) {
     successMessage.value = 'Dados do estudante atualizados com sucesso!'
-    
-  } catch (error) {
-    errorMessage.value = 'Erro ao atualizar dados do estudante. Tente novamente.'
-  } finally {
-    isSubmitting.value = false
+    await router.push(`/administrador/estudantes/visualizar/${student.value.id}`)
+  } else {
+    errorMessage.value = Array.isArray(response?.error)
+      ? response.error.join(', ')
+      : 'Erro ao atualizar dados do estudante. Tente novamente.'
   }
+
+  isSubmitting.value = false
 }
 
 const dismissError = () => {
@@ -70,9 +110,7 @@ const dismissSuccess = () => {
   successMessage.value = ''
 }
 
-onMounted(() => {
-  // fetchStudent(studentId.value)
-})
+onMounted(loadStudent)
 </script>
 
 <template>
@@ -80,16 +118,14 @@ onMounted(() => {
     <Header />
 
     <div class="flex flex-col md:flex-row flex-1">
-      <!-- Sidebar -->
       <Sidebar :activePage="'estudantes'" />
 
-      <!-- Main Content -->
       <main class="flex-1 p-6">
         <Breadcrumb :items="breadcrumbItems" />
 
         <h1 class="text-2xl font-bold mb-6">Editar estudante</h1>
 
-        <Alert 
+        <Alert
           v-if="errorMessage"
           type="error"
           :message="errorMessage"
@@ -98,7 +134,7 @@ onMounted(() => {
           class="mb-4"
         />
 
-        <Alert 
+        <Alert
           v-if="successMessage"
           type="success"
           :message="successMessage"
@@ -107,17 +143,20 @@ onMounted(() => {
           class="mb-4"
         />
 
-        <form @submit="handleSubmit" class="space-y-6">
-          <!-- Dados Pessoais -->
+        <div v-if="isLoading" class="bg-white rounded-lg shadow-sm p-6 text-center">
+          Carregando estudante...
+        </div>
+
+        <form v-else @submit="handleSubmit" class="space-y-6">
           <Card customClass="mb-4">
             <div class="border-b border-gray-200 pb-2 mb-4">
               <h2 class="text-sm font-medium text-gray-500">Dados pessoais</h2>
             </div>
-            
+
             <div class="grid grid-cols-1 gap-6 mb-6">
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Nome</label>
-                <Input 
+                <Input
                   v-model="student.name"
                   type="text"
                   placeholder="Nome completo do estudante"
@@ -129,7 +168,7 @@ onMounted(() => {
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">CPF</label>
-                <Input 
+                <Input
                   v-model="student.cpf"
                   type="text"
                   placeholder="000.000.000-00"
@@ -138,7 +177,7 @@ onMounted(() => {
               </div>
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Data de Nascimento</label>
-                <Input 
+                <Input
                   v-model="student.birthdate"
                   type="date"
                   required
@@ -149,7 +188,7 @@ onMounted(() => {
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Senha para assinatura digital</label>
-                <Input 
+                <Input
                   v-model="student.password"
                   type="password"
                   placeholder="••••••••"
@@ -157,7 +196,7 @@ onMounted(() => {
               </div>
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Confirmar senha</label>
-                <Input 
+                <Input
                   v-model="student.confirmPassword"
                   type="password"
                   placeholder="••••••••"
@@ -166,16 +205,15 @@ onMounted(() => {
             </div>
           </Card>
 
-          <!-- Dados do Responsável -->
           <Card customClass="mb-4">
             <div class="border-b border-gray-200 pb-2 mb-4">
               <h2 class="text-sm font-medium text-gray-500">Dados responsável</h2>
             </div>
-            
+
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Responsável</label>
-                <Input 
+                <Input
                   v-model="student.responsible"
                   type="text"
                   placeholder="Responsável"
@@ -183,7 +221,7 @@ onMounted(() => {
               </div>
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Contato</label>
-                <Input 
+                <Input
                   v-model="student.contact"
                   type="text"
                   placeholder="Email / Telefone"
@@ -193,14 +231,14 @@ onMounted(() => {
           </Card>
 
           <div class="flex justify-start space-x-3">
-            <Button 
+            <Button
               variant="secondary"
               :to="`/administrador/estudantes/visualizar/${student.id}`"
             >
               <i class="fa-solid fa-times mr-2"></i>
               Cancelar
             </Button>
-            <Button 
+            <Button
               type="submit"
               variant="success"
               :loading="isSubmitting"
