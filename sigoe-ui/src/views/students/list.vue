@@ -69,7 +69,7 @@ onMounted(loadStudents);
 
         <div class="bg-white rounded-md shadow p-4 mb-6">
           <div class="flex flex-wrap gap-2">
-            <Button customClass="bg-green-600 hover:bg-green-700 focus:ring-green-500" to="/administrador/usuarios/novo">
+            <Button customClass="bg-green-600 hover:bg-green-700 focus:ring-green-500" to="/administrador/estudantes/novo">
               <i class="fa-solid fa-user"></i>
               Novo Estudante
             </Button>
