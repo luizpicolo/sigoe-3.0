@@ -3,29 +3,54 @@ import Sidebar from '@/components/sidebar.vue'
 import Button from '@/components/ui/button.vue'
 import Breadcrumb from '@/components/breadcrumb.vue'
 import Input from '@/components/ui/input.vue'
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
+import { list } from '@/services/students'
 
-// https://github.com/HENNGE/vue3-pagination
 import VPagination from "@hennge/vue3-pagination";
 import "@hennge/vue3-pagination/dist/vue3-pagination.css";
-
 
 const breadcrumbItems = [
   { label: "Home", href: "/" },
   { label: "Administrador", href: "/" },
-  { label: "Estudantes", href: "/administrador/usuarios/listar" },
+  { label: "Estudantes", href: "/administrador/estudantes/listar" },
 ];
 
 const page = ref(1);
+const amount = ref(10);
+const order = ref('id');
+const search = ref('');
+const students = ref([]);
+const total = ref(0);
+const loading = ref(false);
+
+const loadStudents = async () => {
+  loading.value = true;
+  const response = await list(page.value, order.value, search.value, amount.value);
+  students.value = response?.students || [];
+  total.value = response?.total || 0;
+  loading.value = false;
+};
+
 const updateHandler = (newPage) => {
   page.value = newPage;
-  console.log(`Page updated to: ${newPage}`);
+  loadStudents();
 };
+
+const searchStudents = () => {
+  page.value = 1;
+  loadStudents();
+};
+
+const changeFilters = () => {
+  page.value = 1;
+  loadStudents();
+};
+
+onMounted(loadStudents);
 </script>
 
 <template>
   <div class="min-h-screen flex flex-col">
-    <!-- Header -->
     <header class="bg-white border-b border-gray-200 py-2 px-4 flex justify-between items-center">
       <div class="flex items-center">
         <img src="/logo_ifms.png" width="160">
@@ -36,53 +61,40 @@ const updateHandler = (newPage) => {
     </header>
 
     <div class="flex flex-col md:flex-row flex-1">
-      <!-- Sidebar -->
       <Sidebar :activePage="'estudantes'" />
 
-      <!-- Main Content -->
       <main class="flex-1 p-6">
         <Breadcrumb :items="breadcrumbItems" />
-
         <h1 class="text-2xl font-bold mb-6">Estudantes</h1>
 
         <div class="bg-white rounded-md shadow p-4 mb-6">
           <div class="flex flex-wrap gap-2">
-          <Button 
-            customClass="bg-green-600 hover:bg-green-700 focus:ring-green-500"
-            to="/administrador/usuarios/novo"
-          >
-            <i class="fa-solid fa-user"></i>
-            Novo Estudante
-          </Button>
+            <Button customClass="bg-green-600 hover:bg-green-700 focus:ring-green-500" to="/administrador/usuarios/novo">
+              <i class="fa-solid fa-user"></i>
+              Novo Estudante
+            </Button>
 
             <div class="flex items-center gap-2 ml-auto">
               <span class="text-sm">Ordenar por</span>
-              <div class="relative w-[180px]">
-                <select
-                  class="block w-full px-3 py-2 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm">
-                  <option value="name">Nome</option>
-                  <option value="course">Curso</option>
-                  <option value="class">Turma</option>
-                </select>
-              </div>
+              <select v-model="order" @change="changeFilters" class="block w-[180px] px-3 py-2 border border-gray-300 bg-white rounded-md shadow-sm sm:text-sm">
+                <option value="id">ID</option>
+                <option value="name">Nome</option>
+              </select>
             </div>
 
             <div class="flex items-center gap-2">
               <span class="text-sm">Total</span>
-              <div class="relative w-[80px]">
-                <select
-                  class="block w-full px-3 py-2 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm">
-                  <option value="10">10</option>
-                  <option value="25">25</option>
-                  <option value="50">50</option>
-                  <option value="100">100</option>
-                </select>
-              </div>
+              <select v-model="amount" @change="changeFilters" class="block w-[80px] px-3 py-2 border border-gray-300 bg-white rounded-md shadow-sm sm:text-sm">
+                <option :value="10">10</option>
+                <option :value="25">25</option>
+                <option :value="50">50</option>
+                <option :value="100">100</option>
+              </select>
             </div>
 
             <div class="flex items-center gap-2">
-              <Input type="text" placeholder="Buscar..." class="w-[200px]" />
-              <Button customClass="bg-green-600 hover:bg-green-700 focus:ring-green-500">
+              <Input v-model="search" type="text" placeholder="Buscar..." class="w-[200px]" />
+              <Button @click="searchStudents" customClass="bg-green-600 hover:bg-green-700 focus:ring-green-500">
                 <i class="fa-solid fa-magnifying-glass"></i>
                 Busca
               </Button>
@@ -91,61 +103,41 @@ const updateHandler = (newPage) => {
         </div>
 
         <div class="bg-white rounded-md shadow overflow-hidden">
-          <table class="min-w-full divide-y divide-gray-200">
+          <div v-if="loading" class="p-6 text-center">Carregando estudantes...</div>
+          <table v-else class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gray-100">
               <tr>
-                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  ID
-                </th>
-                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Foto
-                </th>
-                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Nome
-                </th>
-                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Campus
-                </th>
-                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Turma
-                </th>
-                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Polo
-                </th>
-                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Ações
+                <th v-for="heading in ['ID', 'Foto', 'Nome', 'Campus', 'Turma', 'Polo', 'Ações']" :key="heading" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  {{ heading }}
                 </th>
               </tr>
             </thead>
-            <tbody v-for="(value, i) in 5" class="bg-white divide-y divide-gray-200">
-              <tr>
-                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ i }}</td>
+            <tbody class="bg-white divide-y divide-gray-200">
+              <tr v-for="student in students" :key="student.id">
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ student.id }}</td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  <img src="/placeholder.svg" width="100" alt="" srcset="">
+                  <img :src="student.photo || '/placeholder.svg'" width="100" alt="Foto do estudante">
                 </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Luiz Fernando Picolo</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Nova Andradina</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">123443</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">IFMS</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ student.name }}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ student.course?.name || '-' }}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ student.enrollment || '-' }}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ student.school_group?.name || '-' }}</td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  <Button customClass="w-full bg-green-600 hover:bg-green-700 focus:ring-green-500" to="/administrador/estudantes/visualizar/9">
+                  <Button customClass="w-full bg-green-600 hover:bg-green-700 focus:ring-green-500" :to="`/administrador/estudantes/visualizar/${student.id}`">
                     <i class="fa-solid fa-eye"></i>
                     Visualizar
                   </Button>
                 </td>
               </tr>
+              <tr v-if="!students.length">
+                <td colspan="7" class="px-6 py-4 text-center text-sm text-gray-500">Nenhum estudante encontrado.</td>
+              </tr>
             </tbody>
           </table>
 
-            <div class="flex justify-end items-end p-4">
-              <VPagination
-                v-model="page"
-                :pages="100"
-                :range-size="2"
-                active-color="#00a63e"
-                @update:modelValue="updateHandler"
-              />
-            </div>
+          <div class="flex justify-end items-end p-4">
+            <VPagination v-model="page" :pages="Math.max(1, Math.ceil(total / amount))" :range-size="2" active-color="#00a63e" @update:modelValue="updateHandler" />
+          </div>
         </div>
       </main>
     </div>
