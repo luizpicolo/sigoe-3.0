@@ -155,7 +155,7 @@ const dismissError = () => {
               <h2 class="text-sm font-medium text-gray-500">Dados responsável</h2>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Responsável</label>
                 <Input
