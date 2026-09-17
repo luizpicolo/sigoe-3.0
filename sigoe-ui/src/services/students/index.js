@@ -2,6 +2,10 @@ import axios from 'axios';
 
 const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
+const authConfig = () => ({
+  headers: { Authorization: localStorage.getItem('jwt') }
+});
+
 export const list = async (page = 1, order = 'id', search = null, amount = 10) => {
   const token = localStorage.getItem('jwt')
   if (!token) return false
@@ -30,9 +34,7 @@ export const find = async (id) => {
   if (!token) return false
 
   try {
-    const response = await axios.get(`${BASE_URL}/api/students/${id}`, {
-      headers: { Authorization: token },
-    });
+    const response = await axios.get(`${BASE_URL}/api/students/${id}`, authConfig());
 
     return {
       student: response.data.student,
@@ -40,5 +42,29 @@ export const find = async (id) => {
   } catch (error) {
     console.error('Erro ao buscar estudante:', error);
     return { student: null };
+  }
+}
+
+export const update = async (id, student) => {
+  const token = localStorage.getItem('jwt')
+  if (!token) return false
+
+  try {
+    const response = await axios.patch(
+      `${BASE_URL}/api/students/${id}`,
+      { student },
+      authConfig()
+    );
+
+    return {
+      student: response.data.student,
+      error: null
+    };
+  } catch (error) {
+    console.error('Erro ao atualizar estudante:', error);
+    return {
+      student: null,
+      error: error.response?.data?.errors || ['Erro ao atualizar estudante.']
+    };
   }
 }
