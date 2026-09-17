@@ -5,7 +5,6 @@ import Sidebar from '@/components/sidebar.vue'
 import Button from '@/components/ui/button.vue'
 import Breadcrumb from '@/components/breadcrumb.vue'
 import Card from '@/components/ui/card.vue'
-import { find as findUser } from '@/services/users'
 import { getUserPermissions, saveUserPermissions } from '@/services/permissions'
 
 const route = useRoute()
@@ -57,12 +56,9 @@ const load = async () => {
   success.value = ''
 
   try {
-    const [userResponse, permissionResponse] = await Promise.all([
-      findUser(userId),
-      getUserPermissions(userId)
-    ])
+    const permissionResponse = await getUserPermissions(userId)
 
-    user.value = userResponse?.user || permissionResponse?.user || null
+    user.value = permissionResponse?.user || null
     entities.value = permissionResponse?.entities || []
     permissions.value = normalizePermissions(permissionResponse?.permissions)
   } catch (requestError) {
