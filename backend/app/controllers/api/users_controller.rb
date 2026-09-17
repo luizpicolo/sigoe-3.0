@@ -17,6 +17,16 @@ class Api::UsersController < ApplicationController
     }
   end
 
+  # GET /api/users/:id
+  def show
+    authorize! :read, User
+    user = User.find(params[:id])
+
+    render json: {
+      user: user.as_json(include: User.reflect_on_all_associations.map(&:name), except: [:password, :created_at])
+    }
+  end
+
   def validation
     user = get_user_from_token
 
