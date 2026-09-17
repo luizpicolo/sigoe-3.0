@@ -52,7 +52,11 @@ export const loadCurrentPermissions = async (force = false) => {
 
 export const can = (entity, action = 'read') => {
   if (permissionState.admin) return true
-  return permissionState.permissions?.[entity]?.[action] === true
+
+  const entityPermissions = permissionState.permissions?.[entity]
+  if (!entityPermissions) return false
+
+  return entityPermissions[action] === true || entityPermissions[`can_${action}`] === true
 }
 
 export const getUserPermissions = async (userId) => {
