@@ -17,7 +17,7 @@ Rails.application.routes.draw do
         sessions: 'api/sessions',
         registrations: 'api/registrations'
     }
-    resources :users, only: [:index] do
+    resources :users, only: [:index, :show] do
       collection do
         get :validation
       end
@@ -40,15 +40,9 @@ Rails.application.routes.draw do
 
   # Devise Routes
   devise_for :user, path: 'auth', path_names: {
-      sign_in: 'login',
-      sign_out: 'logout',
-      registration: 'register',
-      sign_up: 'signup'
-  }, controllers: {
-      sessions: 'sessions'
-  }
+    sign_in: 'login', sign_out: 'logout', registration: 'register', sign_up: 'signup'
+  }, controllers: { sessions: 'sessions' }
 
-  # routes
   resources :users, except: [:show] do
     get :change_password
     resources :permissions, except: [:show]
