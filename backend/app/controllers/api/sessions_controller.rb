@@ -26,5 +26,7 @@ class Api::SessionsController < Devise::SessionsController
     render json: { user: user, message: 'Login realizado com sucesso' }, status: :ok
   rescue ActionController::ParameterMissing
     render json: { error: 'Usuário e senha são obrigatórios' }, status: :bad_request
+  rescue ActionDispatch::Http::Parameters::ParseError
+    render json: { error: 'Corpo da requisição JSON inválido' }, status: :bad_request
   end
 end

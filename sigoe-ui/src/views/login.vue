@@ -28,16 +28,24 @@ const handleSubmit = async (event) => {
   event.preventDefault()
   error.value = ''
   isLoading.value = true
-  
+
   try {
-    const response = await axios.post(`${BASE_URL}/api/auth/login`, {
-      user: {
-        username: username.value,
-        password: password.value
+    const response = await axios.post(
+      `${BASE_URL}/api/auth/login`,
+      {
+        user: {
+          username: username.value.trim(),
+          password: password.value
+        }
+      },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json'
+        }
       }
-    })
-    
-    // O token JWT vem no header 'Authorization'
+    )
+
     const token = response.headers['authorization']
     if (token) {
       localStorage.setItem('jwt', token)
@@ -46,7 +54,7 @@ const handleSubmit = async (event) => {
       error.value = 'Token não recebido. Tente novamente.'
     }
   } catch (err) {
-    error.value = 'Usuário ou senha inválidos'
+    error.value = err.response?.data?.error || 'Não foi possível realizar o login.'
   } finally {
     isLoading.value = false
   }
@@ -71,7 +79,7 @@ const dismissError = () => {
             <p class="text-gray-600 text-sm">Sistema para o gerenciamento de ocorrências escolares</p>
           </div>
 
-          <Alert 
+          <Alert
             v-if="error"
             type="error"
             :message="error"
@@ -81,26 +89,9 @@ const dismissError = () => {
           />
 
           <form @submit.prevent="handleSubmit" class="space-y-6">
-            <Input
-              id="username"
-              name="username"
-              label="Usuário"
-              v-model="username"
-              required
-            />
-            <Input
-              id="password"
-              name="password"
-              label="Senha"
-              type="password"
-              v-model="password"
-              required
-            />
-            
-            <Button
-              type="submit"
-              customClass="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
-            >
+            <Input id="username" name="username" label="Usuário" v-model="username" required />
+            <Input id="password" name="password" label="Senha" type="password" v-model="password" required />
+            <Button type="submit" customClass="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
               {{ isLoading ? 'Entrando...' : 'Entrar' }}
             </Button>
           </form>
