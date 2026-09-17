@@ -30,10 +30,12 @@ export const logout = async () => {
     await axios.delete(`${BASE_URL}/api/auth/logout`, {
       headers: authorizationHeaders()
     })
+  } catch (error) {
+    console.warn('Não foi possível encerrar a sessão no servidor:', error)
+  } finally {
     localStorage.removeItem('jwt')
     clearPermissions()
-    return true
-  } catch {
-    return false
   }
+
+  return true
 }
