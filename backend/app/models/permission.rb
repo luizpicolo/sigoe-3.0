@@ -20,21 +20,25 @@
 class Permission < ApplicationRecord
   include SearchCop
 
-  # Validações
   validates :user, presence: true
+  validate :entity_must_be_an_application_record
 
   belongs_to :user
 
-  # Atributos para busca com SearchCop
   search_scope :search do
     attributes user: 'user.name'
   end
 
-  # Retorna um vetor com os atributos que serão utilizados para a
-  # busca nas listagens de usuários
-  #
-  # @return [Array] contendo os atributos para a busca
   def self.ordenation_attributes
     [%w[ID id], %w[User user]]
+  end
+
+  private
+
+  def entity_must_be_an_application_record
+    model = entity.to_s.safe_constantize
+    return if model.is_a?(Class) && model <= ApplicationRecord
+
+    errors.add(:entity, 'deve ser uma entidade válida do sistema')
   end
 end

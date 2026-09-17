@@ -7,6 +7,7 @@ import Breadcrumb from '@/components/breadcrumb.vue'
 import Card from '@/components/ui/card.vue'
 
 import { find } from '@/services/users'
+import { can } from '@/services/permissions'
 import { formatDate, avatar } from '@/utils'
 
 const breadcrumbItems = [
@@ -14,7 +15,7 @@ const breadcrumbItems = [
   { label: "Administrador", href: "/administrador" },
   { label: "Usuários", href: "/administrador/usuarios" },
   { label: "Visualizar", href: "/administrador/usuarios/visualizar" },
-];
+]
 
 const route = useRoute()
 const userId = ref(route.params.id)
@@ -24,15 +25,14 @@ onMounted(() => {
   fetchUser(userId)
 })
 
-const fetchUser = async (userId) => {
-  const response = await find(userId)
+const fetchUser = async (id) => {
+  const response = await find(id)
   user.value = response.user
 }
 </script>
 
 <template>
   <div class="min-h-screen flex flex-col">
-    <!-- Header -->
     <header class="bg-white border-b border-gray-200 py-2 px-4 flex justify-between items-center">
       <div class="flex items-center">
         <img src="/logo_ifms.png" width="160">
@@ -43,10 +43,8 @@ const fetchUser = async (userId) => {
     </header>
 
     <div class="flex flex-col md:flex-row flex-1">
-      <!-- Sidebar -->
       <Sidebar :activePage="'usuarios'" />
 
-      <!-- Main Content -->
       <main class="flex-1 p-6">
         <Breadcrumb :items="breadcrumbItems" />
 
@@ -86,15 +84,15 @@ const fetchUser = async (userId) => {
             </dl>
           </Card>
           <Card customClass="col-span-1" title="Ações">
-            <Button variant="info" to="/administrador/usuarios/permissoes/9" customClass="w-full">
-                <i class="fa-solid fa-edit"></i>
+            <Button v-if="can('users', 'update')" variant="info" :to="`/administrador/usuarios/permissoes/${userId}`" customClass="w-full">
+              <i class="fa-solid fa-edit"></i>
               Gerenciar Permissões
             </Button>
-            <Button to="" customClass="mt-4 w-full">
+            <Button v-if="can('users', 'update')" to="" customClass="mt-4 w-full">
               <i class="fa-solid fa-edit"></i>
               Editar Usuário
             </Button>
-            <Button to="" variant="danger" customClass="mt-4 w-full">
+            <Button v-if="can('users', 'destroy')" to="" variant="danger" customClass="mt-4 w-full">
               <i class="fa-solid fa-trash-alt"></i>
               Excluir Usuário
             </Button>
@@ -108,42 +106,24 @@ const fetchUser = async (userId) => {
               <div class="py-3 grid grid-cols-3">
                 <dt class="text-sm font-medium text-gray-500">Administrador</dt>
                 <dd class="text-sm text-gray-900 col-span-2">
-                  <span
-                    v-if="user.admin"
-                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                    Ativo
-                  </span>
-                  <span
-                    v-else class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                    Não
-                  </span>
+                  <span v-if="user.admin" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">Ativo</span>
+                  <span v-else class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">Não</span>
                 </dd>
               </div>
               <div class="py-3 grid grid-cols-3">
                 <dt class="text-sm font-medium text-gray-500">Status</dt>
                 <dd class="text-sm text-gray-900 col-span-2">
-                  <span
-                    v-if="user.status"
-                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                    Ativo
-                  </span>
-                  <span
-                    v-else class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                    Não
-                  </span>
+                  <span v-if="user.status" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">Ativo</span>
+                  <span v-else class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">Não</span>
                 </dd>
               </div>
               <div class="py-3 grid grid-cols-3">
                 <dt class="text-sm font-medium text-gray-500">Data de criação</dt>
-                <dd class="text-sm text-gray-900 col-span-2">
-                  {{ formatDate(user.created_at) }}
-                </dd>
+                <dd class="text-sm text-gray-900 col-span-2">{{ formatDate(user.created_at) }}</dd>
               </div>
               <div class="py-3 grid grid-cols-3">
                 <dt class="text-sm font-medium text-gray-500">Último acesso</dt>
-                <dd class="text-sm text-gray-900 col-span-2">
-                  {{ formatDate(user.updated_at) }}
-                </dd>
+                <dd class="text-sm text-gray-900 col-span-2">{{ formatDate(user.updated_at) }}</dd>
               </div>
             </dl>
           </Card>

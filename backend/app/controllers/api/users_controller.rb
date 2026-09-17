@@ -4,6 +4,8 @@ class Api::UsersController < ApplicationController
 
   # GET /api/users
   def index
+    authorize! :read, User
+
     users = User.where(set_polo)
                 .order("#{set_order}": :asc)
                 .search(params[:search])
