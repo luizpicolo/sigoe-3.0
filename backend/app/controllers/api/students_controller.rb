@@ -4,7 +4,7 @@ class Api::StudentsController < ApplicationController
   include ParamsSearch
 
   before_action :authenticate_user!
-  before_action :set_student, only: :show
+  before_action :set_student, only: %i[show update]
 
   # GET /api/students
   def index
@@ -24,6 +24,18 @@ class Api::StudentsController < ApplicationController
   # GET /api/students/:id
   def show
     render json: { student: student_json(@student, detailed: true) }
+  end
+
+  # PATCH/PUT /api/students/:id
+  def update
+    attributes = student_params
+    attributes = check_password(attributes)
+
+    if @student.update(attributes)
+      render json: { student: student_json(@student, detailed: true) }
+    else
+      render json: { errors: @student.errors.full_messages }, status: :unprocessable_entity
+    end
   end
 
   private
@@ -63,6 +75,27 @@ class Api::StudentsController < ApplicationController
     return photo if photo.start_with?('http://', 'https://')
 
     "#{request.base_url}#{photo.start_with?('/') ? '' : '/'}#{photo}"
+  end
+
+  def check_password(attributes)
+    if attributes[:password].blank?
+      attributes.delete(:password)
+      attributes.delete(:password_confirmation)
+    end
+    attributes
+  end
+
+  def student_params
+    params.require(:student).permit(
+      :name,
+      :cpf,
+      :birth_date,
+      :responsible,
+      :responsible_contact,
+      :contact,
+      :password,
+      :password_confirmation
+    )
   end
 
   def params_return
