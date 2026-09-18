@@ -4,6 +4,7 @@ class Api::IncidentsController < ApplicationController
   include ParamsSearch
 
   before_action :authenticate_user!
+  before_action :set_incident, only: :show
 
   def index
     authorize! :read, Incident
@@ -17,7 +18,16 @@ class Api::IncidentsController < ApplicationController
     render json: { incidents: incidents.map { |incident| incident_json(incident) }, total: incidents.total_count }
   end
 
+  def show
+    authorize! :read, Incident
+    render json: { incident: incident_json(@incident) }
+  end
+
   private
+
+  def set_incident
+    @incident = Incident.includes(:student, :course, :type_incident, :user).where(params_return).find(params[:id])
+  end
 
   def params_return
     return '' if current_user.super_admin?
@@ -29,6 +39,6 @@ class Api::IncidentsController < ApplicationController
   end
 
   def incident_json(incident)
-    incident.as_json(only: %i[id date_incident time_incident visibility is_resolved signed_in student_id course_id type_incident_id user_id], include: { student: { only: %i[id name] }, course: { only: %i[id name initial] }, type_incident: { only: %i[id name] }, user: { only: %i[id name] } })
+    incident.as_json(include: { student: { only: %i[id name] }, course: { only: %i[id name initial polo_id] }, type_incident: { only: %i[id name] }, user: { only: %i[id name] } })
   end
 end
