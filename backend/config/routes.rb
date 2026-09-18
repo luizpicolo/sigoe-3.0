@@ -17,7 +17,7 @@ Rails.application.routes.draw do
     resources :permissions, only: [] do
       collection { get :current }
     end
-    resources :students, only: [:index, :show, :create, :update] do
+    resources :students, only: [:index, :show, :create, :update, :destroy] do
       collection { get :options }
     end
     resources :courses, only: [:index, :show, :create, :update, :destroy]
