@@ -7,3 +7,8 @@ export const list = async (page = 1, order = 'id', search = null, amount = 10) =
   const response = await axios.get(`${BASE_URL}/api/incidents`, { ...config(), params: { page, order, search, amount } })
   return response.data
 }
+
+export const find = async (id) => {
+  const response = await axios.get(`${BASE_URL}/api/incidents/${id}`, config())
+  return response.data
+}
