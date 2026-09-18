@@ -6,6 +6,26 @@ RSpec.describe 'Api::Users', type: :request do
 
   before { sign_in admin }
 
+  describe 'GET /api/users' do
+    it 'lista usuários autenticados' do
+      get '/api/users'
+
+      expect(response).to have_http_status(:ok)
+      body = JSON.parse(response.body)
+      expect(body).to include('users', 'total')
+      expect(body['users'].map { |item| item['id'] }).to include(user.id)
+    end
+  end
+
+  describe 'GET /api/users/:id' do
+    it 'retorna um usuário autenticado' do
+      get "/api/users/#{user.id}"
+
+      expect(response).to have_http_status(:ok)
+      expect(JSON.parse(response.body).dig('user', 'id')).to eq(user.id)
+    end
+  end
+
   describe 'PUT /api/users/:id' do
     it 'atualiza os dados do usuário sem exigir nova senha' do
       put "/api/users/#{user.id}", params: { user: { name: 'Nome Atualizado', email: user.email } }
