@@ -6,8 +6,14 @@ class Api::SchoolGroupsController < ApplicationController
 
   def index
     authorize! :read, SchoolGroup
-    groups = SchoolGroup.includes(:polo).order(:name)
-    render json: { school_groups: groups.map { |g| group_json(g) }, total: groups.count }
+    groups = SchoolGroup.includes(:polo)
+    groups = groups.where('school_groups.name ILIKE :search OR school_groups.identifier ILIKE :search', search: "%#{params[:search]}%") if params[:search].present?
+    order_column = %w[id name].include?(params[:order]) ? params[:order] : 'id'
+    total = groups.count
+    amount = params[:amount].to_i.clamp(1, 100)
+    page = [params[:page].to_i, 1].max
+    groups = groups.order(order_column => :asc).offset((page - 1) * amount).limit(amount)
+    render json: { school_groups: groups.map { |g| group_json(g) }, total: total }
   end
 
   def show

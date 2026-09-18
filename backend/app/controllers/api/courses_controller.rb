@@ -6,8 +6,14 @@ class Api::CoursesController < ApplicationController
 
   def index
     authorize! :read, Course
-    courses = Course.includes(:polo).order(:name)
-    render json: { courses: courses.map { |c| course_json(c) }, total: courses.count }
+    courses = Course.includes(:polo)
+    courses = courses.where('courses.name ILIKE :search OR courses.initial ILIKE :search', search: "%#{params[:search]}%") if params[:search].present?
+    order_column = %w[id name].include?(params[:order]) ? params[:order] : 'id'
+    total = courses.count
+    amount = params[:amount].to_i.clamp(1, 100)
+    page = [params[:page].to_i, 1].max
+    courses = courses.order(order_column => :asc).offset((page - 1) * amount).limit(amount)
+    render json: { courses: courses.map { |c| course_json(c) }, total: total }
   end
 
   def show
