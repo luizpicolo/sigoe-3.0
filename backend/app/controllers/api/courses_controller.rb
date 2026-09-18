@@ -1,19 +1,20 @@
 # frozen_string_literal: true
 
 class Api::CoursesController < ApplicationController
+  include ParamsSearch
+
   before_action :authenticate_user!
   before_action :set_course, only: %i[show update destroy]
 
   def index
     authorize! :read, Course
-    courses = Course.includes(:polo)
-    courses = courses.where('courses.name ILIKE :search OR courses.initial ILIKE :search', search: "%#{params[:search]}%") if params[:search].present?
-    order_column = %w[id name].include?(params[:order]) ? params[:order] : 'id'
-    total = courses.count
-    amount = params[:amount].to_i.clamp(1, 100)
-    page = [params[:page].to_i, 1].max
-    courses = courses.order(order_column => :asc).offset((page - 1) * amount).limit(amount)
-    render json: { courses: courses.map { |c| course_json(c) }, total: total }
+    courses = Course.where(set_polo)
+                    .order("#{set_order}": :desc)
+                    .search(params[:search])
+                    .page(params[:page])
+                    .per(set_amount_return)
+
+    render json: { courses: courses.map { |course| course_json(course) }, total: courses.total_count }
   end
 
   def show
