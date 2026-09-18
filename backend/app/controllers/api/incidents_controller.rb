@@ -23,6 +23,30 @@ class Api::IncidentsController < ApplicationController
     render json: { incident: incident_json(@incident) }
   end
 
+  def create
+    authorize! :create, Incident
+    student_ids = incident_params[:student_ids]
+    attributes = incident_params.except(:student_ids)
+
+    incidents = Incident.transaction do
+      student_ids.map do |student_id|
+        student = Student.find(student_id)
+        incident = Incident.new(attributes)
+        incident.user = current_user
+        incident.student = student
+        incident.course = student.course
+        incident.save!
+        incident
+      end
+    end
+
+    render json: { incidents: incidents.map { |incident| incident_json(incident) } }, status: :created
+  rescue ActiveRecord::RecordInvalid => e
+    render json: { errors: e.record.errors.full_messages }, status: :unprocessable_entity
+  rescue ActiveRecord::RecordNotFound => e
+    render json: { errors: [e.message] }, status: :unprocessable_entity
+  end
+
   private
 
   def set_incident
@@ -36,6 +60,12 @@ class Api::IncidentsController < ApplicationController
     params = { courses: set_polo }
     params[:user] = current_user if can?(:read_restricted, Incident) && !current_user.admin? && !current_user.super_admin?
     params
+  end
+
+  def incident_params
+    params.require(:incident).permit(
+      :type_incident_id, :date_incident, :sector_id, :assistant_id, :time_incident, :institution, :description, :soluction, :is_resolved, :visibility, :type_student, :sanction, student_ids: [], prohibition_and_responsibility_ids: [], student_duty_ids: []
+    )
   end
 
   def incident_json(incident)
