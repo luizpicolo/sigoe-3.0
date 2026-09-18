@@ -26,7 +26,7 @@ class Api::IncidentsController < ApplicationController
   private
 
   def set_incident
-    @incident = Incident.includes(:student, :course, :type_incident, :user).where(params_return).find(params[:id])
+    @incident = Incident.find(params[:id] || params[:incident_id])
   end
 
   def params_return
@@ -34,7 +34,11 @@ class Api::IncidentsController < ApplicationController
     return set_polo if set_polo.empty?
 
     params = { courses: set_polo }
-    params[:user] = current_user if can?(:read_restricted, Incident) && !current_user.admin? && !current_user.super_admin?
+
+    if can?(:read_restricted, Incident)
+      params[:user] = current_user unless current_user.admin? || current_user.super_admin?
+    end
+
     params
   end
 
