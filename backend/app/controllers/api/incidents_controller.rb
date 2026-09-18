@@ -21,6 +21,8 @@ class Api::IncidentsController < ApplicationController
   def options
     authorize! :create, Incident
     render json: {
+      assistants: User.get_all(set_polo).map { |name, id| { id: id, name: name } },
+      sectors: Sector.get_all(set_polo).map { |name, id| { id: id, name: name } },
       type_incidents: Incident::TypeIncident.order(:name).as_json(only: %i[id name]),
       student_duties: Incident::StudentDuty.where(status: true).order(:id).as_json(only: %i[id item]),
       prohibition_and_responsibilities: Incident::ProhibitionAndResponsibility.where(status: true).order(:id).as_json(only: %i[id item]),
