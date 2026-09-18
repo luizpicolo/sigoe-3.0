@@ -1,19 +1,20 @@
 # frozen_string_literal: true
 
 class Api::SchoolGroupsController < ApplicationController
+  include ParamsSearch
+
   before_action :authenticate_user!
   before_action :set_school_group, only: %i[show update destroy]
 
   def index
     authorize! :read, SchoolGroup
-    groups = SchoolGroup.includes(:polo)
-    groups = groups.where('school_groups.name ILIKE :search OR school_groups.identifier ILIKE :search', search: "%#{params[:search]}%") if params[:search].present?
-    order_column = %w[id name].include?(params[:order]) ? params[:order] : 'id'
-    total = groups.count
-    amount = params[:amount].to_i.clamp(1, 100)
-    page = [params[:page].to_i, 1].max
-    groups = groups.order(order_column => :asc).offset((page - 1) * amount).limit(amount)
-    render json: { school_groups: groups.map { |g| group_json(g) }, total: total }
+    groups = SchoolGroup.where(set_polo)
+                         .order("#{set_order}": :desc)
+                         .search(params[:search])
+                         .page(params[:page])
+                         .per(set_amount_return)
+
+    render json: { school_groups: groups.map { |group| group_json(group) }, total: groups.total_count }
   end
 
   def show
@@ -54,5 +55,9 @@ class Api::SchoolGroupsController < ApplicationController
   def group_params = params.require(:school_group).permit(:name, :identifier, :polo_id)
   def group_json(group)
     group.as_json(only: %i[id name identifier polo_id], include: { polo: { only: %i[id name] } })
+  end
+
+  def set_order
+    params[:order].presence || 'name'
   end
 end
