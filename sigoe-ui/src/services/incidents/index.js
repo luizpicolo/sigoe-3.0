@@ -14,6 +14,10 @@ export const find = async (id) => {
 }
 
 export const create = async (incident) => {
-  const response = await axios.post(`${BASE_URL}/api/incidents`, { incident }, config())
-  return response.data
+  try {
+    const response = await axios.post(`${BASE_URL}/api/incidents`, { incident }, config())
+    return { ...response.data, error: null }
+  } catch (error) {
+    return { incident: null, error: error.response?.data?.errors || 'Não foi possível cadastrar a ocorrência.' }
+  }
 }
