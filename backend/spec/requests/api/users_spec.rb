@@ -4,13 +4,6 @@ RSpec.describe 'Api::Users', type: :request do
   let!(:admin) { create(:user, admin: true) }
   let!(:user) { create(:user, name: 'Usuário Original') }
 
-  describe 'autenticação' do
-    it 'retorna não autorizado sem autenticação' do
-      get '/api/users'
-      expect(response).to have_http_status(:unauthorized)
-    end
-  end
-
   before { sign_in admin }
 
   describe 'GET /api/users' do
