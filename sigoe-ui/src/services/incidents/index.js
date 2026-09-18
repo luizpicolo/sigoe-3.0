@@ -8,6 +8,11 @@ export const list = async (page = 1, order = 'id', search = null, amount = 10) =
   return response.data
 }
 
+export const options = async () => {
+  const response = await axios.get(`${BASE_URL}/api/incidents/options`, config())
+  return response.data
+}
+
 export const find = async (id) => {
   const response = await axios.get(`${BASE_URL}/api/incidents/${id}`, config())
   return response.data
