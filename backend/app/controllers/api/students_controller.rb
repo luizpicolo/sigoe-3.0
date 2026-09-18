@@ -4,9 +4,8 @@ class Api::StudentsController < ApplicationController
   include ParamsSearch
 
   before_action :authenticate_user!
-  before_action :set_student, only: %i[show update]
+  before_action :set_student, only: %i[show update destroy]
 
-  # GET /api/students
   def index
     authorize! :read, Student
 
@@ -23,13 +22,11 @@ class Api::StudentsController < ApplicationController
     }
   end
 
-  # GET /api/students/:id
   def show
     authorize! :read, Student
     render json: { student: student_json(@student, detailed: true) }
   end
 
-  # POST /api/students
   def create
     authorize! :create, Student
     student = Student.new(student_params)
@@ -41,11 +38,9 @@ class Api::StudentsController < ApplicationController
     end
   end
 
-  # PATCH/PUT /api/students/:id
   def update
     authorize! :update, Student
-    attributes = student_params
-    attributes = check_password(attributes)
+    attributes = check_password(student_params)
 
     if @student.update(attributes)
       render json: { student: student_json(@student, detailed: true) }
@@ -54,7 +49,14 @@ class Api::StudentsController < ApplicationController
     end
   end
 
-  # GET /api/students/options
+  def destroy
+    authorize! :destroy, Student
+    @student.destroy!
+    head :no_content
+  rescue ActiveRecord::RecordNotDestroyed => e
+    render json: { errors: [e.message] }, status: :unprocessable_entity
+  end
+
   def options
     authorize! :read, Student
     courses = Course.where(set_polo).order(:name)
@@ -70,30 +72,14 @@ class Api::StudentsController < ApplicationController
   private
 
   def set_student
-    @student = Student.includes(course: :polo, school_group: :polo)
-                      .where(params_return)
-                      .find(params[:id])
+    @student = Student.includes(course: :polo, school_group: :polo).where(params_return).find(params[:id])
   end
 
   def student_json(student, detailed: false)
     attributes = detailed ? %i[id name cpf birth_date responsible responsible_contact contact ra enrollment course_situation created_at updated_at] : %i[id name ra enrollment course_situation]
     attributes << :photo unless detailed
 
-    data = student.as_json(
-      only: attributes,
-      methods: detailed ? :course_situation : nil,
-      include: {
-        course: {
-          only: %i[id name initial polo_id],
-          include: { polo: { only: %i[id name] } }
-        },
-        school_group: {
-          only: %i[id name identifier polo_id],
-          include: { polo: { only: %i[id name] } }
-        }
-      }
-    )
-
+    data = student.as_json(only: attributes, methods: detailed ? :course_situation : nil, include: { course: { only: %i[id name initial polo_id], include: { polo: { only: %i[id name] } } }, school_group: { only: %i[id name identifier polo_id], include: { polo: { only: %i[id name] } } } })
     data['photo'] = photo_url(student)
     data
   end
@@ -115,21 +101,7 @@ class Api::StudentsController < ApplicationController
   end
 
   def student_params
-    params.require(:student).permit(
-      :name,
-      :cpf,
-      :birth_date,
-      :responsible,
-      :responsible_contact,
-      :contact,
-      :password,
-      :password_confirmation,
-      :ra,
-      :enrollment,
-      :course_situation,
-      :course_id,
-      :school_group_id
-    )
+    params.require(:student).permit(:name, :cpf, :birth_date, :responsible, :responsible_contact, :contact, :password, :password_confirmation, :ra, :enrollment, :course_situation, :course_id, :school_group_id)
   end
 
   def params_return
