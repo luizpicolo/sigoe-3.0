@@ -12,3 +12,8 @@ export const find = async (id) => {
   const response = await axios.get(`${BASE_URL}/api/incidents/${id}`, config())
   return response.data
 }
+
+export const create = async (incident) => {
+  const response = await axios.post(`${BASE_URL}/api/incidents`, { incident }, config())
+  return response.data
+}
