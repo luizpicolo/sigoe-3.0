@@ -1,50 +1,46 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import Swal from 'sweetalert2'
 import Sidebar from '@/components/sidebar.vue'
 import Button from '@/components/ui/button.vue'
 import Breadcrumb from '@/components/breadcrumb.vue'
 import Card from '@/components/ui/card.vue'
 import Header from '@/components/header.vue'
-
 import { find, remove } from '@/services/users'
 import { can } from '@/services/permissions'
 import { formatDate, avatar } from '@/utils'
 
-const breadcrumbItems = [
-  { label: "Home", href: "/" },
-  { label: "Administrador", href: "/administrador" },
-  { label: "Usuários", href: "/administrador/usuarios" },
-  { label: "Visualizar", href: "/administrador/usuarios/visualizar" },
-]
-
+const breadcrumbItems = [{ label: 'Home', href: '/' }, { label: 'Administrador', href: '/administrador' }, { label: 'Usuários', href: '/administrador/usuarios' }, { label: 'Visualizar', href: '/administrador/usuarios/visualizar' }]
 const route = useRoute()
 const router = useRouter()
 const userId = ref(route.params.id)
-const user = ref("")
+const user = ref('')
 const errorMessage = ref('')
 
-onMounted(() => {
-  fetchUser(userId)
-})
+onMounted(() => fetchUser(userId))
 
-const fetchUser = async (id) => {
+const fetchUser = async id => {
   try {
     const response = await find(id)
     user.value = response.user
   } catch (error) {
     errorMessage.value = 'Não foi possível carregar o usuário.'
+    await Swal.fire({ title: 'Erro!', text: errorMessage.value, icon: 'error', confirmButtonText: 'OK' })
   }
 }
 
 const deleteUser = async () => {
-  if (!confirm('Deseja realmente excluir este usuário?')) return
+  const confirmation = await Swal.fire({ title: 'Excluir usuário?', text: 'Deseja realmente excluir este usuário?', icon: 'warning', showCancelButton: true, confirmButtonText: 'Sim, excluir', cancelButtonText: 'Cancelar', reverseButtons: true })
+  if (!confirmation.isConfirmed) return
 
   try {
     await remove(userId.value)
+    await Swal.fire({ title: 'Sucesso!', text: 'Usuário excluído com sucesso!', icon: 'success', confirmButtonText: 'OK' })
     router.push('/administrador/usuarios/listar')
   } catch (error) {
     errorMessage.value = error.response?.data?.error || 'Não foi possível excluir o usuário.'
+    await Swal.fire({ title: 'Erro!', text: errorMessage.value, icon: 'error', confirmButtonText: 'OK' })
   }
 }
 </script>
@@ -52,96 +48,18 @@ const deleteUser = async () => {
 <template>
   <div class="min-h-screen flex flex-col">
     <Header />
-
     <div class="flex flex-col md:flex-row flex-1">
       <Sidebar :activePage="'usuarios'" />
-
       <main class="flex-1 p-6">
         <Breadcrumb :items="breadcrumbItems" />
-
         <h1 class="text-2xl font-bold mb-1">Detalhes do Usuário</h1>
         <p v-if="errorMessage" class="text-red-600 mb-4">{{ errorMessage }}</p>
-
-        <div class="flex justify-end">
-          <Button to="/administrador/usuarios/listar" customClass="bg-white border-gray-200 !text-gray-900 hover:bg-gray-100 !focus:ring-gray-300">
-            <i class="fa-solid fa-arrow-left"></i>
-            Voltar
-          </Button>
-        </div>
-
+        <div class="flex justify-end"><Button to="/administrador/usuarios/listar" customClass="bg-white border-gray-200 !text-gray-900 hover:bg-gray-100 !focus:ring-gray-300"><i class="fa-solid fa-arrow-left"></i>Voltar</Button></div>
         <div class="grid grid-cols-4 gap-4 mb-6 mt-4 rounded-lg shadow-sm">
-          <Card customClass="col-span-1" title="Foto">
-            <div class="flex justify-center items-center mt-5 pt-2 pb-5">
-              <img :src="avatar(user?.avatar?.url)" width="200" alt="" srcset="">
-            </div>
-          </Card>
-
-          <Card customClass="col-span-3" title="Informações Pessoais">
-            <dl class="divide-y divide-gray-200">
-              <div class="py-3 grid grid-cols-3">
-                <dt class="text-sm font-medium text-gray-500">Nome completo</dt>
-                <dd class="text-sm text-gray-900 col-span-2">{{ user.name }}</dd>
-              </div>
-              <div class="py-3 grid grid-cols-3">
-                <dt class="text-sm font-medium text-gray-500">Email</dt>
-                <dd class="text-sm text-gray-900 col-span-2">{{ user.email }}</dd>
-              </div>
-              <div class="py-3 grid grid-cols-3">
-                <dt class="text-sm font-medium text-gray-500">SIAPE</dt>
-                <dd class="text-sm text-gray-900 col-span-2">{{ user.siape }}</dd>
-              </div>
-              <div class="py-3 grid grid-cols-3">
-                <dt class="text-sm font-medium text-gray-500">Campus</dt>
-                <dd class="text-sm text-gray-900 col-span-2">{{ user.polo?.name }}</dd>
-              </div>
-            </dl>
-          </Card>
-
-          <Card customClass="col-span-1" title="Ações">
-            <Button v-if="can('users', 'update')" variant="info" :to="`/administrador/usuarios/visualizar/${userId}/permissoes`" customClass="w-full">
-              <i class="fa-solid fa-shield-halved"></i>
-              Gerenciar Permissões
-            </Button>
-            <Button v-if="can('users', 'update')" :to="`/administrador/usuarios/editar/${userId}`" customClass="mt-4 w-full">
-              <i class="fa-solid fa-edit"></i>
-              Editar Usuário
-            </Button>
-            <Button v-if="can('users', 'destroy')" variant="danger" @click="deleteUser" customClass="mt-4 w-full">
-              <i class="fa-solid fa-trash-alt"></i>
-              Excluir Usuário
-            </Button>
-          </Card>
-
-          <Card customClass="col-span-3" title="Informações de Acesso" description="Aqui será um diagrama">
-            <dl class="divide-y divide-gray-200">
-              <div class="py-3 grid grid-cols-3">
-                <dt class="text-sm font-medium text-gray-500">Nome de usuário</dt>
-                <dd class="text-sm text-gray-900 col-span-2">{{ user.username }}</dd>
-              </div>
-              <div class="py-3 grid grid-cols-3">
-                <dt class="text-sm font-medium text-gray-500">Administrador</dt>
-                <dd class="text-sm text-gray-900 col-span-2">
-                  <span v-if="user.admin" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">Ativo</span>
-                  <span v-else class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">Não</span>
-                </dd>
-              </div>
-              <div class="py-3 grid grid-cols-3">
-                <dt class="text-sm font-medium text-gray-500">Status</dt>
-                <dd class="text-sm text-gray-900 col-span-2">
-                  <span v-if="user.status" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">Ativo</span>
-                  <span v-else class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">Não</span>
-                </dd>
-              </div>
-              <div class="py-3 grid grid-cols-3">
-                <dt class="text-sm font-medium text-gray-500">Data de criação</dt>
-                <dd class="text-sm text-gray-900 col-span-2">{{ formatDate(user.created_at) }}</dd>
-              </div>
-              <div class="py-3 grid grid-cols-3">
-                <dt class="text-sm font-medium text-gray-500">Último acesso</dt>
-                <dd class="text-sm text-gray-900 col-span-2">{{ formatDate(user.updated_at) }}</dd>
-              </div>
-            </dl>
-          </Card>
+          <Card customClass="col-span-1" title="Foto"><div class="flex justify-center items-center mt-5 pt-2 pb-5"><img :src="avatar(user?.avatar?.url)" width="200" alt="" srcset=""></div></Card>
+          <Card customClass="col-span-3" title="Informações Pessoais"><dl class="divide-y divide-gray-200"><div class="py-3 grid grid-cols-3"><dt class="text-sm font-medium text-gray-500">Nome completo</dt><dd class="text-sm text-gray-900 col-span-2">{{ user.name }}</dd></div><div class="py-3 grid grid-cols-3"><dt class="text-sm font-medium text-gray-500">Email</dt><dd class="text-sm text-gray-900 col-span-2">{{ user.email }}</dd></div><div class="py-3 grid grid-cols-3"><dt class="text-sm font-medium text-gray-500">SIAPE</dt><dd class="text-sm text-gray-900 col-span-2">{{ user.siape }}</dd></div><div class="py-3 grid grid-cols-3"><dt class="text-sm font-medium text-gray-500">Campus</dt><dd class="text-sm text-gray-900 col-span-2">{{ user.polo?.name }}</dd></div></dl></Card>
+          <Card customClass="col-span-1" title="Ações"><Button v-if="can('users', 'update')" variant="info" :to="`/administrador/usuarios/visualizar/${userId}/permissoes`" customClass="w-full"><i class="fa-solid fa-shield-halved"></i>Gerenciar Permissões</Button><Button v-if="can('users', 'update')" :to="`/administrador/usuarios/editar/${userId}`" customClass="mt-4 w-full"><i class="fa-solid fa-edit"></i>Editar Usuário</Button><Button v-if="can('users', 'destroy')" variant="danger" @click="deleteUser" customClass="mt-4 w-full"><i class="fa-solid fa-trash-alt"></i>Excluir Usuário</Button></Card>
+          <Card customClass="col-span-3" title="Informações de Acesso" description="Aqui será um diagrama"><dl class="divide-y divide-gray-200"><div class="py-3 grid grid-cols-3"><dt class="text-sm font-medium text-gray-500">Nome de usuário</dt><dd class="text-sm text-gray-900 col-span-2">{{ user.username }}</dd></div><div class="py-3 grid grid-cols-3"><dt class="text-sm font-medium text-gray-500">Administrador</dt><dd class="text-sm text-gray-900 col-span-2"><span v-if="user.admin" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">Ativo</span><span v-else class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">Não</span></dd></div><div class="py-3 grid grid-cols-3"><dt class="text-sm font-medium text-gray-500">Status</dt><dd class="text-sm text-gray-900 col-span-2"><span v-if="user.status" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">Ativo</span><span v-else class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">Não</span></dd></div><div class="py-3 grid grid-cols-3"><dt class="text-sm font-medium text-gray-500">Data de criação</dt><dd class="text-sm text-gray-900 col-span-2">{{ formatDate(user.created_at) }}</dd></div><div class="py-3 grid grid-cols-3"><dt class="text-sm font-medium text-gray-500">Último acesso</dt><dd class="text-sm text-gray-900 col-span-2">{{ formatDate(user.updated_at) }}</dd></div></dl></Card>
         </div>
       </main>
     </div>
