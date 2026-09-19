@@ -8,6 +8,7 @@ class IncidentsController < ApplicationController
   before_action :set_incident, only: %i[
       edit destroy update confirmation sign show export_to_academic_system
   ]
+  before_action :authorize_private_incident!, only: %i[edit destroy update confirmation sign show export_to_academic_system]
 
   add_breadcrumb 'Home', :root_path
 
@@ -119,17 +120,18 @@ class IncidentsController < ApplicationController
     @incident = Incident.find(params[:id] || params[:incident_id])
   end
 
+  def authorize_private_incident!
+    return if @incident.visibility != 'private'
+    return if current_user.super_admin? || @incident.user_id == current_user.id
+
+    raise CanCan::AccessDenied
+  end
+
   def params_return
     return '' if current_user.super_admin?
     return set_polo if set_polo.empty?
 
-    params = { courses: set_polo }
-
-    if can?(:read_restricted, Incident)
-      params[:user] = current_user unless current_user.admin? || current_user.super_admin?
-    end
-
-    params
+    { courses: set_polo }
   end
 
   def incident_params
