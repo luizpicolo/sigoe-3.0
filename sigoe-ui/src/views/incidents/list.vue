@@ -1,9 +1,9 @@
 <script setup>
+import { onMounted, computed, ref } from 'vue'
 import Sidebar from '@/components/sidebar.vue'
 import Button from '@/components/ui/button.vue'
 import Breadcrumb from '@/components/breadcrumb.vue'
 import Input from '@/components/ui/input.vue'
-import { onMounted, ref } from 'vue'
 import { list } from '@/services/incidents'
 import { can, permissionState } from '@/services/permissions'
 import VPagination from '@hennge/vue3-pagination'
@@ -17,6 +17,7 @@ const search = ref('')
 const incidents = ref([])
 const total = ref(0)
 const loading = ref(false)
+const showCampus = computed(() => permissionState.user?.super_admin === true)
 
 const canAccessIncident = incident => incident.visibility !== 'private' || permissionState.admin || incident.user?.id === permissionState.user?.id
 
@@ -80,7 +81,7 @@ onMounted(loadIncidents)
                 <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">Data</th>
                 <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">Estudante</th>
                 <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">Curso</th>
-                <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">Campus</th>
+                <th v-if="showCampus" class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">Campus</th>
                 <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">Visibilidade</th>
                 <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">Verificado?</th>
                 <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">Ações</th>
@@ -92,7 +93,7 @@ onMounted(loadIncidents)
                 <td class="px-3 py-4 text-sm">{{ formatDate(incident.date_incident) }}</td>
                 <td class="px-3 py-4 text-sm">{{ incident.student?.name || '-' }}</td>
                 <td class="px-3 py-4 text-sm">{{ incident.course?.name || '-' }}</td>
-                <td class="px-3 py-4 text-sm">{{ incident.course?.polo?.name || '-' }}</td>
+                <td v-if="showCampus" class="px-3 py-4 text-sm">{{ incident.course?.polo?.name || '-' }}</td>
                 <td class="px-3 py-4 text-center text-sm">
                   <i v-if="incident.visibility === 'public'" class="fa-solid fa-check text-green-600" title="Público"></i>
                   <i v-else-if="incident.visibility === 'private'" class="fa-solid fa-lock text-red-600" title="Privado"></i>
