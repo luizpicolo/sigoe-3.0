@@ -22,7 +22,7 @@ Rails.application.routes.draw do
     end
     resources :courses, only: [:index, :show, :create, :update, :destroy]
     resources :school_groups, only: [:index, :show, :create, :update, :destroy]
-    resources :incidents, only: [:index, :show, :create] do
+    resources :incidents, only: [:index, :show, :create, :update] do
       collection { get :options }
     end
   end
