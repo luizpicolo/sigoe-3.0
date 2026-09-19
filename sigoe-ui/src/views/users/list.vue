@@ -161,7 +161,7 @@ const handlerUpdatePagination = newPage => {
             <tbody>
               <tr v-for="user in users" :key="user.id" class="bg-white divide-y divide-gray-200">
                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                  {{ user }}
+                  {{ user.id }}
                 </td>
                 
                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
