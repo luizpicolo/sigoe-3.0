@@ -1,6 +1,7 @@
 <script setup>
 import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
+import Swal from 'sweetalert2'
 import { create, options } from '@/services/users'
 import Sidebar from '@/components/sidebar.vue'
 import Button from '@/components/ui/button.vue'
@@ -66,10 +67,13 @@ const handleSubmit = async event => {
   try {
     await create(form.value)
     successMessage.value = 'Usuário cadastrado com sucesso!'
-    setTimeout(() => router.push('/administrador/usuarios/listar'), 1500)
+    await Swal.fire({ title: 'Sucesso!', text: successMessage.value, icon: 'success', confirmButtonText: 'OK' })
+    router.push('/administrador/usuarios/listar')
   } catch (error) {
     const errors = error.response?.data?.errors
-    errorMessage.value = Array.isArray(errors) ? errors.join(', ') : errors || 'Erro ao cadastrar usuário. Tente novamente.'
+    const message = Array.isArray(errors) ? errors.join(', ') : errors || 'Erro ao cadastrar usuário. Tente novamente.'
+    errorMessage.value = message
+    await Swal.fire({ title: 'Erro!', text: message, icon: 'error', confirmButtonText: 'OK' })
   } finally {
     isSubmitting.value = false
   }
