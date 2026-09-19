@@ -27,6 +27,7 @@ Rails.application.routes.draw do
     resources :incidents, only: [:index, :show, :create, :update, :destroy] do
       collection { get :options }
     end
+    get 'dashboard', to: 'dashboard#show'
     resources :report_incidents, only: [] do
       collection do
         get :options

@@ -5,7 +5,6 @@ class Incident < ApplicationRecord
             presence: true
   validates :visibility, presence: true, inclusion: { in: %w[public private] }
 
-  # Delegates
   delegate :ra, to: :user, prefix: true
   delegate :name, to: :course, prefix: true
 
@@ -22,7 +21,6 @@ class Incident < ApplicationRecord
   has_and_belongs_to_many :prohibition_and_responsibilities
   has_and_belongs_to_many :student_duties
 
-  # Atributos para busca com SearchCop
   search_scope :search do
     attributes incident: 'id'
     attributes student: 'student.id'
@@ -43,21 +41,20 @@ class Incident < ApplicationRecord
     signed_in.strftime('%d/%m/%Y') if signed_in.present?
   end
 
-  ## Charts
   def self.by_years(params_return)
-    joins(:course).where(params_return).group_by_year(:created_at, format: '%Y').count
+    joins(:course).where(params_return).group_by_year(:date_incident, format: '%Y').count
   end
 
   def self.by_courses(params_return)
     joins(:course).where(params_return).group(:'courses.name').count
   end
 
-  def self.by_is_resolved
-    result = group(:is_resolved).count
+  def self.by_is_resolved(params_return = {})
+    result = joins(:course).where(params_return).group(:is_resolved).count
     result['Não'] = result.delete 'no_'
     result['Sim'] = result.delete 'yes_'
     result['Sem Categoria'] = result.delete nil
-    result
+    result.compact
   end
 
   def self.by_type_incident(params_return)
@@ -71,13 +68,9 @@ class Incident < ApplicationRecord
     result['Adv Verbal'] = result.delete 'verbal_warning'
     result['Desligamento'] = result.delete 'quitting_school'
     result['Sem Categoria'] = result.delete nil
-    result
+    result.compact
   end
 
-  # Retorna um vetor com os atributos que serão utilizados para a
-  # busca nas listagens de ocorrencias
-  #
-  # @return [Array] contendo os atributos para a busca
   def self.ordenation_attributes
     [%w[ID id], %w[Estudante student_id], %w[Data date_incident], %w[Turma course_id]]
   end
