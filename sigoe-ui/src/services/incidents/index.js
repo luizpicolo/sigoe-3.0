@@ -13,12 +13,12 @@ export const options = async () => {
   return response.data
 }
 
-export const find = async (id) => {
+export const find = async id => {
   const response = await axios.get(`${BASE_URL}/api/incidents/${id}`, config())
   return response.data
 }
 
-export const create = async (incident) => {
+export const create = async incident => {
   try {
     const response = await axios.post(`${BASE_URL}/api/incidents`, { incident }, config())
     return { ...response.data, error: null }
@@ -33,5 +33,14 @@ export const update = async (id, incident) => {
     return { ...response.data, error: null }
   } catch (error) {
     return { incident: null, error: error.response?.data?.errors || 'Não foi possível atualizar a ocorrência.' }
+  }
+}
+
+export const remove = async id => {
+  try {
+    await axios.delete(`${BASE_URL}/api/incidents/${id}`, config())
+    return { error: null }
+  } catch (error) {
+    return { error: error.response?.data?.errors || 'Não foi possível excluir a ocorrência.' }
   }
 }
