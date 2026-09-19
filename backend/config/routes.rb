@@ -26,7 +26,7 @@ Rails.application.routes.draw do
     resources :incidents, only: [:index, :show, :create, :update, :destroy] do
       collection { get :options }
     end
-    post 'report_incidents', to: 'report_incidents#create'
+    post 'report_incidents', to: 'report_incidents#create', defaults: { format: :pdf }
   end
 
   devise_for :user, path: 'auth', path_names: { sign_in: 'login', sign_out: 'logout', registration: 'register', sign_up: 'signup' }, controllers: { sessions: 'sessions' }
