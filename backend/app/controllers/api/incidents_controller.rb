@@ -4,7 +4,7 @@ class Api::IncidentsController < ApplicationController
   include ParamsSearch
 
   before_action :authenticate_user!
-  before_action :set_incident, only: :show
+  before_action :set_incident, only: %i[show update]
 
   def index
     authorize! :read, Incident
@@ -38,7 +38,7 @@ class Api::IncidentsController < ApplicationController
   def create
     authorize! :create, Incident
     student_ids = incident_params[:student_ids]
-    attributes = incident_params.except(:student_ids)
+    attributes = incident_params.except(:student_ids, :student_duty_ids, :prohibition_and_responsibility_ids)
 
     incidents = Incident.transaction do
       student_ids.map do |student_id|
@@ -47,22 +47,34 @@ class Api::IncidentsController < ApplicationController
         incident.user = current_user
         incident.student = student
         incident.course = student.course
+        incident.student_duty_ids = incident_params[:student_duty_ids]
+        incident.prohibition_and_responsibility_ids = incident_params[:prohibition_and_responsibility_ids]
         incident.save!
         incident
       end
     end
 
     render json: { incidents: incidents.map { |incident| incident_json(incident) } }, status: :created
+  rescue ActiveRecord::RecordInvalid, ActiveRecord::RecordNotFound => e
+    render json: { errors: [e.message] }, status: :unprocessable_entity
+  end
+
+  def update
+    authorize! :update, @incident
+    attributes = incident_params.except(:student_ids, :student_duty_ids, :prohibition_and_responsibility_ids)
+    @incident.assign_attributes(attributes)
+    @incident.student_duty_ids = incident_params[:student_duty_ids] if incident_params.key?(:student_duty_ids)
+    @incident.prohibition_and_responsibility_ids = incident_params[:prohibition_and_responsibility_ids] if incident_params.key?(:prohibition_and_responsibility_ids)
+    @incident.save!
+    render json: { incident: incident_json(@incident) }
   rescue ActiveRecord::RecordInvalid => e
     render json: { errors: e.record.errors.full_messages }, status: :unprocessable_entity
-  rescue ActiveRecord::RecordNotFound => e
-    render json: { errors: [e.message] }, status: :unprocessable_entity
   end
 
   private
 
   def set_incident
-    @incident = Incident.includes(:student, :course, :type_incident, :user).where(params_return).find(params[:id])
+    @incident = Incident.includes(:student, :course, :type_incident, :user, :assistant, :student_duties, :prohibition_and_responsibilities).where(params_return).find(params[:id])
   end
 
   def params_return
@@ -76,11 +88,19 @@ class Api::IncidentsController < ApplicationController
 
   def incident_params
     params.require(:incident).permit(
-      :type_incident_id, :date_incident, :sector_id, :assistant_id, :time_incident, :institution, :description, :soluction, :is_resolved, :visibility, :type_student, :sanction, student_ids: [], prohibition_and_responsibility_ids: [], student_duty_ids: []
+      :type_incident_id, :student_id, :date_incident, :sector_id, :assistant_id, :time_incident, :institution, :description, :soluction, :is_resolved, :visibility, :type_student, :sanction, student_ids: [], prohibition_and_responsibility_ids: [], student_duty_ids: []
     )
   end
 
   def incident_json(incident)
-    incident.as_json(include: { student: { only: %i[id name] }, course: { only: %i[id name initial polo_id] }, type_incident: { only: %i[id name] }, user: { only: %i[id name] } })
+    incident.as_json(include: {
+      student: { only: %i[id name ra] },
+      course: { only: %i[id name initial polo_id], include: { polo: { only: %i[id name] } } },
+      type_incident: { only: %i[id name] },
+      user: { only: %i[id name] },
+      assistant: { only: %i[id name email] },
+      student_duties: { only: %i[id item] },
+      prohibition_and_responsibilities: { only: %i[id item] }
+    })
   end
 end
