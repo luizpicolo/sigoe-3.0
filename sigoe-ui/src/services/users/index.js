@@ -32,4 +32,5 @@ export const create = async user => {
 }
 
 export const update = async (id, user) => (await axios.put(`${BASE_URL}/api/users/${id}`, { user }, authConfig())).data
+export const changePassword = async (current_password, new_password, password_confirmation) => (await axios.put(`${BASE_URL}/api/users/change_password`, { current_password, new_password, password_confirmation }, authConfig())).data
 export const remove = async (id) => axios.delete(`${BASE_URL}/api/users/${id}`, authConfig())
