@@ -5,7 +5,7 @@ import Breadcrumb from '@/components/breadcrumb.vue'
 import Input from '@/components/ui/input.vue'
 import { onMounted, ref } from 'vue'
 import { list } from '@/services/incidents'
-import { can } from '@/services/permissions'
+import { can, permissionState } from '@/services/permissions'
 import VPagination from '@hennge/vue3-pagination'
 import '@hennge/vue3-pagination/dist/vue3-pagination.css'
 
@@ -17,6 +17,8 @@ const search = ref('')
 const incidents = ref([])
 const total = ref(0)
 const loading = ref(false)
+
+const canAccessIncident = incident => incident.visibility !== 'private' || permissionState.admin || incident.user?.id === permissionState.user?.id
 
 const loadIncidents = async () => {
   loading.value = true
@@ -92,17 +94,15 @@ onMounted(loadIncidents)
                 <td class="px-3 py-4 text-sm">{{ incident.course?.name || '-' }}</td>
                 <td class="px-3 py-4 text-sm">{{ incident.course?.polo?.name || '-' }}</td>
                 <td class="px-3 py-4 text-center text-sm">
-                  <i v-if="incident.visibility === 'public'" class="fa-solid fa-check text-green-600"
-                    title="Público"></i>
-                  <i v-else-if="incident.visibility === 'private'" class="fa-solid fa-lock text-red-600"
-                    title="Privado"></i>
+                  <i v-if="incident.visibility === 'public'" class="fa-solid fa-check text-green-600" title="Público"></i>
+                  <i v-else-if="incident.visibility === 'private'" class="fa-solid fa-lock text-red-600" title="Privado"></i>
                   <span v-else>-</span>
                 </td>
                 <td class="px-3 py-4 text-center text-sm">
                   <i v-if="incident.signed_in" class="fa-solid fa-check text-green-600"></i>
                   <i v-else class="fa-solid fa-xmark text-red-600"></i>
                 </td>
-                <td class="px-3 py-4 text-sm"><Button
+                <td class="px-3 py-4 text-sm"><Button :disabled="!can('occurrences', 'read') || !canAccessIncident(incident)"
                     customClass="w-full bg-green-600 hover:bg-green-700 focus:ring-green-500"
                     :to="`/ocorrencias/ocorrencias/visualizar/${incident.id}`"><i
                       class="fa-solid fa-eye"></i>Visualizar</Button></td>
@@ -113,8 +113,7 @@ onMounted(loadIncidents)
             </tbody>
           </table>
           <div class="flex justify-end items-end p-4">
-            <VPagination v-model="page" :pages="Math.max(1, Math.ceil(total / amount))" :range-size="2"
-              active-color="#00a63e" @update:modelValue="updateHandler" />
+            <VPagination v-model="page" :pages="Math.max(1, Math.ceil(total / amount))" :range-size="2" active-color="#00a63e" @update:modelValue="updateHandler" />
           </div>
         </div>
       </main>
