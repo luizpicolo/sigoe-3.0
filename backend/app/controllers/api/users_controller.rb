@@ -37,6 +37,28 @@ class Api::UsersController < ApplicationController
     render json: { errors: e.record.errors.full_messages }, status: :unprocessable_entity
   end
 
+  def change_password
+    current_password = params.require(:current_password)
+    new_password = params.require(:new_password)
+    password_confirmation = params.require(:password_confirmation)
+
+    unless current_user.valid_password?(current_password)
+      render json: { error: 'A senha atual está incorreta.' }, status: :unprocessable_entity
+      return
+    end
+
+    unless new_password == password_confirmation
+      render json: { error: 'A confirmação da senha não corresponde.' }, status: :unprocessable_entity
+      return
+    end
+
+    if current_user.update(password: new_password, password_confirmation: password_confirmation)
+      render json: { message: 'Senha alterada com sucesso.' }, status: :ok
+    else
+      render json: { errors: current_user.errors.full_messages }, status: :unprocessable_entity
+    end
+  end
+
   def destroy
     authorize! :destroy, User
     user = User.find(params[:id])
