@@ -26,3 +26,12 @@ export const create = async (incident) => {
     return { incident: null, error: error.response?.data?.errors || 'Não foi possível cadastrar a ocorrência.' }
   }
 }
+
+export const update = async (id, incident) => {
+  try {
+    const response = await axios.put(`${BASE_URL}/api/incidents/${id}`, { incident }, config())
+    return { ...response.data, error: null }
+  } catch (error) {
+    return { incident: null, error: error.response?.data?.errors || 'Não foi possível atualizar a ocorrência.' }
+  }
+}
