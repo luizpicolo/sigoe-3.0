@@ -134,21 +134,61 @@ onMounted(async () => {
             <div class="grid grid-cols-6 gap-6">
               <div class="col-span-4">
                 <label class="block text-sm font-medium mb-1">Pesquisar estudante</label>
-                <input v-model="studentSearch" type="search" placeholder="Nome, R.A. ou matrícula" class="block w-full px-3 py-2 rounded-md border-2 border-gray-300 bg-white">
-                <div class="rounded-md mt-2 max-h-56 overflow-y-auto border-2 border-gray-300 bg-white">
-                  <div v-if="loadingStudents" class="p-3 text-sm">Buscando...</div>
-                  <label v-for="student in visibleStudents" :key="student.id" class="flex gap-2 p-2"><input type="checkbox" :checked="isSelected(student.id)" @change="toggleStudent(student)"><span>{{ student.name }}{{ student.ra ? ` - ${student.ra}` : '' }}</span></label>
-                </div>
+                <input v-model="studentSearch" type="search" placeholder="Nome, R.A. ou matrícula"
+                  class="block w-full px-3 py-2 rounded-md border-2 border-gray-300 bg-white">
+                  <div class="rounded-md mt-2 max-h-56 overflow-y-auto border-2 border-gray-300 bg-white">
+                    <div v-if="loadingStudents" class="p-3 text-sm">Buscando...</div>
+                    <label v-for="student in visibleStudents" :key="student.id" class="flex gap-2 p-2"><input
+                        type="checkbox" :checked="isSelected(student.id)" @change="toggleStudent(student)"><span>{{
+                          student.name }}{{ student.ra ? ` - ${student.ra}` : '' }}</span></label>
+                  </div>
               </div>
-              <div class="col-span-2"><Select id="studentType" label="Estudante é?" v-model="selectedStudentType" :options="[{ value: 'non_resident', label: 'Não residente' }, { value: 'resident', label: 'Residente' }]" /></div>
+              <div class="col-span-2"><Select id="studentType" label="Estudante é?" v-model="selectedStudentType"
+                  :options="[{ value: 'non_resident', label: 'Não residente' }, { value: 'resident', label: 'Residente' }]" />
+              </div>
             </div>
-            <div v-if="selectedStudents.length" class="mt-4"><p class="text-sm font-medium mb-2">Estudantes selecionados</p><ul class="list-disc ml-5 text-sm"><li v-for="student in selectedStudents" :key="student.id">{{ student.name }}</li></ul></div>
+            <div v-if="selectedStudents.length" class="mt-4">
+              <p class="text-sm font-medium mb-2">Estudantes selecionados</p>
+              <ul class="list-disc ml-5 text-sm">
+                <li v-for="student in selectedStudents" :key="student.id">{{ student.name }}</li>
+              </ul>
+            </div>
           </Card>
-          <Card title="Assistente"><div class="grid grid-cols-6 gap-6"><div class="col-span-3"><Select id="assistant" label="Assistente" v-model="selectedAssistant" :options="assistantOptions" /></div><div class="col-span-3"><Select id="sector" label="Encaminhar para" v-model="selectedSector" :options="[{ value: '', label: 'Não enviar notificação' }, ...sectorOptions]" /></div></div></Card>
-          <Card title="Ocorrência"><div class="grid grid-cols-12 gap-4"><div class="col-span-3"><Input v-model="dateIncident" type="date" label="Data ocorrência" /></div><div class="col-span-3"><Input v-model="timeIncident" type="time" label="Hora ocorrência" /></div><div class="col-span-3"><Select id="occurrenceType" label="Tipo da ocorrência" v-model="selectedOccurrenceType" :options="occurrenceOptions" /></div><div class="col-span-3"><Select id="accessType" label="Tipo de acesso" v-model="selectedAccessType" :options="[{ value: 'public', label: 'Público' }, { value: 'private', label: 'Privado' }]" /></div></div><textarea v-model="description" rows="5" class="border-2 border-gray-300 bg-white w-full border rounded-md mt-4 p-3" placeholder="Ocorrência"></textarea><div class="grid grid-cols-6 gap-6 mt-4"><div class="col-span-3"><Select id="sanction" label="Sanção aplicada" v-model="selectedSanction" :options="options.sanctions" /></div><div class="col-span-3"><Select id="resolved" label="Ocorrência resolvida?" v-model="occurrenceResolved" :options="[{ value: 'no_', label: 'Não' }, { value: 'yes_', label: 'Sim' }]" /></div></div></Card>
-          <Card title="Direitos e deveres do estudante"><label v-for="item in options.student_duties" :key="item.id" class="flex gap-2 mb-2"><input type="checkbox" :value="item.id" v-model="studentDuties"><span>{{ item.item }}</span></label></Card>
-          <Card title="Proibições e responsabilidades"><label v-for="item in options.prohibition_and_responsibilities" :key="item.id" class="flex gap-2 mb-2"><input type="checkbox" :value="item.id" v-model="prohibitions"><span>{{ item.item }}</span></label></Card>
-          <Card title="Descrição da solução"><textarea v-model="solution" rows="5" class="border-2 border-gray-300 bg-white w-full border rounded-md p-3" placeholder="Solução"></textarea></Card>
+          <Card title="Assistente">
+            <div class="grid grid-cols-6 gap-6">
+              <div class="col-span-3"><Select id="assistant" label="Assistente" v-model="selectedAssistant"
+                  :options="assistantOptions" /></div>
+              <div class="col-span-3"><Select id="sector" label="Encaminhar para" v-model="selectedSector"
+                  :options="[{ value: '', label: 'Não enviar notificação' }, ...sectorOptions]" /></div>
+            </div>
+          </Card>
+          <Card title="Ocorrência">
+            <div class="grid grid-cols-12 gap-4">
+              <div class="col-span-3"><Input v-model="dateIncident" type="date" label="Data ocorrência" /></div>
+              <div class="col-span-3"><Input v-model="timeIncident" type="time" label="Hora ocorrência" /></div>
+              <div class="col-span-3"><Select id="occurrenceType" label="Tipo da ocorrência"
+                  v-model="selectedOccurrenceType" :options="occurrenceOptions" /></div>
+              <div class="col-span-3"><Select id="accessType" label="Tipo de acesso" v-model="selectedAccessType"
+                  :options="[{ value: 'public', label: 'Público' }, { value: 'private', label: 'Privado' }]" /></div>
+            </div><textarea v-model="description" rows="5"
+              class="border-2 border-gray-300 bg-white w-full border rounded-md mt-4 p-3"
+              placeholder="Ocorrência"></textarea>
+            <div class="grid grid-cols-6 gap-6 mt-4">
+              <div class="col-span-3"><Select id="sanction" label="Sanção aplicada" v-model="selectedSanction"
+                  :options="options.sanctions" /></div>
+              <div class="col-span-3"><Select id="resolved" label="Ocorrência resolvida?" v-model="occurrenceResolved"
+                  :options="[{ value: 'no_', label: 'Não' }, { value: 'yes_', label: 'Sim' }]" /></div>
+            </div>
+          </Card>
+          <Card title="Direitos e deveres do estudante"><label v-for="item in options.student_duties" :key="item.id"
+              class="flex gap-2 mb-2"><input type="checkbox" :value="item.id" v-model="studentDuties"><span>{{ item.item
+                  }}</span></label></Card>
+          <Card title="Proibições e responsabilidades"><label v-for="item in options.prohibition_and_responsibilities"
+              :key="item.id" class="flex gap-2 mb-2"><input type="checkbox" :value="item.id"
+                v-model="prohibitions"><span>{{ item.item }}</span></label></Card>
+          <Card title="Descrição da solução"><textarea v-model="solution" rows="5"
+              class="border-2 border-gray-300 bg-white w-full border rounded-md p-3" placeholder="Solução"></textarea>
+          </Card>
           <p v-if="errorMessage" class="text-red-600">{{ errorMessage }}</p>
           <p v-if="successMessage" class="text-green-600">{{ successMessage }}</p>
           <Button type="submit" :disabled="loading">{{ loading ? 'Salvando...' : 'Salvar' }}</Button>
