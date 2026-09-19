@@ -22,7 +22,9 @@ Rails.application.routes.draw do
     end
     resources :courses, only: [:index, :show, :create, :update, :destroy]
     resources :school_groups, only: [:index, :show, :create, :update, :destroy]
-    resources :incidents, only: [:index, :show]
+    resources :incidents, only: [:index, :show, :create, :update, :destroy] do
+      collection { get :options }
+    end
   end
 
   devise_for :user, path: 'auth', path_names: { sign_in: 'login', sign_out: 'logout', registration: 'register', sign_up: 'signup' }, controllers: { sessions: 'sessions' }

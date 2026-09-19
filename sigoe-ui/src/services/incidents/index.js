@@ -8,7 +8,39 @@ export const list = async (page = 1, order = 'id', search = null, amount = 10) =
   return response.data
 }
 
-export const find = async (id) => {
+export const options = async () => {
+  const response = await axios.get(`${BASE_URL}/api/incidents/options`, config())
+  return response.data
+}
+
+export const find = async id => {
   const response = await axios.get(`${BASE_URL}/api/incidents/${id}`, config())
   return response.data
+}
+
+export const create = async incident => {
+  try {
+    const response = await axios.post(`${BASE_URL}/api/incidents`, { incident }, config())
+    return { ...response.data, error: null }
+  } catch (error) {
+    return { incident: null, error: error.response?.data?.errors || 'Não foi possível cadastrar a ocorrência.' }
+  }
+}
+
+export const update = async (id, incident) => {
+  try {
+    const response = await axios.put(`${BASE_URL}/api/incidents/${id}`, { incident }, config())
+    return { ...response.data, error: null }
+  } catch (error) {
+    return { incident: null, error: error.response?.data?.errors || 'Não foi possível atualizar a ocorrência.' }
+  }
+}
+
+export const remove = async id => {
+  try {
+    await axios.delete(`${BASE_URL}/api/incidents/${id}`, config())
+    return { error: null }
+  } catch (error) {
+    return { error: error.response?.data?.errors || 'Não foi possível excluir a ocorrência.' }
+  }
 }
