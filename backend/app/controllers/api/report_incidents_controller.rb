@@ -20,7 +20,7 @@ class Api::ReportIncidentsController < ApplicationController
     end
 
     @incidents = incidents
-    render template: 'report_incidents/create', formats: [:html], layout: false, content_type: 'application/pdf'
+    render pdf: 'relatorio-ocorrencias', template: 'report_incidents/create', layout: false
   end
 
   private
