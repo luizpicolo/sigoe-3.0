@@ -10,6 +10,7 @@ Rails.application.routes.draw do
     resources :users, only: [:index, :show, :create, :update, :destroy] do
       collection { get :validation }
       collection { get :options }
+      collection { put :change_password }
       member do
         get :permissions, to: 'permissions#show'
         put :permissions, to: 'permissions#update'
