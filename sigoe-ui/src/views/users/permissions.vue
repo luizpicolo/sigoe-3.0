@@ -1,6 +1,7 @@
 <script setup>
 import { computed, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
+import Swal from 'sweetalert2'
 import Sidebar from '@/components/sidebar.vue'
 import Button from '@/components/ui/button.vue'
 import Breadcrumb from '@/components/breadcrumb.vue'
@@ -98,8 +99,11 @@ const save = async () => {
     const response = await saveUserPermissions(userId, permissions.value)
     permissions.value = normalizePermissions(response?.permissions)
     success.value = 'Permissões salvas com sucesso.'
+    await Swal.fire({ title: 'Sucesso!', text: success.value, icon: 'success', confirmButtonText: 'OK' })
   } catch (requestError) {
-    error.value = requestError.response?.data?.error || 'Não foi possível salvar as permissões.'
+    const message = requestError.response?.data?.error || 'Não foi possível salvar as permissões.'
+    error.value = message
+    await Swal.fire({ title: 'Erro!', text: message, icon: 'error', confirmButtonText: 'OK' })
   } finally {
     saving.value = false
   }
