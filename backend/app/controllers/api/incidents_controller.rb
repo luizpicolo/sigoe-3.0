@@ -9,7 +9,9 @@ class Api::IncidentsController < ApplicationController
 
   def index
     authorize! :read, Incident
-    incidents = Incident.joins(:course).where(params_return).order("#{set_order}": :desc).search(params[:search]).page(params[:page]).per(set_amount_return)
+    incidents = Incident.joins(:course).where(params_return).order("#{set_order}": :desc).search(params[:search])
+    incidents = incidents.where(user_id: current_user.id) if restricted_read_only?
+    incidents = incidents.page(params[:page]).per(set_amount_return)
     render json: { incidents: incidents.map { |incident| incident_json(incident) }, total: incidents.total_count }
   end
 
@@ -74,6 +76,12 @@ class Api::IncidentsController < ApplicationController
     return if current_user.super_admin? || @incident.user_id == current_user.id
 
     raise CanCan::AccessDenied
+  end
+
+  def restricted_read_only?
+    return false if current_user.admin? || current_user.super_admin?
+
+    current_user.permissions.exists?(entity: 'Incident', can_read_restricted: true)
   end
 
   def params_return
