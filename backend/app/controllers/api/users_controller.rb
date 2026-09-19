@@ -14,10 +14,21 @@ class Api::UsersController < ApplicationController
     render json: { user: user.as_json(include: User.reflect_on_all_associations.map(&:name), except: [:password, :created_at]) }
   end
 
+  def create
+    authorize! :create, User
+    user = User.new(user_params)
+
+    if user.save
+      render json: { user: user.as_json(except: [:encrypted_password, :reset_password_token]) }, status: :created
+    else
+      render json: { errors: user.errors.full_messages }, status: :unprocessable_entity
+    end
+  end
+
   def update
     authorize! :update, User
     user = User.find(params[:id])
-    attributes = params.require(:user).permit(:name, :email, :username, :siape, :polo_id, :admin, :status, :password, :password_confirmation)
+    attributes = params.require(:user).permit(:name, :email, :username, :siape, :polo_id, :admin, :status, :password, :password_confirmation, :avatar)
     attributes.delete(:password) if attributes[:password].blank?
     attributes.delete(:password_confirmation) if attributes[:password_confirmation].blank?
     user.update!(attributes)
@@ -34,6 +45,12 @@ class Api::UsersController < ApplicationController
     head :no_content
   end
 
+  def options
+    authorize! :read, User
+    polos = Polo.order(:name)
+    render json: { polos: polos.as_json(only: %i[id name]) }
+  end
+
   def validation
     user = get_user_from_token
     if user
@@ -44,6 +61,10 @@ class Api::UsersController < ApplicationController
   end
 
   private
+
+  def user_params
+    params.require(:user).permit(:name, :siape, :username, :email, :password, :password_confirmation, :status, :avatar, :course_id, :admin, :polo_id)
+  end
 
   def get_user_from_token
     token = request.headers['Authorization']&.split(' ')&.last
