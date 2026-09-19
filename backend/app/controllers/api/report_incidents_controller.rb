@@ -5,6 +5,17 @@ class Api::ReportIncidentsController < ApplicationController
 
   before_action :authenticate_user!
 
+  def options
+    authorize! :read, Incident
+
+    render json: {
+      students: Student.where(params_return).order(:name).as_json(only: %i[id name]),
+      courses: Course.where(params_return).order(:name).as_json(only: %i[id name]),
+      school_groups: SchoolGroup.where(params_return).order(:name).as_json(only: %i[id name]),
+      type_incidents: Incident::TypeIncident.order(:name).as_json(only: %i[id name])
+    }
+  end
+
   def create
     authorize! :read, Incident
 
@@ -37,6 +48,7 @@ class Api::ReportIncidentsController < ApplicationController
     conditionals = {}
     conditionals[:student] = params[:student] if params[:student].present?
     conditionals[:course] = params[:course] if params[:course].present?
+    conditionals[:school_group] = params[:school_group] if params[:school_group].present?
     conditionals[:type_incident_id] = params[:type_incident_id] if params[:type_incident_id].present?
     conditionals[:type_student] = params[:type_student] if params[:type_student].present?
     conditionals[:is_resolved] = params[:is_resolved] if params[:is_resolved].present?
