@@ -46,7 +46,7 @@ onMounted(loadIncidents)
         <Breadcrumb :items="breadcrumbItems" />
         <h1 class="text-2xl font-bold mb-6">Ocorrências Escolares</h1>
         <div class="bg-white rounded-md shadow p-4 mb-6">
-          <div class="flex flex-wrap gap-2"><Button v-if="can('occurrences', 'create')"
+          <div class="flex flex-wrap gap-2"><Button :disabled="!can('occurrences', 'create')"
               customClass="bg-green-600 hover:bg-green-700 focus:ring-green-500" to="/ocorrencias/ocorrencias/novo"><i
                 class="fa-solid fa-user"></i>Nova Ocorrência</Button>
             <div class="flex items-center gap-2 ml-auto"><span class="text-sm">Ordenar por</span><select v-model="order"
