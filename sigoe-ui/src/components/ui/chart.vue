@@ -1,11 +1,6 @@
 <script setup>
 import { computed } from 'vue'
 
-defineProps({
-  title: { type: String, required: true },
-  data: { type: Object, default: () => ({}) }
-})
-
 const props = defineProps({
   title: { type: String, required: true },
   data: { type: Object, default: () => ({}) }
