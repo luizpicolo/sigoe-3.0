@@ -6,6 +6,7 @@ import Button from '@/components/ui/button.vue'
 import Breadcrumb from '@/components/breadcrumb.vue'
 import Card from '@/components/ui/card.vue'
 import Select from '@/components/ui/select.vue'
+import SearchableSelect from '@/components/ui/searchable-select.vue'
 import Input from '@/components/ui/input.vue'
 import Header from '@/components/header.vue'
 import { getIncidentReportOptions, generateIncidentReport } from '@/services/reports/incidents'
@@ -17,9 +18,6 @@ const selectedClass = ref('')
 const selectedOccurrenceType = ref('')
 const selectedResident = ref('')
 const selectedResolved = ref('')
-const studentSearch = ref('')
-const courseSearch = ref('')
-const classSearch = ref('')
 const startDate = ref('')
 const endDate = ref('')
 const selectedQuickFilter = ref(7)
@@ -27,9 +25,9 @@ const options = ref({ students: [], courses: [], school_groups: [], type_inciden
 const isGenerating = ref(false)
 const isLoadingOptions = ref(false)
 
-const studentOptions = computed(() => [{ value: '', label: 'Todos os estudantes' }, ...options.value.students.filter(item => item.name.toLowerCase().includes(studentSearch.value.toLowerCase())).map(item => ({ value: String(item.id), label: item.name }))])
-const courseOptions = computed(() => [{ value: '', label: 'Todos os cursos' }, ...options.value.courses.filter(item => item.name.toLowerCase().includes(courseSearch.value.toLowerCase())).map(item => ({ value: String(item.id), label: item.name }))])
-const classOptions = computed(() => [{ value: '', label: 'Todas as turmas' }, ...options.value.school_groups.filter(item => item.name.toLowerCase().includes(classSearch.value.toLowerCase())).map(item => ({ value: String(item.id), label: item.name }))])
+const studentOptions = computed(() => [{ value: '', label: 'Todos os estudantes' }, ...options.value.students.map(item => ({ value: String(item.id), label: item.name }))])
+const courseOptions = computed(() => [{ value: '', label: 'Todos os cursos' }, ...options.value.courses.map(item => ({ value: String(item.id), label: item.name }))])
+const classOptions = computed(() => [{ value: '', label: 'Todas as turmas' }, ...options.value.school_groups.map(item => ({ value: String(item.id), label: item.name }))])
 const occurrenceOptions = computed(() => [{ value: '', label: 'Todos os tipos' }, ...options.value.type_incidents.map(item => ({ value: String(item.id), label: item.name }))])
 const isFormValid = computed(() => startDate.value && endDate.value && startDate.value <= endDate.value)
 const hasFilters = computed(() => selectedStudent.value || selectedCourse.value || selectedClass.value || selectedOccurrenceType.value || selectedResident.value || selectedResolved.value || startDate.value || endDate.value)
@@ -69,9 +67,6 @@ const clearFilters = () => {
   selectedOccurrenceType.value = ''
   selectedResident.value = ''
   selectedResolved.value = ''
-  studentSearch.value = ''
-  courseSearch.value = ''
-  classSearch.value = ''
   setQuickFilter(7)
 }
 
@@ -96,8 +91,8 @@ onMounted(async () => {
       <div class="flex justify-between items-center mb-6"><h1 class="text-2xl font-bold">Relatório de Ocorrências</h1><Button v-if="hasFilters" @click="clearFilters" customClass="bg-gray-500 hover:bg-gray-600 focus:ring-gray-500">Limpar Filtros</Button></div>
       <Card customClass="mb-4" title="Filtros Rápidos" icon="filter"><div class="flex flex-wrap gap-2"><Button @click="setQuickFilter(7)" :customClass="selectedQuickFilter === 7 ? 'bg-green-700 text-sm' : 'bg-blue-500 hover:bg-blue-600 text-sm'">Últimos 7 dias</Button><Button @click="setQuickFilter(30)" :customClass="selectedQuickFilter === 30 ? 'bg-green-700 text-sm' : 'bg-blue-500 hover:bg-blue-600 text-sm'">Últimos 30 dias</Button><Button @click="setQuickFilter(90)" :customClass="selectedQuickFilter === 90 ? 'bg-green-700 text-sm' : 'bg-blue-500 hover:bg-blue-600 text-sm'">Últimos 3 meses</Button><Button @click="setQuickFilter(365)" :customClass="selectedQuickFilter === 365 ? 'bg-green-700 text-sm' : 'bg-blue-500 hover:bg-blue-600 text-sm'">Último ano</Button></div></Card>
       <form @submit.prevent="handleGenerateReport" class="space-y-6"><Card customClass="mb-4" title="Período *" icon="calendar"><div class="grid grid-cols-1 md:grid-cols-2 gap-6"><Input v-model="startDate" type="date" required /><Input v-model="endDate" type="date" required /></div></Card>
-        <Card customClass="mb-4" title="Estudante e Curso" icon="user-graduate"><div class="grid grid-cols-1 md:grid-cols-2 gap-6"><div><Input v-model="studentSearch" placeholder="Buscar estudante" /><Select v-model="selectedStudent" :options="studentOptions" :disabled="isLoadingOptions" /></div><div><Input v-model="courseSearch" placeholder="Buscar curso" /><Select v-model="selectedCourse" :options="courseOptions" :disabled="isLoadingOptions" /></div></div></Card>
-        <Card customClass="mb-4" title="Dados da Ocorrência" icon="exclamation-triangle"><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"><div><Select v-model="selectedOccurrenceType" :options="occurrenceOptions" :disabled="isLoadingOptions" /></div><div><Select v-model="selectedResident" :options="[{ value: '', label: 'Todos' }, { value: 'resident', label: 'Sim' }, { value: 'non_resident', label: 'Não' }]" /></div><div><Select v-model="selectedResolved" :options="[{ value: '', label: 'Todas' }, { value: 'yes_', label: 'Sim' }, { value: 'no_', label: 'Não' }]" /></div><div><Input v-model="classSearch" placeholder="Buscar turma" /><Select v-model="selectedClass" :options="classOptions" :disabled="isLoadingOptions" /></div></div></Card>
+        <Card customClass="mb-4" title="Estudante e Curso" icon="user-graduate"><div class="grid grid-cols-1 md:grid-cols-2 gap-6"><SearchableSelect v-model="selectedStudent" :options="studentOptions" placeholder="Todos os estudantes" :disabled="isLoadingOptions" /><SearchableSelect v-model="selectedCourse" :options="courseOptions" placeholder="Todos os cursos" :disabled="isLoadingOptions" /></div></Card>
+        <Card customClass="mb-4" title="Dados da Ocorrência" icon="exclamation-triangle"><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"><SearchableSelect v-model="selectedOccurrenceType" :options="occurrenceOptions" placeholder="Todos os tipos" :disabled="isLoadingOptions" /><Select v-model="selectedResident" :options="[{ value: '', label: 'Todos' }, { value: 'resident', label: 'Sim' }, { value: 'non_resident', label: 'Não' }]" /><Select v-model="selectedResolved" :options="[{ value: '', label: 'Todas' }, { value: 'yes_', label: 'Sim' }, { value: 'no_', label: 'Não' }]" /><SearchableSelect v-model="selectedClass" :options="classOptions" placeholder="Todas as turmas" :disabled="isLoadingOptions" /></div></Card>
         <div><Button type="submit" :disabled="!isFormValid || isGenerating || isLoadingOptions" customClass="bg-green-600 hover:bg-green-700">{{ isGenerating ? 'Gerando...' : 'Exportar PDF' }}</Button></div>
       </form>
     </main></div>
