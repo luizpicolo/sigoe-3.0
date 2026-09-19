@@ -18,5 +18,18 @@ export const find = async (id) => {
   return { user: response.data.user }
 }
 
+export const options = async () => (await axios.get(`${BASE_URL}/api/users/options`, authConfig())).data
+
+export const create = async user => {
+  const formData = new FormData()
+  Object.entries(user).forEach(([key, value]) => {
+    if (value !== null && value !== undefined) formData.append(`user[${key}]`, value)
+  })
+  const response = await axios.post(`${BASE_URL}/api/users`, formData, {
+    headers: { ...authConfig().headers, 'Content-Type': 'multipart/form-data' }
+  })
+  return response.data
+}
+
 export const update = async (id, user) => (await axios.put(`${BASE_URL}/api/users/${id}`, { user }, authConfig())).data
 export const remove = async (id) => axios.delete(`${BASE_URL}/api/users/${id}`, authConfig())
