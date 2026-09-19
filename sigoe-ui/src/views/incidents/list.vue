@@ -8,6 +8,7 @@ import { list } from '@/services/incidents'
 import { can, permissionState } from '@/services/permissions'
 import VPagination from '@hennge/vue3-pagination'
 import '@hennge/vue3-pagination/dist/vue3-pagination.css'
+import Header from '@/components/header.vue'
 
 const breadcrumbItems = [{ label: 'Home', href: '/' }, { label: 'Administrador', href: '/' }, { label: 'Ocorrências', href: '/ocorrencias/ocorrencias/listar' }]
 const page = ref(1)
@@ -40,10 +41,7 @@ onMounted(loadIncidents)
 
 <template>
   <div class="min-h-screen flex flex-col overflow-x-hidden">
-    <header class="bg-white border-b border-gray-200 py-2 px-4 flex justify-between items-center">
-      <div class="flex items-center"><img src="/logo_ifms.png" width="160"></div>
-      <div class="text-sm">SIGOE - Controle de ocorrências escolares - <span class="text-green-600">Sair</span></div>
-    </header>
+    <Header />
     <div class="flex flex-col md:flex-row flex-1 min-w-0">
       <Sidebar :activePage="'ocorrencias'" />
       <main class="flex-1 min-w-0 p-6">

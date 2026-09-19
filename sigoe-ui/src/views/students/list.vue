@@ -4,6 +4,7 @@ import Sidebar from '@/components/sidebar.vue'
 import Button from '@/components/ui/button.vue'
 import Breadcrumb from '@/components/breadcrumb.vue'
 import Input from '@/components/ui/input.vue'
+import Header from '@/components/header.vue'
 import { onMounted, ref } from 'vue'
 import { list } from '@/services/students'
 import { can, permissionState } from '@/services/permissions'
@@ -54,11 +55,7 @@ onMounted(loadStudents);
 
 <template>
   <div class="min-h-screen flex flex-col overflow-x-hidden">
-    <header class="bg-white border-b border-gray-200 py-2 px-4 flex justify-between items-center">
-      <div class="flex items-center"><img src="/logo_ifms.png" width="160"></div>
-      <div class="text-sm">SIGOE - Controle de ocorrências escolares - <span class="text-green-600">Sair</span></div>
-    </header>
-
+    <Header />
     <div class="flex flex-col md:flex-row flex-1 min-w-0">
       <Sidebar :activePage="'estudantes'" />
       <main class="flex-1 min-w-0 p-6">
