@@ -16,14 +16,30 @@ class Api::ReportIncidentsController < ApplicationController
     }
   end
 
-  def create
+  def data
     authorize! :read, Incident
 
-    incidents = Incident.joins(:student, :course)
-                        .where(params_return)
-                        .search(search_params)
-                        .where(date_incident: date_start..date_final)
-                        .order(date_incident: :desc)
+    incidents = filtered_incidents
+    if incidents.blank?
+      render json: { error: 'Não foi encontrada ocorrência para estes parâmetros' }, status: :not_found
+      return
+    end
+
+    render json: incidents.map { |incident|
+      {
+        student: incident.student_name,
+        course: incident.course_name,
+        date_incident: incident.date_incident,
+        time_incident: incident.time_incident,
+        type_incident: incident.type_incident.name,
+        description: incident.description
+      }
+    }
+  end
+
+  def create
+    authorize! :read, Incident
+    incidents = filtered_incidents
 
     if incidents.blank?
       render json: { error: 'Não foi encontrada ocorrência para estes parâmetros' }, status: :not_found
@@ -35,6 +51,14 @@ class Api::ReportIncidentsController < ApplicationController
   end
 
   private
+
+  def filtered_incidents
+    Incident.joins(:student, :course)
+            .where(params_return)
+            .search(search_params)
+            .where(date_incident: date_start..date_final)
+            .order(date_incident: :desc)
+  end
 
   def date_start
     Date.parse(params.require(:date_start))
