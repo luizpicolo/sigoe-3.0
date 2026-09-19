@@ -5,6 +5,7 @@ class Api::IncidentsController < ApplicationController
 
   before_action :authenticate_user!
   before_action :set_incident, only: %i[show update destroy]
+  before_action :authorize_private_incident!, only: %i[show update destroy]
 
   def index
     authorize! :read, Incident
@@ -49,7 +50,7 @@ class Api::IncidentsController < ApplicationController
     attributes = incident_params.except(:student_ids, :student_duty_ids, :prohibition_and_responsibility_ids)
     @incident.assign_attributes(attributes)
     @incident.student_duty_ids = incident_params[:student_duty_ids] if incident_params.key?(:student_duty_ids)
-    @incident.prohibition_and_responsibility_ids = incident_params[:prohibition_and_responsibility_ids] if incident_params.key?(:prohibition_and_responsibility_ids)
+    @incident.prohibition_and_responsibilities_ids = incident_params[:prohibition_and_responsibilities_ids] if incident_params.key?(:prohibition_and_responsibilities_ids)
     @incident.save!
     render json: { incident: incident_json(@incident) }
   rescue ActiveRecord::RecordInvalid => e
@@ -68,12 +69,18 @@ class Api::IncidentsController < ApplicationController
     @incident = Incident.includes(:student, :course, :type_incident, :user, :assistant, :student_duties, :prohibition_and_responsibilities).where(params_return).find(params[:id])
   end
 
+  def authorize_private_incident!
+    return if @incident.visibility != 'private'
+    return if current_user.super_admin? || @incident.user_id == current_user.id
+
+    raise CanCan::AccessDenied
+  end
+
   def params_return
     return '' if current_user.super_admin?
     return set_polo if set_polo.empty?
-    params = { courses: set_polo }
-    params[:user] = current_user if can?(:read_restricted, Incident) && !current_user.admin? && !current_user.super_admin?
-    params
+
+    { courses: set_polo }
   end
 
   def incident_params
