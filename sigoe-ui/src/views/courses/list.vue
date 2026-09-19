@@ -9,6 +9,7 @@ import { list, remove } from '@/services/courses'
 import { can, permissionState } from '@/services/permissions'
 import VPagination from '@hennge/vue3-pagination'
 import '@hennge/vue3-pagination/dist/vue3-pagination.css'
+import { success, error, confirm } from '@/utils/sweetPopup2'
 
 const breadcrumbItems = [{ label: 'Home', href: '/' }, { label: 'Administrador', href: '/' }, { label: 'Cursos', href: '/administrador/cursos/listar' }]
 
@@ -19,19 +20,17 @@ const search = ref('')
 const courses = ref([])
 const total = ref(0)
 const loading = ref(false)
-const error = ref('')
 const showCampus = computed(() => permissionState.user?.super_admin === true)
 
 const loadCourses = async () => {
   loading.value = true
-  error.value = ''
 
   try {
     const r = await list(page.value, order.value, search.value, amount.value)
     courses.value = r?.courses || []
     total.value = r?.total || 0
   } catch (e) {
-    error.value = 'Não foi possível carregar os cursos.'
+    error('Não foi possível carregar os cursos.')
     courses.value = []
     total.value = 0
   } finally {
@@ -55,13 +54,14 @@ const changeFilters = () => {
 }
 
 const destroy = async id => {
-  if (!confirm('Excluir este curso?')) return
-
-  try {
-    await remove(id)
-    await loadCourses()
-  } catch (e) {
-    error.value = 'Não foi possível excluir o curso.'
+  if (await confirm('Excluir este curso?')) {
+    try {
+      await remove(id)
+      success("Curso removido com sucesso")
+      await loadCourses()
+    } catch (e) {
+      error('Não foi possível excluir o curso.')
+    }
   }
 }
 
@@ -110,9 +110,6 @@ onMounted(loadCourses)
         <div class="bg-white rounded-md shadow overflow-hidden w-full">
           <div v-if="loading" class="p-6 text-center">
             Carregando cursos...
-          </div>
-          <div v-else-if="error" class="p-6 text-center text-red-600">
-            {{ error }}
           </div>
           <table v-else class="w-full table-fixed divide-y divide-gray-200">
             <thead class="bg-gray-100">

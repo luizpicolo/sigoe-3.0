@@ -16,7 +16,7 @@ class Course < ApplicationRecord
   include SearchCop
 
   # Validações
-  validates :name, :initial, presence: true, uniqueness: true
+  validates :name, :initial, presence: true
 
   # Delegates
   delegate :name, to: :polo, prefix: true

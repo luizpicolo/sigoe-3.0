@@ -34,6 +34,7 @@ class Api::CoursesController < ApplicationController
 
   def update
     authorize! :update, Course
+    p course_params
     if @course.update(course_params)
       render json: { course: course_json(@course) }
     else
