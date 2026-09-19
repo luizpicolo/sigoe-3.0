@@ -41,7 +41,7 @@ const props = defineProps({
 const emit = defineEmits(['click'])
 
 const buttonClasses = computed(() => {
-  const baseClasses = 'inline-flex items-center justify-center border rounded-md shadow-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors duration-200'
+  const baseClasses = 'inline-flex items-center justify-center border rounded-md shadow-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors duration-200 box-border'
   const variantClasses = {
     primary: 'border-transparent text-white bg-green-600 hover:bg-green-700 focus:ring-green-500',
     secondary: 'border-gray-300 text-gray-700 bg-white hover:bg-gray-50 focus:ring-gray-500',
@@ -69,7 +69,7 @@ const handleClick = (event) => {
 </script>
 
 <template>
-  <RouterLink v-if="to && !disabled && !loading" :to="to" class="inline-block">
+  <RouterLink v-if="to && !disabled && !loading" :to="to" class="block">
     <button :type="type" :class="buttonClasses" @click="handleClick">
       <i v-if="loading" class="fa-solid fa-spinner fa-spin mr-2"></i>
       <slot></slot>
