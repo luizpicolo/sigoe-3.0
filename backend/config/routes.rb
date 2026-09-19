@@ -7,8 +7,9 @@ Rails.application.routes.draw do
 
   namespace :api, defaults: { format: :json } do
     devise_for :user, path: 'auth', path_names: { sign_in: 'login', sign_out: 'logout', registration: 'register', sign_up: 'signup' }, controllers: { sessions: 'api/sessions', registrations: 'api/registrations' }
-    resources :users, only: [:index, :show, :update, :destroy] do
+    resources :users, only: [:index, :show, :create, :update, :destroy] do
       collection { get :validation }
+      collection { get :options }
       member do
         get :permissions, to: 'permissions#show'
         put :permissions, to: 'permissions#update'
