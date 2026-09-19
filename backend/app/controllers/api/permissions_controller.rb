@@ -67,8 +67,9 @@ class Api::PermissionsController < ApplicationController
     end
 
     {
-      user: user.as_json(only: %i[id name username email admin]),
+      user: user.as_json(only: %i[id name username email admin super_admin]),
       admin: user.admin?,
+      super_admin: user.super_admin?,
       entities: entity_options,
       permissions: permissions
     }

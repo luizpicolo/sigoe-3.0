@@ -59,8 +59,43 @@ onMounted(loadIncidents)
         <div class="bg-white rounded-md shadow overflow-hidden w-full">
           <div v-if="loading" class="p-6 text-center">Carregando ocorrências...</div>
           <table v-else class="w-full table-fixed divide-y divide-gray-200">
-            <thead class="bg-gray-100"><tr><th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">ID</th><th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">Data</th><th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">Estudante</th><th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">Curso</th><th v-if="showCampus" class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">Campus</th><th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">Visibilidade</th><th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">Verificado?</th><th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">Ações</th></tr></thead>
-            <tbody class="bg-white divide-y divide-gray-200"><tr v-for="incident in incidents" :key="incident.id"><td class="px-3 py-4 text-sm">{{ incident.id }}</td><td class="px-3 py-4 text-sm">{{ formatDate(incident.date_incident) }}</td><td class="px-3 py-4 text-sm">{{ incident.student?.name || '-' }}</td><td class="px-3 py-4 text-sm">{{ incident.course?.name || '-' }}</td><td v-if="showCampus" class="px-3 py-4 text-sm">{{ incident.course?.polo?.name || '-' }}</td><td class="px-3 py-4 text-center text-sm"><i v-if="incident.visibility === 'public'" class="fa-solid fa-check text-green-600" title="Público"></i><i v-else-if="incident.visibility === 'private'" class="fa-solid fa-lock text-red-600" title="Privado"></i><span v-else>-</span></td><td class="px-3 py-4 text-center text-sm"><i v-if="incident.signed_in" class="fa-solid fa-check text-green-600"></i><i v-else class="fa-solid fa-xmark text-red-600"></i></td><td class="px-3 py-4 text-sm"><Button :disabled="!can('occurrences', 'read') || !canAccessIncident(incident)" customClass="w-full bg-green-600 hover:bg-green-700 focus:ring-green-500" :to="`/ocorrencias/ocorrencias/visualizar/${incident.id}`"><i class="fa-solid fa-eye"></i>Visualizar</Button></td></tr><tr v-if="!incidents.length"><td :colspan="showCampus ? 8 : 7" class="px-6 py-4 text-center text-sm text-gray-500">Nenhuma ocorrência encontrada.</td></tr></tbody>
+            <thead class="bg-gray-100">
+              <tr>
+                <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">ID</th>
+                <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">Data</th>
+                <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">Estudante</th>
+                <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">Curso</th>
+                <th v-if="showCampus" class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">Campus</th>
+                <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">Visibilidade</th>
+                <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">Verificado?</th>
+                <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">Ações</th>
+              </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+              <tr v-for="incident in incidents" :key="incident.id">
+                <td class="px-3 py-4 text-sm">{{ incident.id }}</td>
+                <td class="px-3 py-4 text-sm">{{ formatDate(incident.date_incident) }}</td>
+                <td class="px-3 py-4 text-sm">{{ incident.student?.name || '-' }}</td>
+                <td class="px-3 py-4 text-sm">{{ incident.course?.name || '-' }}</td>
+                <td v-if="showCampus" class="px-3 py-4 text-sm">{{ incident.course?.polo?.name || '-' }}</td>
+                <td class="px-3 py-4 text-center text-sm">
+                  <i v-if="incident.visibility === 'public'" class="fa-solid fa-check text-green-600" title="Público"></i>
+                  <i v-else-if="incident.visibility === 'private'" class="fa-solid fa-lock text-red-600" title="Privado"></i>
+                  <span v-else>-</span>
+                </td>
+                <td class="px-3 py-4 text-center text-sm">
+                  <i v-if="incident.signed_in" class="fa-solid fa-check text-green-600"></i>
+                  <i v-else class="fa-solid fa-xmark text-red-600"></i>
+                </td>
+                <td class="px-3 py-4 text-sm"><Button :disabled="!can('occurrences', 'read') || !canAccessIncident(incident)"
+                    customClass="w-full bg-green-600 hover:bg-green-700 focus:ring-green-500"
+                    :to="`/ocorrencias/ocorrencias/visualizar/${incident.id}`"><i
+                      class="fa-solid fa-eye"></i>Visualizar</Button></td>
+              </tr>
+              <tr v-if="!incidents.length">
+                <td colspan="8" class="px-6 py-4 text-center text-sm text-gray-500">Nenhuma ocorrência encontrada.</td>
+              </tr>
+            </tbody>
           </table>
           <div class="flex justify-end items-end p-4"><VPagination v-model="page" :pages="Math.max(1, Math.ceil(total / amount))" :range-size="2" active-color="#00a63e" @update:modelValue="updateHandler" /></div>
         </div>

@@ -1,11 +1,12 @@
 <script setup>
+import { computed } from 'vue'
 import Sidebar from '@/components/sidebar.vue'
 import Button from '@/components/ui/button.vue'
 import Breadcrumb from '@/components/breadcrumb.vue'
 import Input from '@/components/ui/input.vue'
 import { onMounted, ref } from 'vue'
 import { list } from '@/services/students'
-import { can } from '@/services/permissions'
+import { can, permissionState } from '@/services/permissions'
 
 import VPagination from "@hennge/vue3-pagination";
 import "@hennge/vue3-pagination/dist/vue3-pagination.css";
@@ -23,6 +24,7 @@ const search = ref('');
 const students = ref([]);
 const total = ref(0);
 const loading = ref(false);
+const showCampus = computed(() => permissionState.user?.super_admin === true)
 
 const loadStudents = async () => {
   loading.value = true;
@@ -106,11 +108,9 @@ onMounted(loadStudents);
                 </th>
                 <th class="w-[20%] px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nome
                 </th>
-                <th class="w-[17%] px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th v-if="showCampus" class="w-[17%] px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Campus</th>
                 <th class="w-[15%] px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Turma
-                </th>
-                <th class="w-[13%] px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Polo
                 </th>
                 <th class="w-[15%] px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ações
                 </th>
@@ -123,11 +123,9 @@ onMounted(loadStudents);
                     :src="student.photo || '/placeholder.svg?height=100&width=100'" width="56" height="56"
                     alt="Foto do estudante" class="rounded-md object-cover"></td>
                 <td class="px-3 py-4 text-sm text-gray-500 break-words">{{ student.name }}</td>
-                <td class="px-3 py-4 text-sm text-gray-500 break-words">{{ student.course?.polo?.name || '-' }}</td>
+                <td v-if="showCampus" class="px-3 py-4 text-sm text-gray-500 break-words">{{ student.course?.polo?.name || '-' }}</td>
                 <td class="px-3 py-4 text-sm text-gray-500 break-words">{{ student.school_group?.identifier ||
                   student.school_group?.name || '-' }}</td>
-                <td class="px-3 py-4 text-sm text-gray-500 break-words">{{ student.school_group?.polo?.name ||
-                  student.course?.polo?.name || '-' }}</td>
                 <td class="px-3 py-4 text-sm text-gray-500"><Button
                     customClass="w-full bg-green-600 hover:bg-green-700 focus:ring-green-500"
                     :to="`/administrador/estudantes/visualizar/${student.id}`"><i
