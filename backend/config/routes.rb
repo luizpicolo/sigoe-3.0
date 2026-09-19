@@ -27,7 +27,7 @@ Rails.application.routes.draw do
       collection { get :options }
     end
     resources :report_incidents, only: [] do
-      collection { get :options }
+      collection { get :options, :data }
     end
     post 'report_incidents', to: 'report_incidents#create', defaults: { format: :pdf }
   end
