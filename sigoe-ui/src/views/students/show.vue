@@ -64,10 +64,10 @@ onMounted(() => loadStudent(studentId.value))
             </dl>
           </Card>
           <Card customClass="col-span-1" title="Ações">
-            <Button v-if="can('students', 'update')" variant="info" :to="`/administrador/estudantes/editar/${student.id}`" customClass="w-full"><i class="fa-solid fa-edit"></i>Editar Estudante</Button>
+            <Button :disabled="!can('students', 'update')" variant="info" :to="`/administrador/estudantes/editar/${student.id}`" customClass="w-full"><i class="fa-solid fa-edit"></i>Editar Estudante</Button>
             <Button v-if="can('students', 'read')" customClass="mt-4 w-full bg-green-600 hover:bg-green-700 focus:ring-green-500"><i class="fa-solid fa-print"></i>Imprimir Ficha</Button>
             <Button v-if="can('students', 'read')" customClass="mt-4 w-full bg-yellow-600 hover:bg-yellow-700 focus:ring-yellow-500"><i class="fa-solid fa-file-alt"></i>Histórico Escolar</Button>
-            <Button v-if="can('students', 'destroy')" customClass="mt-4 w-full bg-red-600 hover:bg-red-700 focus:ring-red-500"><i class="fa-solid fa-trash-alt"></i>Excluir Estudante</Button>
+            <Button :disabled="!can('students', 'destroy')" customClass="mt-4 w-full bg-red-600 hover:bg-red-700 focus:ring-red-500"><i class="fa-solid fa-trash-alt"></i>Excluir Estudante</Button>
           </Card>
           <Card customClass="col-span-3" title="Informações Acadêmicas">
             <dl class="divide-y divide-gray-200">
