@@ -12,6 +12,7 @@ import Header from '@/components/header.vue'
 import { getIncidentReportOptions, generateIncidentReport } from '@/services/reports/incidents'
 
 const breadcrumbItems = [{ label: 'Home', href: '/' }, { label: 'Ocorrências', href: '/ocorrencias' }, { label: 'Relatório ocorrências', href: '/ocorrencias/relatorio' }]
+
 const selectedStudent = ref('')
 const selectedCourse = ref('')
 const selectedClass = ref('')
@@ -37,8 +38,10 @@ const showError = message => Swal.fire({ title: 'Erro!', text: message, icon: 'e
 
 const setQuickFilter = days => {
   selectedQuickFilter.value = days
+
   const today = new Date()
   const pastDate = new Date()
+
   pastDate.setDate(today.getDate() - days)
   endDate.value = today.toISOString().split('T')[0]
   startDate.value = pastDate.toISOString().split('T')[0]
@@ -46,14 +49,23 @@ const setQuickFilter = days => {
 
 const handleGenerateReport = async () => {
   if (!isFormValid.value) return showError('Informe um período válido, com data inicial e final.')
+
   isGenerating.value = true
+
   try {
     await generateIncidentReport(filters.value)
   } catch (error) {
     let message = 'Não foi possível gerar o relatório.'
+
     if (error.response?.data instanceof Blob) {
-      try { message = JSON.parse(await error.response.data.text()).error || message } catch (_) {}
-    } else message = error.response?.data?.error || message
+      try {
+        message = JSON.parse(await error.response.data.text()).error || message
+      } catch (_) {
+      }
+    } else {
+      message = error.response?.data?.error || message
+    }
+
     await showError(message)
   } finally {
     isGenerating.value = false
@@ -73,6 +85,7 @@ const clearFilters = () => {
 onMounted(async () => {
   setQuickFilter(7)
   isLoadingOptions.value = true
+
   try {
     options.value = await getIncidentReportOptions()
   } catch (error) {
@@ -86,15 +99,48 @@ onMounted(async () => {
 <template>
   <div class="min-h-screen flex flex-col">
     <Header />
-    <div class="flex flex-col md:flex-row flex-1"><Sidebar :activePage="'relatorio'" /><main class="flex-1 p-6">
-      <Breadcrumb :items="breadcrumbItems" />
-      <div class="flex justify-between items-center mb-6"><h1 class="text-2xl font-bold">Relatório de Ocorrências</h1><Button v-if="hasFilters" @click="clearFilters" customClass="bg-gray-500 hover:bg-gray-600 focus:ring-gray-500">Limpar Filtros</Button></div>
-      <Card customClass="mb-4" title="Filtros Rápidos" icon="filter"><div class="flex flex-wrap gap-2"><Button @click="setQuickFilter(7)" :customClass="selectedQuickFilter === 7 ? 'bg-green-700 text-sm' : 'bg-blue-500 hover:bg-blue-600 text-sm'">Últimos 7 dias</Button><Button @click="setQuickFilter(30)" :customClass="selectedQuickFilter === 30 ? 'bg-green-700 text-sm' : 'bg-blue-500 hover:bg-blue-600 text-sm'">Últimos 30 dias</Button><Button @click="setQuickFilter(90)" :customClass="selectedQuickFilter === 90 ? 'bg-green-700 text-sm' : 'bg-blue-500 hover:bg-blue-600 text-sm'">Últimos 3 meses</Button><Button @click="setQuickFilter(365)" :customClass="selectedQuickFilter === 365 ? 'bg-green-700 text-sm' : 'bg-blue-500 hover:bg-blue-600 text-sm'">Último ano</Button></div></Card>
-      <form @submit.prevent="handleGenerateReport" class="space-y-6"><Card customClass="mb-4" title="Período *" icon="calendar"><div class="grid grid-cols-1 md:grid-cols-2 gap-6"><Input v-model="startDate" type="date" required /><Input v-model="endDate" type="date" required /></div></Card>
-        <Card customClass="mb-4" title="Estudante e Curso" icon="user-graduate"><div class="grid grid-cols-1 md:grid-cols-2 gap-6"><SearchableSelect v-model="selectedStudent" :options="studentOptions" placeholder="Todos os estudantes" :disabled="isLoadingOptions" /><SearchableSelect v-model="selectedCourse" :options="courseOptions" placeholder="Todos os cursos" :disabled="isLoadingOptions" /></div></Card>
-        <Card customClass="mb-4" title="Dados da Ocorrência" icon="exclamation-triangle"><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"><SearchableSelect v-model="selectedOccurrenceType" :options="occurrenceOptions" placeholder="Todos os tipos" :disabled="isLoadingOptions" /><Select v-model="selectedResident" :options="[{ value: '', label: 'Todos' }, { value: 'resident', label: 'Sim' }, { value: 'non_resident', label: 'Não' }]" /><Select v-model="selectedResolved" :options="[{ value: '', label: 'Todas' }, { value: 'yes_', label: 'Sim' }, { value: 'no_', label: 'Não' }]" /><SearchableSelect v-model="selectedClass" :options="classOptions" placeholder="Todas as turmas" :disabled="isLoadingOptions" /></div></Card>
-        <div><Button type="submit" :disabled="!isFormValid || isGenerating || isLoadingOptions" customClass="bg-green-600 hover:bg-green-700">{{ isGenerating ? 'Gerando...' : 'Exportar PDF' }}</Button></div>
-      </form>
-    </main></div>
+    <div class="flex flex-col md:flex-row flex-1">
+      <Sidebar :activePage="'relatorio'" />
+      <main class="flex-1 p-6">
+        <Breadcrumb :items="breadcrumbItems" />
+        <div class="flex justify-between items-center mb-6">
+          <h1 class="text-2xl font-bold">Relatório de Ocorrências</h1>
+          <Button v-if="hasFilters" @click="clearFilters" customClass="bg-gray-500 hover:bg-gray-600 focus:ring-gray-500">Limpar Filtros</Button>
+        </div>
+        <Card customClass="mb-4" title="Filtros Rápidos" icon="filter">
+          <div class="flex flex-wrap gap-2">
+            <Button @click="setQuickFilter(7)" :customClass="selectedQuickFilter === 7 ? 'bg-green-700 text-sm' : 'bg-blue-500 hover:bg-blue-600 text-sm'">Últimos 7 dias</Button>
+            <Button @click="setQuickFilter(30)" :customClass="selectedQuickFilter === 30 ? 'bg-green-700 text-sm' : 'bg-blue-500 hover:bg-blue-600 text-sm'">Últimos 30 dias</Button>
+            <Button @click="setQuickFilter(90)" :customClass="selectedQuickFilter === 90 ? 'bg-green-700 text-sm' : 'bg-blue-500 hover:bg-blue-600 text-sm'">Últimos 3 meses</Button>
+            <Button @click="setQuickFilter(365)" :customClass="selectedQuickFilter === 365 ? 'bg-green-700 text-sm' : 'bg-blue-500 hover:bg-blue-600 text-sm'">Último ano</Button>
+          </div>
+        </Card>
+        <form @submit.prevent="handleGenerateReport" class="space-y-6">
+          <Card customClass="mb-4" title="Período *" icon="calendar">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <Input v-model="startDate" type="date" required />
+              <Input v-model="endDate" type="date" required />
+            </div>
+          </Card>
+          <Card customClass="mb-4" title="Estudante e Curso" icon="user-graduate">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <SearchableSelect v-model="selectedStudent" :options="studentOptions" placeholder="Todos os estudantes" :disabled="isLoadingOptions" />
+              <SearchableSelect v-model="selectedCourse" :options="courseOptions" placeholder="Todos os cursos" :disabled="isLoadingOptions" />
+            </div>
+          </Card>
+          <Card customClass="mb-4" title="Dados da Ocorrência" icon="exclamation-triangle">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              <SearchableSelect v-model="selectedOccurrenceType" :options="occurrenceOptions" placeholder="Todos os tipos" :disabled="isLoadingOptions" />
+              <Select v-model="selectedResident" :options="[{ value: '', label: 'Todos' }, { value: 'resident', label: 'Sim' }, { value: 'non_resident', label: 'Não' }]" />
+              <Select v-model="selectedResolved" :options="[{ value: '', label: 'Todas' }, { value: 'yes_', label: 'Sim' }, { value: 'no_', label: 'Não' }]" />
+              <SearchableSelect v-model="selectedClass" :options="classOptions" placeholder="Todas as turmas" :disabled="isLoadingOptions" />
+            </div>
+          </Card>
+          <div>
+            <Button type="submit" :disabled="!isFormValid || isGenerating || isLoadingOptions" customClass="bg-green-600 hover:bg-green-700">{{ isGenerating ? 'Gerando...' : 'Exportar PDF' }}</Button>
+          </div>
+        </form>
+      </main>
+    </div>
   </div>
 </template>
