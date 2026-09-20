@@ -85,7 +85,22 @@ onMounted(async () => { options.value = await incidentOptions() })
           <Card title="Ocorrência">
             <div class="grid grid-cols-12 gap-4"><div class="col-span-3"><Input v-model="dateIncident" type="date" label="Data ocorrência" /></div><div class="col-span-3"><Input v-model="timeIncident" type="time" label="Hora ocorrência" /></div><div class="col-span-3"><Select id="occurrenceType" label="Tipo da ocorrência" v-model="selectedOccurrenceType" :options="occurrenceOptions" /></div><div class="col-span-3"><Select id="accessType" label="Tipo de acesso" v-model="selectedAccessType" :options="[{ value: 'public', label: 'Público' }, { value: 'private', label: 'Privado' }]" /></div></div>
             <textarea v-model="description" rows="5" class="border-2 border-gray-300 bg-white w-full border rounded-md mt-4 p-3" placeholder="Ocorrência"></textarea>
-            <template v-if="canApplySanction"><div class="grid grid-cols-6 gap-6 mt-4"><div class="col-span-3"><Select id="sanction" label="Sanção aplicada" v-model="selectedSanction" :options="options.sanctions" /></div><div class="col-span-3"><Select id="resolved" label="Ocorrência resolvida?" v-model="occurrenceResolved" :options="[{ value: 'no_', label: 'Não' }, { value: 'yes_', label: 'Sim' }]" /></div></div><Card title="Direitos e deveres do estudante"><label v-for="item in options.student_duties" :key="item.id" class="flex gap-2 mb-2"><input type="checkbox" :value="item.id" v-model="studentDuties"><span>{{ item.item }}</span></label></Card><Card title="Proibições e responsabilidades"><label v-for="item in options.prohibition_and_responsibilities" :key="item.id" class="flex gap-2 mb-2"><input type="checkbox" :value="item.id" v-model="prohibitions"><span>{{ item.item }}</span></label></Card><Card title="Descrição da solução"><textarea v-model="solution" rows="5" class="border-2 border-gray-300 bg-white w-full border rounded-md p-3" placeholder="Solução"></textarea></Card></template>
+          </Card>
+          <template v-if="canApplySanction">
+            <div class="grid grid-cols-6 gap-6 mt-4">
+              <div class="col-span-3"><Select id="sanction" label="Sanção aplicada" v-model="selectedSanction" :options="options.sanctions" /></div>
+              <div class="col-span-3"><Select id="resolved" label="Ocorrência resolvida?" v-model="occurrenceResolved" :options="[{ value: 'no_', label: 'Não' }, { value: 'yes_', label: 'Sim' }]" /></div>
+            </div>
+            <Card title="Direitos e deveres do estudante">
+              <label v-for="item in options.student_duties" :key="item.id" class="flex gap-2 mb-2"><input type="checkbox" :value="item.id" v-model="studentDuties"><span>{{ item.item }}</span></label>
+            </Card>
+            <Card title="Proibições e responsabilidades">
+              <label v-for="item in options.prohibition_and_responsibilities" :key="item.id" class="flex gap-2 mb-2"><input type="checkbox" :value="item.id" v-model="prohibitions"><span>{{ item.item }}</span></label>
+            </Card>
+            <Card title="Descrição da solução">
+              <textarea v-model="solution" rows="5" class="border-2 border-gray-300 bg-white w-full border rounded-md p-3" placeholder="Solução"></textarea>
+            </Card>
+          </template>
           <p v-if="errorMessage" class="text-red-600">{{ errorMessage }}</p><p v-if="successMessage" class="text-green-600">{{ successMessage }}</p>
           <Button type="submit" :disabled="loading">{{ loading ? 'Salvando...' : 'Salvar' }}</Button>
         </form>
