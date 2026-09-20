@@ -15,7 +15,7 @@ pt-BR:
       institution: "Instituições"
       sector: "Setores"
       Schoolgroup: "Turmas"
-      
+
     attributes:
       user:
         name: "Nome"
@@ -33,6 +33,15 @@ pt-BR:
         time_incident: 'Hora ocorrência'
         course: 'Curso'
         user: 'Usuário'
+        is_resolved: 'Ocorrência resolvida?'
+        type_student: 'Tipo de estudante'
+        sanction: 'Sanção aplicada'
+        sector:
+          name: 'Nome'
+          polo: 'Polo'
+
+    enums:
+      incident:
         is_resolved:
           no_: 'Não'
           yes_: 'Sim'
@@ -40,11 +49,7 @@ pt-BR:
           non_resident: 'Não residente'
           resident: 'Residente'
         sanction:
-          one: 'Sanção aplicada'
           verbal_warning: 'Advertência Verbal'
           written_warning: 'Advertência escrita'
           suspension: 'Suspensão'
           quitting_school: 'Desligamento'
-        sector:
-          name: 'Nome'
-          polo: 'Polo'

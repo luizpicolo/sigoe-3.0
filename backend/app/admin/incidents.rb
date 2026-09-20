@@ -15,9 +15,11 @@ ActiveAdmin.register Incident do
     column :course
     column :type_incident
     column :sanction do |incident|
-      I18n.t("activerecord.attributes.incident.sanction.#{incident.sanction}", default: 'Sem sanção')
+      I18n.t("enums.incident.sanction.#{incident.sanction}", default: 'Sem sanção')
     end
-    column :is_resolved
+    column :is_resolved do |incident|
+      I18n.t("enums.incident.is_resolved.#{incident.is_resolved}", default: incident.is_resolved)
+    end
     column :sector_id
     column :visibility
     actions
@@ -46,9 +48,9 @@ ActiveAdmin.register Incident do
       f.input :date_incident
       f.input :time_incident
       f.input :soluction
-      f.input :is_resolved
-      f.input :type_student
-      f.input :sanction
+      f.input :is_resolved, as: :select, collection: Incident.is_resolveds.keys.map { |key| [I18n.t("enums.incident.is_resolved.#{key}"), key] }
+      f.input :type_student, as: :select, collection: Incident.type_students.keys.map { |key| [I18n.t("enums.incident.type_student.#{key}"), key] }
+      f.input :sanction, as: :select, collection: Incident.sanctions.keys.map { |key| [I18n.t("enums.incident.sanction.#{key}"), key] }
       f.input :visibility
       f.input :signed_in
       f.input :prohibition_and_responsibilities
@@ -72,10 +74,14 @@ ActiveAdmin.register Incident do
       row :date_incident
       row :time_incident
       row :soluction
-      row :is_resolved
-      row :type_student
+      row :is_resolved do |incident|
+        I18n.t("enums.incident.is_resolved.#{incident.is_resolved}", default: incident.is_resolved)
+      end
+      row :type_student do |incident|
+        I18n.t("enums.incident.type_student.#{incident.type_student}", default: incident.type_student)
+      end
       row :sanction do |incident|
-        I18n.t("activerecord.attributes.incident.sanction.#{incident.sanction}", default: 'Sem sanção')
+        I18n.t("enums.incident.sanction.#{incident.sanction}", default: 'Sem sanção')
       end
       row :visibility
       row :signed_in
