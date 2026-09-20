@@ -1,6 +1,5 @@
 <script setup>
 import { ref } from 'vue'
-import { useRouter } from 'vue-router'
 import Sidebar from '@/components/sidebar.vue'
 import Breadcrumb from '@/components/breadcrumb.vue'
 import Card from '@/components/ui/card.vue'
@@ -8,9 +7,7 @@ import Input from '@/components/ui/input.vue'
 import Alert from '@/components/ui/alert.vue'
 import Header from '@/components/header.vue'
 import { changePassword } from '@/services/users'
-import { success, error, confirm } from '@/utils/sweetPopup2'
-
-const router = useRouter()
+import { success, error } from '@/utils/sweetPopup2'
 
 const breadcrumbItems = [
   { label: 'Home', href: '/home' },
@@ -62,8 +59,8 @@ const handleSubmit = async event => {
     currentPassword.value = ''
     newPassword.value = ''
     confirmPassword.value = ''
-  } catch (error) {
-    error(error.response?.data?.error || error.response?.data?.errors?.join(', ') || 'Erro ao alterar a senha. Por favor, tente novamente.')
+  } catch (e) {
+    error(e.response?.data?.error || e.response?.data?.errors?.join(', ') || 'Erro ao alterar a senha. Por favor, tente novamente.')
   } finally {
     isSubmitting.value = false
   }
