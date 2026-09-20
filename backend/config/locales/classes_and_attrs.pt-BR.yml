@@ -36,9 +36,10 @@ pt-BR:
         is_resolved: 'Ocorrência resolvida?'
         type_student: 'Tipo de estudante'
         sanction: 'Sanção aplicada'
-        sector:
-          name: 'Nome'
-          polo: 'Polo'
+        sector: 'Setor'
+      sector:
+        name: 'Nome'
+        polo: 'Polo'
 
     enums:
       incident:
