@@ -1,8 +1,7 @@
 class Incident < ApplicationRecord
   include SearchCop
 
-  validates :user, :assistant, :description, :date_incident, :time_incident, :type_incident,
-            presence: true
+  validates :user, :assistant, :description, :date_incident, :time_incident, :type_incident, presence: true
   validates :visibility, presence: true, inclusion: { in: %w[public private] }
 
   delegate :ra, to: :user, prefix: true
@@ -45,19 +44,19 @@ class Incident < ApplicationRecord
   end
 
   def self.by_courses(params_return)
-    joins(:course).where(params_return).group(:'courses.name').count
+    joins(:course).where(params_return).group(:'courses.name').order(Arel.sql('COUNT(*) DESC')).count
   end
 
   def self.by_is_resolved(params_return = {})
-    result = joins(:course).where(params_return).group(:is_resolved).count
+    result = joins(:course).where(params_return).group(:is_resolved).order(Arel.sql('COUNT(*) DESC')).count
     result['Não'] = result.delete 'no_'
     result['Sim'] = result.delete 'yes_'
-    result['Sem Categoria'] = result.delete nil
+    result['Não'] = result.delete nil
     result.compact
   end
 
   def self.by_type_incident(params_return)
-    joins(:course).where(params_return).joins(:type_incident).group(:'type_incidents.name').count
+    joins(:course).where(params_return).joins(:type_incident).group(:'type_incidents.name').order(Arel.sql('COUNT(*) DESC')).count
   end
 
   def self.by_sanction(params_return)
@@ -66,7 +65,7 @@ class Incident < ApplicationRecord
     result['Advertência Escrita'] = result.delete 'written_warning'
     result['Advertência Verbal'] = result.delete 'verbal_warning'
     result['Desligamento'] = result.delete 'quitting_school'
-    result['Sem Categoria'] = result.delete nil
+    result['Não se Aplica'] = result.delete nil
     result.compact
   end
 
