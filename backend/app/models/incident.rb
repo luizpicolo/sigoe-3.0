@@ -8,10 +8,9 @@ class Incident < ApplicationRecord
   delegate :ra, to: :user, prefix: true
   delegate :name, to: :course, prefix: true
 
-  enum is_resolved: { 'no_' => 0, 'yes_' => 1 }
-  enum type_student: { 'non_resident' => 0, 'resident' => 1 }
-  enum sanction: { 'verbal_warning' => 0, 'written_warning' => 1, 'suspension' => 2,
-                   'quitting_school' => 3 }
+  enum :is_resolved, { no_: 0, yes_: 1 }
+  enum :type_student, { non_resident: 0, resident: 1 }
+  enum :sanction, { verbal_warning: 0, written_warning: 1, suspension: 2, quitting_school: 3 }
 
   belongs_to :student, optional: true
   belongs_to :user
@@ -42,7 +41,7 @@ class Incident < ApplicationRecord
   end
 
   def self.by_years(params_return)
-    joins(:course).where(params_return).group_by_year(:date_incident, format: '%Y').count
+    joins(:course).where(params_return).group_by_year(:created_at, format: '%Y').count
   end
 
   def self.by_courses(params_return)
@@ -64,8 +63,8 @@ class Incident < ApplicationRecord
   def self.by_sanction(params_return)
     result = joins(:course).where(params_return).group(:sanction).count
     result['Suspensão'] = result.delete 'suspension'
-    result['Adv Escrita'] = result.delete 'written_warning'
-    result['Adv Verbal'] = result.delete 'verbal_warning'
+    result['Advertência Escrita'] = result.delete 'written_warning'
+    result['Advertência Verbal'] = result.delete 'verbal_warning'
     result['Desligamento'] = result.delete 'quitting_school'
     result['Sem Categoria'] = result.delete nil
     result.compact
