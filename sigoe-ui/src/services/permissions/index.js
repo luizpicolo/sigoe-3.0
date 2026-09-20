@@ -56,7 +56,10 @@ export const can = (entity, action = 'read') => {
   const entityPermissions = permissionState.permissions?.[entity]
   if (!entityPermissions) return false
 
-  return entityPermissions[action] === true || entityPermissions[`can_${action}`] === true
+  // A permissão "Aplicar sanção" usa o campo legado can_extras no backend.
+  const permissionKey = action === 'sanction' ? 'can_extras' : action
+
+  return entityPermissions[permissionKey] === true || entityPermissions[`can_${permissionKey}`] === true
 }
 
 export const getUserPermissions = async (userId) => {
