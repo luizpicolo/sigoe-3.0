@@ -9,6 +9,7 @@ import { list, remove } from '@/services/school_groups'
 import { can, permissionState } from '@/services/permissions'
 import VPagination from '@hennge/vue3-pagination'
 import '@hennge/vue3-pagination/dist/vue3-pagination.css'
+import { error, confirm, success } from '@/utils/sweetPopup2'
 
 const breadcrumbItems = [{ label: 'Home', href: '/' }, { label: 'Administrador', href: '/' }, { label: 'Turmas', href: '/administrador/turmas/listar' }]
 
@@ -19,19 +20,17 @@ const search = ref('')
 const groups = ref([])
 const total = ref(0)
 const loading = ref(false)
-const error = ref('')
 const showCampus = computed(() => permissionState.user?.super_admin === true)
 
 const loadGroups = async () => {
   loading.value = true
-  error.value = ''
 
   try {
     const r = await list(page.value, order.value, search.value, amount.value)
     groups.value = r?.school_groups || []
     total.value = r?.total || 0
   } catch (e) {
-    error.value = 'Não foi possível carregar as turmas.'
+    error('Não foi possível carregar as turmas.')
     groups.value = []
     total.value = 0
   } finally {
@@ -55,13 +54,14 @@ const changeFilters = () => {
 }
 
 const destroy = async id => {
-  if (!confirm('Excluir esta turma?')) return
-
-  try {
-    await remove(id)
-    await loadGroups()
-  } catch (e) {
-    error.value = 'Não foi possível excluir a turma.'
+  if (await confirm('Excluir esta turma?')){
+    try {
+      await remove(id)
+      success("Turma excluida com sucesso");
+      await loadGroups()
+    } catch (e) {
+      error('Não foi possível excluir a turma.')
+    }
   }
 }
 
@@ -110,9 +110,6 @@ onMounted(loadGroups)
         <div class="bg-white rounded-md shadow overflow-hidden w-full">
           <div v-if="loading" class="p-6 text-center">
             Carregando turmas...
-          </div>
-          <div v-else-if="error" class="p-6 text-center text-red-600">
-            {{ error }}
           </div>
           <table v-else class="w-full table-fixed divide-y divide-gray-200">
             <thead class="bg-gray-100">
