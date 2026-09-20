@@ -34,7 +34,6 @@ const actions = [
   { key: 'can_read_restricted', label: 'Leitura restrita' },
   { key: 'can_update', label: 'Atualizar' },
   { key: 'can_destroy', label: 'Deletar' },
-  { key: 'can_extras', label: 'Opções extras' },
   { key: 'can_export_to_academic_system', label: 'Exportar' },
 ]
 
@@ -110,6 +109,7 @@ const save = async () => {
 }
 
 const entityName = (id) => entities.value.find(entity => entity.id === id)?.name || id
+const isOccurrence = (permission) => permission.entity === 'occurrences'
 
 onMounted(load)
 </script>
@@ -187,6 +187,10 @@ onMounted(load)
                 <label v-for="action in actions" :key="action.key" class="flex items-center gap-3 p-3 border border-gray-200 rounded-md cursor-pointer hover:bg-gray-50">
                   <input v-model="permission[action.key]" type="checkbox" class="w-5 h-5" />
                   <span class="text-sm text-gray-700">{{ action.label }}</span>
+                </label>
+                <label v-if="isOccurrence(permission)" class="flex items-center gap-3 p-3 border border-gray-200 rounded-md cursor-pointer hover:bg-gray-50">
+                  <input v-model="permission.can_extras" type="checkbox" class="w-5 h-5" />
+                  <span class="text-sm text-gray-700">Aplicar sanção</span>
                 </label>
               </div>
             </div>
