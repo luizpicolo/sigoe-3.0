@@ -1,7 +1,9 @@
+```vue
 <script setup>
 import { computed, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import Swal from 'sweetalert2'
+
+import { success, error, confirm } from '@/utils/sweetPopup2'
 import Sidebar from '@/components/sidebar.vue'
 import Breadcrumb from '@/components/breadcrumb.vue'
 import Button from '@/components/ui/button.vue'
@@ -9,15 +11,29 @@ import Select from '@/components/ui/select.vue'
 import Input from '@/components/ui/input.vue'
 import Card from '@/components/ui/card.vue'
 import Header from '@/components/header.vue'
-import { formatDate, formatTime } from '@/utils'
+
 import { can } from '@/services/permissions'
-import { find as findIncident, options as incidentOptions, update as updateIncident } from '@/services/incidents'
+import {
+  find as findIncident,
+  options as incidentOptions,
+  update as updateIncident
+} from '@/services/incidents'
 
 const route = useRoute()
 const router = useRouter()
 const incidentId = route.params.id
+
 const incident = ref(null)
-const options = ref({ assistants: [], sectors: [], type_incidents: [], student_duties: [], prohibition_and_responsibilities: [], sanctions: [] })
+
+const options = ref({
+  assistants: [],
+  sectors: [],
+  type_incidents: [],
+  student_duties: [],
+  prohibition_and_responsibilities: [],
+  sanctions: []
+})
+
 const selectedStudentType = ref('')
 const selectedAssistant = ref('')
 const selectedSector = ref('')
@@ -25,24 +41,44 @@ const selectedOccurrenceType = ref('')
 const selectedAccessType = ref('public')
 const selectedSanction = ref('')
 const occurrenceResolved = ref('no_')
+
 const occurrenceDate = ref('')
 const occurrenceTime = ref('')
 const occurrenceDescription = ref('')
-const canApplySanction = computed(() => can('occurrences', 'sanction'))
 const solutionDescription = ref('')
+
 const studentDuties = ref([])
 const prohibitions = ref([])
+
 const loading = ref(true)
 const saving = ref(false)
 const errorMessage = ref('')
 
-const assistantOptions = computed(() => options.value.assistants.map(item => ({ value: String(item.id), label: `${item.name}${item.email ? ` - ${item.email}` : ''}` })))
-const sectorOptions = computed(() => options.value.sectors.map(item => ({ value: String(item.id), label: `${item.name}${item.email ? ` - ${item.email}` : ''}` })))
-const occurrenceOptions = computed(() => options.value.type_incidents.map(item => ({ value: String(item.id), label: item.name })))
+const assistantOptions = computed(() => options.value.assistants.map(item => ({
+  value: String(item.id),
+  label: `${item.name}${item.email ? ` - ${item.email}` : ''}`
+})))
+
+const sectorOptions = computed(() => options.value.sectors.map(item => ({
+  value: String(item.id),
+  label: `${item.name}${item.email ? ` - ${item.email}` : ''}`
+})))
+
+const occurrenceOptions = computed(() => options.value.type_incidents.map(item => ({
+  value: String(item.id),
+  label: item.name
+})))
 
 const loadData = async () => {
+  loading.value = true
+  errorMessage.value = ''
+
   try {
-    const [incidentResponse, optionsResponse] = await Promise.all([findIncident(incidentId), incidentOptions()])
+    const [incidentResponse, optionsResponse] = await Promise.all([
+      findIncident(incidentId),
+      incidentOptions()
+    ])
+
     incident.value = incidentResponse.incident
     options.value = optionsResponse
 
@@ -61,8 +97,9 @@ const loadData = async () => {
     solutionDescription.value = data.soluction || ''
     studentDuties.value = (data.student_duties || []).map(item => item.id)
     prohibitions.value = (data.prohibition_and_responsibilities || []).map(item => item.id)
-  } catch (error) {
-    errorMessage.value = error.response?.data?.errors?.join(', ') || 'Não foi possível carregar a ocorrência.'
+  } catch (err) {
+    const message = err.response?.data?.errors?.join(', ') || 'Não foi possível carregar a ocorrência.'
+    error({ title: 'Erro!', text: message})
   } finally {
     loading.value = false
   }
@@ -70,20 +107,28 @@ const loadData = async () => {
 
 const handleSubmit = async () => {
   saving.value = true
-  errorMessage.value = ''
 
-  const payload = { type_student: selectedStudentType.value, assistant_id: selectedAssistant.value, sector_id: selectedSector.value || null, type_incident_id: selectedOccurrenceType.value, visibility: selectedAccessType.value, date_incident: occurrenceDate.value, time_incident: occurrenceTime.value, description: occurrenceDescription.value }
-  if (canApplySanction.value) Object.assign(payload, { sanction: selectedSanction.value || null, is_resolved: occurrenceResolved.value, soluction: solutionDescription.value, student_duty_ids: studentDuties.value, prohibition_and_responsibility_ids: prohibitions.value })
-  const response = await updateIncident(incidentId, payload)
+  try {
+    const payload = {
+      type_student: selectedStudentType.value,
+      assistant_id: selectedAssistant.value,
+      sector_id: selectedSector.value || null,
+      type_incident_id: selectedOccurrenceType.value,
+      visibility: selectedAccessType.value,
+      date_incident: occurrenceDate.value,
+      time_incident: occurrenceTime.value,
+      description: occurrenceDescription.value
+    }
 
-  saving.value = false
-
-  if (response.error) return (errorMessage.value = Array.isArray(response.error) ? response.error.join(', ') : response.error)
-
-  const result = await Swal.fire({ title: 'Atualizada!', text: 'Ocorrência atualizada com sucesso.', icon: 'success', confirmButtonText: 'OK' })
-
-  if (result.isConfirmed) {
-    router.push(`/ocorrencias/ocorrencias/visualizar/${incidentId}`)
+    const response = await updateIncident(incidentId, payload)
+    if (await success('Ocorrência atualizada com sucesso.')){
+      router.push(`/ocorrencias/ocorrencias/visualizar/${incidentId}`)
+    }
+  } catch (err) {
+    const message = err.response?.data?.errors?.join(', ') || 'Não foi possível atualizar a ocorrência.'
+    error({ title: 'Erro!', text: message })
+  } finally {
+    saving.value = false
   }
 }
 
@@ -155,9 +200,9 @@ onMounted(loadData)
 
             <textarea v-model="occurrenceDescription" rows="5" class="w-full border rounded-md mt-4 p-3"></textarea>
 
-            <div v-if="canApplySanction" class="grid grid-cols-6 gap-6 mt-4">
+            <div v-if="can('occurrences', 'sanction')" class="grid grid-cols-6 gap-6 mt-4">
               <div class="col-span-3">
-                <Select id="sanction" label="Sanção aplicada" v-model="selectedSanction" :options="[{ value: '', label: 'Não se aplicada' }, ...options.sanctions]" />
+                <Select id="sanction" label="Sanção aplicada" v-model="selectedSanction" :options="[{ value: '', label: 'Não se aplica' }, ...options.sanctions]" />
               </div>
 
               <div class="col-span-3">
@@ -166,25 +211,24 @@ onMounted(loadData)
             </div>
           </Card>
 
-          <template v-if="canApplySanction">
-          <Card title="Capítulo III - Direitos e Deveres">
-            <label v-for="item in options.student_duties" :key="item.id" class="flex gap-2 mb-2">
-              <input type="checkbox" :value="item.id" v-model="studentDuties">
-              <span>{{ item.item }}</span>
-            </label>
-          </Card>
+          <template v-if="can('occurrences', 'sanction')">
+            <Card title="Capítulo III - Direitos e Deveres">
+              <label v-for="item in options.student_duties" :key="item.id" class="flex gap-2 mb-2">
+                <input type="checkbox" :value="item.id" v-model="studentDuties">
+                <span>{{ item.item }}</span>
+              </label>
+            </Card>
 
-          <Card title="Capítulo IV - Proibições">
-            <label v-for="item in options.prohibition_and_responsibilities" :key="item.id" class="flex gap-2 mb-2">
-              <input type="checkbox" :value="item.id" v-model="prohibitions">
-              <span>{{ item.item }}</span>
-            </label>
-          </Card>
+            <Card title="Capítulo IV - Proibições">
+              <label v-for="item in options.prohibition_and_responsibilities" :key="item.id" class="flex gap-2 mb-2">
+                <input type="checkbox" :value="item.id" v-model="prohibitions">
+                <span>{{ item.item }}</span>
+              </label>
+            </Card>
 
-          <Card title="Descrição da solução">
-            <textarea v-model="solutionDescription" rows="5" class="w-full border rounded-md p-3"></textarea>
-          </Card>
-
+            <Card title="Descrição da solução">
+              <textarea v-model="solutionDescription" rows="5" class="w-full border rounded-md p-3"></textarea>
+            </Card>
           </template>
 
           <p v-if="errorMessage" class="text-red-600">{{ errorMessage }}</p>
@@ -198,3 +242,4 @@ onMounted(loadData)
     </div>
   </div>
 </template>
+```

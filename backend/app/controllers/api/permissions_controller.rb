@@ -11,7 +11,7 @@ class Api::PermissionsController < ApplicationController
     'occurrences' => { model: Incident, name: 'Ocorrências' }
   }.freeze
 
-  ACTIONS = %w[can_create can_read can_read_restricted can_update can_destroy can_extras can_export_to_academic_system].freeze
+  ACTIONS = %w[can_create can_read can_read_restricted can_update can_sanction can_destroy can_extras can_export_to_academic_system].freeze
 
   def current
     render json: permission_payload(current_user)

@@ -14,7 +14,6 @@ import { find, remove } from '@/services/incidents'
 
 const route = useRoute()
 const router = useRouter()
-const canApplySanction = computed(() => can('occurrences', 'sanction'))
 const incidentId = route.params.id
 const loading = ref(true)
 const incident = ref(null)
@@ -123,7 +122,7 @@ onMounted(loadIncident)
                 Imprimir Relatório
               </Button>
 
-              <Button :disabled="!can('occurrences', 'read')" customClass="mt-4 w-full bg-purple-600 hover:bg-purple-700" @click="openAcademicExportForm">
+              <Button :disabled="!can('occurrences', 'can_export_to_academic_system')" customClass="mt-4 w-full bg-purple-600 hover:bg-purple-700" @click="openAcademicExportForm">
                 <i class="fa-solid fa-file-export"></i>
                 Exportar para Sistema Acadêmico
               </Button>
@@ -134,7 +133,7 @@ onMounted(loadIncident)
               </Button>
             </Card>
 
-            <template v-if="canApplySanction">
+            <template v-if="can('occurrences', 'sanction')">
             <Card customClass="col-span-3" title="Status da Ocorrência">
               <dl class="divide-y divide-gray-200">
                 <div v-for="item in [{ label: 'Sanção aplicada', value: sanctionLabels[incident.sanction] || 'Nenhuma sanção aplicada' }, { label: 'Ocorrência resolvida', value: incident.is_resolved ? 'Sim' : 'Não' }, { label: 'Visibilidade', value: incident.visibility ? 'Visível' : 'Oculta' }, { label: 'Verificada', value: incident.signed_in ? 'Verificada' : 'Pendente' }]" :key="item.label" class="py-3 grid grid-cols-3">

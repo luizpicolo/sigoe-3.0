@@ -79,6 +79,7 @@ const addEntity = (entityId) => {
     can_update: false,
     can_destroy: false,
     can_extras: false,
+    can_sanction: false,
     can_export_to_academic_system: false
   })
 
@@ -189,7 +190,7 @@ onMounted(load)
                   <span class="text-sm text-gray-700">{{ action.label }}</span>
                 </label>
                 <label v-if="isOccurrence(permission)" class="flex items-center gap-3 p-3 border border-gray-200 rounded-md cursor-pointer hover:bg-gray-50">
-                  <input v-model="permission.can_extras" type="checkbox" class="w-5 h-5" />
+                  <input v-model="permission.can_sanction" type="checkbox" class="w-5 h-5" />
                   <span class="text-sm text-gray-700">Aplicar sanção</span>
                 </label>
               </div>
