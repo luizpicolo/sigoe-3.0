@@ -18,6 +18,7 @@ ActiveAdmin.register Incident do
       I18n.t("activerecord.attributes.incident.sanction.#{incident.sanction}", default: 'Sem sanção')
     end
     column :is_resolved
+    column :sector_id
     column :visibility
     actions
   end
@@ -28,6 +29,7 @@ ActiveAdmin.register Incident do
   filter :date_incident
   filter :sanction
   filter :is_resolved
+  filter :sector_id, as: :select, collection: Sector.order(:name).pluck(:name, :id)
   filter :visibility
 
   form do |f|
@@ -38,7 +40,7 @@ ActiveAdmin.register Incident do
       f.input :course
       f.input :school_group
       f.input :type_incident
-      f.input :sector
+      f.input :sector_id, label: 'Setor', as: :select, collection: Sector.order(:name).pluck(:name, :id)
       f.input :institution
       f.input :description
       f.input :date_incident
