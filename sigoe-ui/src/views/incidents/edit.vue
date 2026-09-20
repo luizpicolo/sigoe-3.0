@@ -10,6 +10,7 @@ import Input from '@/components/ui/input.vue'
 import Card from '@/components/ui/card.vue'
 import Header from '@/components/header.vue'
 import { formatDate, formatTime } from '@/utils'
+import { can } from '@/services/permissions'
 import { find as findIncident, options as incidentOptions, update as updateIncident } from '@/services/incidents'
 
 const route = useRoute()
@@ -27,6 +28,7 @@ const occurrenceResolved = ref('no_')
 const occurrenceDate = ref('')
 const occurrenceTime = ref('')
 const occurrenceDescription = ref('')
+const canApplySanction = computed(() => can('occurrences', 'sanction'))
 const solutionDescription = ref('')
 const studentDuties = ref([])
 const prohibitions = ref([])
@@ -70,7 +72,9 @@ const handleSubmit = async () => {
   saving.value = true
   errorMessage.value = ''
 
-  const response = await updateIncident(incidentId, { type_student: selectedStudentType.value, assistant_id: selectedAssistant.value, sector_id: selectedSector.value || null, type_incident_id: selectedOccurrenceType.value, visibility: selectedAccessType.value, sanction: selectedSanction.value || null, is_resolved: occurrenceResolved.value, date_incident: occurrenceDate.value, time_incident: occurrenceTime.value, description: occurrenceDescription.value, soluction: solutionDescription.value, student_duty_ids: studentDuties.value, prohibition_and_responsibility_ids: prohibitions.value })
+  const payload = { type_student: selectedStudentType.value, assistant_id: selectedAssistant.value, sector_id: selectedSector.value || null, type_incident_id: selectedOccurrenceType.value, visibility: selectedAccessType.value, date_incident: occurrenceDate.value, time_incident: occurrenceTime.value, description: occurrenceDescription.value }
+  if (canApplySanction.value) Object.assign(payload, { sanction: selectedSanction.value || null, is_resolved: occurrenceResolved.value, soluction: solutionDescription.value, student_duty_ids: studentDuties.value, prohibition_and_responsibility_ids: prohibitions.value })
+  const response = await updateIncident(incidentId, payload)
 
   saving.value = false
 
@@ -151,7 +155,7 @@ onMounted(loadData)
 
             <textarea v-model="occurrenceDescription" rows="5" class="w-full border rounded-md mt-4 p-3"></textarea>
 
-            <div class="grid grid-cols-6 gap-6 mt-4">
+            <div v-if="canApplySanction" class="grid grid-cols-6 gap-6 mt-4">
               <div class="col-span-3">
                 <Select id="sanction" label="Sanção aplicada" v-model="selectedSanction" :options="[{ value: '', label: 'Não se aplicada' }, ...options.sanctions]" />
               </div>
@@ -162,6 +166,7 @@ onMounted(loadData)
             </div>
           </Card>
 
+          <template v-if="canApplySanction">
           <Card title="Capítulo III - Direitos e Deveres">
             <label v-for="item in options.student_duties" :key="item.id" class="flex gap-2 mb-2">
               <input type="checkbox" :value="item.id" v-model="studentDuties">
@@ -179,6 +184,8 @@ onMounted(loadData)
           <Card title="Descrição da solução">
             <textarea v-model="solutionDescription" rows="5" class="w-full border rounded-md p-3"></textarea>
           </Card>
+
+          </template>
 
           <p v-if="errorMessage" class="text-red-600">{{ errorMessage }}</p>
 
