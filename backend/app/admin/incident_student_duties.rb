@@ -1,4 +1,4 @@
-ActiveAdmin.register Incident::StudentDuty, as: 'Atividade do Aluno' do
+ActiveAdmin.register Incident::StudentDuty, as: 'StudentDuty' do
   menu label: 'Atividades do aluno'
 
   permit_params :item, :status

@@ -1,4 +1,4 @@
-ActiveAdmin.register Incident::ProhibitionAndResponsibility, as: 'Proibição e Responsabilidade' do
+ActiveAdmin.register Incident::ProhibitionAndResponsibility, as: 'ProhibitionAndResponsibility' do
   menu label: 'Proibições e responsabilidades'
 
   permit_params :item, :status
