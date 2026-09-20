@@ -41,18 +41,16 @@ pt-BR:
         name: 'Nome'
         polo: 'Polo'
 
-
-
-enums:
-  incident:
-    is_resolved:
-      no_: 'Não'
-      yes_: 'Sim'
-    type_student:
-      non_resident: 'Não residente'
-      resident: 'Residente'
-    sanction:
-      verbal_warning: 'Advertência Verbal'
-      written_warning: 'Advertência escrita'
-      suspension: 'Suspensão'
-      quitting_school: 'Desligamento'
+  enums:
+    incident:
+      is_resolved:
+        no_: 'Não'
+        yes_: 'Sim'
+      type_student:
+        non_resident: 'Não residente'
+        resident: 'Residente'
+      sanction:
+        verbal_warning: 'Advertência Verbal'
+        written_warning: 'Advertência escrita'
+        suspension: 'Suspensão'
+        quitting_school: 'Desligamento'
