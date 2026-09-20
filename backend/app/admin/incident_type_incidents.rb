@@ -1,4 +1,4 @@
-ActiveAdmin.register Incident::TypeIncident, as: 'Tipo de Ocorrência' do
+ActiveAdmin.register Incident::TypeIncident, as: 'TypeIncident' do
   menu label: 'Tipos de ocorrência'
 
   permit_params :name, :old_id
