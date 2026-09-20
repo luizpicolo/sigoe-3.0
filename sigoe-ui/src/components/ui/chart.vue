@@ -20,7 +20,7 @@ const maxValue = computed(() => Math.max(...entries.value.map(([, value]) => Num
           <span class="font-bold text-gray-900">{{ value }}</span>
         </div>
         <div class="h-3 rounded bg-gray-100 overflow-hidden">
-          <div class="h-full rounded bg-blue-600" :style="{ width: `${(Number(value) / maxValue) * 100}%` }"></div>
+          <div class="h-full rounded bg-blue-400" :style="{ width: `${(Number(value) / maxValue) * 100}%` }"></div>
         </div>
       </div>
     </div>

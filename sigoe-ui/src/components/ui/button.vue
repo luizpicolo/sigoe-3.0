@@ -24,6 +24,10 @@ const props = defineProps({
     type: String,
     default: null
   },
+  href: {
+    type: String,
+    default: null
+  },
   disabled: {
     type: Boolean,
     default: false
@@ -69,7 +73,13 @@ const handleClick = (event) => {
 </script>
 
 <template>
-  <RouterLink v-if="to && !disabled && !loading" :to="to" class="block">
+  <a v-if="href && !disabled && !loading" :href="href" class="block">
+    <button :type="type" :class="buttonClasses" @click="handleClick">
+      <i v-if="loading" class="fa-solid fa-spinner fa-spin mr-2"></i>
+      <slot></slot>
+    </button>
+  </a>
+  <RouterLink v-else-if="to && !disabled && !loading" :to="to" class="block">
     <button :type="type" :class="buttonClasses" @click="handleClick">
       <i v-if="loading" class="fa-solid fa-spinner fa-spin mr-2"></i>
       <slot></slot>
