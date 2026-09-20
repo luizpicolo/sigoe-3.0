@@ -4,7 +4,9 @@ pt-BR:
       user: "Usuários"
       student: "Estudantes"
       course: "Cursos"
-      incident: "Ocorrências"
+      incident:
+        one: "Ocorrência"
+        other: "Ocorrências"
       incident/prohibition_and_responsibility: "Proibições e responsabilidades"
       incident/type_incident: "Tipo de ocorrências"
       incident/student_duty: "Deveres dos estudantes"
