@@ -7,17 +7,18 @@ import Button from '@/components/ui/button.vue'
 import Breadcrumb from '@/components/breadcrumb.vue'
 import Card from '@/components/ui/card.vue'
 import Header from '@/components/header.vue'
+import AcademicExportForm from '@/components/incidents/academic-export-form.vue'
 import { formatDate } from '@/utils'
 import { can } from '@/services/permissions'
 import { find, remove } from '@/services/incidents'
 
-const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000'
 const route = useRoute()
 const router = useRouter()
 const incidentId = route.params.id
 const loading = ref(true)
 const incident = ref(null)
-const academicExportUrl = `${BASE_URL}/incidents/${incidentId}/export_to_academic_system`
+const showAcademicExportForm = ref(false)
+const academicExportAction = ref('')
 
 const breadcrumbItems = [
   { label: 'Home', href: '/' },
@@ -30,11 +31,20 @@ const loadIncident = async () => {
   try {
     const response = await find(incidentId)
     incident.value = response.incident
+    academicExportAction.value = `https://academico.ifms.edu.br/administrativo/atendimentos/adicionar/${incident.value.student?.ra || ''}/${incident.value.student?.registration_id || ''}`
   } catch (exception) {
     error('Não foi possível carregar a ocorrência.')
   } finally {
     loading.value = false
   }
+}
+
+const openAcademicExportForm = () => {
+  showAcademicExportForm.value = true
+}
+
+const closeAcademicExportForm = () => {
+  showAcademicExportForm.value = false
 }
 
 const deleteIncident = async () => {
@@ -59,13 +69,9 @@ onMounted(loadIncident)
       <Sidebar :activePage="'ocorrencias'" />
       <main class="flex-1 p-6">
         <Breadcrumb :items="breadcrumbItems" />
-        <div v-if="loading" class="py-8 text-center">
-          Carregando ocorrência...
-        </div>
+        <div v-if="loading" class="py-8 text-center">Carregando ocorrência...</div>
         <template v-else>
-          <h1 class="text-2xl font-bold mb-1">
-            Detalhes da Ocorrência #{{ incident.id }}
-          </h1>
+          <h1 class="text-2xl font-bold mb-1">Detalhes da Ocorrência #{{ incident.id }}</h1>
           <div class="flex justify-end">
             <Button to="/ocorrencias/ocorrencias/listar" customClass="bg-white border-gray-200 !text-gray-900">
               <i class="fa-solid fa-arrow-left"></i>
@@ -78,29 +84,17 @@ onMounted(loadIncident)
                 <img :src="incident.student?.photo || '/placeholder.svg?height=200&width=200'" width="200" alt="Foto do estudante" />
               </div>
               <div class="text-center">
-                <h3 class="font-medium text-gray-900">
-                  {{ incident.student?.name }}
-                </h3>
-                <p class="text-sm text-gray-500">
-                  {{ incident.course?.name }}
-                </p>
-                <p class="text-sm text-gray-500">
-                  R.A.: {{ incident.student?.ra || 'Não informado' }}
-                </p>
-                <p class="text-sm text-gray-500">
-                  Campus: {{ incident.course?.polo?.name || 'Não informado' }}
-                </p>
+                <h3 class="font-medium text-gray-900">{{ incident.student?.name }}</h3>
+                <p class="text-sm text-gray-500">{{ incident.course?.name }}</p>
+                <p class="text-sm text-gray-500">R.A.: {{ incident.student?.ra || 'Não informado' }}</p>
+                <p class="text-sm text-gray-500">Campus: {{ incident.course?.polo?.name || 'Não informado' }}</p>
               </div>
             </Card>
             <Card customClass="col-span-3" title="Informações da Ocorrência">
               <dl class="divide-y divide-gray-200">
                 <div v-for="item in [{ label: 'Data da ocorrência', value: formatDate(incident.date_incident) }, { label: 'Horário', value: incident.time_incident }, { label: 'Tipo de ocorrência', value: incident.type_incident?.name }, { label: 'Tipo de acesso', value: incident.visibility ? 'Público' : 'Privado' }, { label: 'Assistente responsável', value: incident.assistant?.name || incident.user?.name }, { label: 'Encaminhado para', value: incident.sector_id || 'Não encaminhado' }]" :key="item.label" class="py-3 grid grid-cols-3">
-                  <dt class="text-sm font-medium text-gray-500">
-                    {{ item.label }}
-                  </dt>
-                  <dd class="text-sm text-gray-900 col-span-2">
-                    {{ item.value }}
-                  </dd>
+                  <dt class="text-sm font-medium text-gray-500">{{ item.label }}</dt>
+                  <dd class="text-sm text-gray-900 col-span-2">{{ item.value }}</dd>
                 </div>
               </dl>
             </Card>
@@ -113,7 +107,7 @@ onMounted(loadIncident)
                 <i class="fa-solid fa-print"></i>
                 Imprimir Relatório
               </Button>
-              <Button :disabled="!can('occurrences', 'read')" :href="academicExportUrl" customClass="mt-4 w-full bg-purple-600 hover:bg-purple-700">
+              <Button :disabled="!can('occurrences', 'read')" customClass="mt-4 w-full bg-purple-600 hover:bg-purple-700" @click="openAcademicExportForm">
                 <i class="fa-solid fa-file-export"></i>
                 Exportar para Sistema Acadêmico
               </Button>
@@ -125,54 +119,33 @@ onMounted(loadIncident)
             <Card customClass="col-span-3" title="Status da Ocorrência">
               <dl class="divide-y divide-gray-200">
                 <div v-for="item in [{ label: 'Sanção aplicada', value: incident.sanction || 'Nenhuma sanção aplicada' }, { label: 'Ocorrência resolvida', value: incident.is_resolved ? 'Sim' : 'Não' }, { label: 'Visibilidade', value: incident.visibility ? 'Visível' : 'Oculta' }, { label: 'Verificada', value: incident.signed_in ? 'Verificada' : 'Pendente' }]" :key="item.label" class="py-3 grid grid-cols-3">
-                  <dt class="text-sm font-medium text-gray-500">
-                    {{ item.label }}
-                  </dt>
-                  <dd class="text-sm text-gray-900 col-span-2">
-                    {{ item.value }}
-                  </dd>
+                  <dt class="text-sm font-medium text-gray-500">{{ item.label }}</dt>
+                  <dd class="text-sm text-gray-900 col-span-2">{{ item.value }}</dd>
                 </div>
               </dl>
             </Card>
             <Card customClass="col-span-4" title="Descrição da Ocorrência">
-              <div class="bg-gray-50 p-4 rounded-md">
-                <p class="text-sm text-gray-700 whitespace-pre-wrap">
-                  {{ incident.description }}
-                </p>
-              </div>
+              <div class="bg-gray-50 p-4 rounded-md"><p class="text-sm text-gray-700 whitespace-pre-wrap">{{ incident.description }}</p></div>
             </Card>
             <Card customClass="col-span-2" title="Capítulo III - Direitos e Deveres">
               <div class="space-y-2">
-                <div v-for="item in incident.student_duties" :key="item.id" class="flex items-start">
-                  <i class="fa-solid fa-check-circle text-green-600 mt-1 mr-2"></i>
-                  <span class="text-sm">{{ item.item }}</span>
-                </div>
-                <p v-if="!incident.student_duties?.length" class="text-sm text-gray-500">
-                  Nenhum item selecionado.
-                </p>
+                <div v-for="item in incident.student_duties" :key="item.id" class="flex items-start"><i class="fa-solid fa-check-circle text-green-600 mt-1 mr-2"></i><span class="text-sm">{{ item.item }}</span></div>
+                <p v-if="!incident.student_duties?.length" class="text-sm text-gray-500">Nenhum item selecionado.</p>
               </div>
             </Card>
             <Card customClass="col-span-2" title="Capítulo IV - Proibições">
               <div class="space-y-2">
-                <div v-for="item in incident.prohibition_and_responsibilities" :key="item.id" class="flex items-start">
-                  <i class="fa-solid fa-check-circle text-red-600 mt-1 mr-2"></i>
-                  <span class="text-sm">{{ item.item }}</span>
-                </div>
-                <p v-if="!incident.prohibition_and_responsibilities?.length" class="text-sm text-gray-500">
-                  Nenhum item selecionado.
-                </p>
+                <div v-for="item in incident.prohibition_and_responsibilities" :key="item.id" class="flex items-start"><i class="fa-solid fa-check-circle text-red-600 mt-1 mr-2"></i><span class="text-sm">{{ item.item }}</span></div>
+                <p v-if="!incident.prohibition_and_responsibilities?.length" class="text-sm text-gray-500">Nenhum item selecionado.</p>
               </div>
             </Card>
             <Card customClass="col-span-4" title="Descrição da Solução">
-              <div class="bg-gray-50 p-4 rounded-md">
-                <p class="text-sm text-gray-700 whitespace-pre-wrap">
-                  {{ incident.soluction || 'Nenhuma solução descrita ainda.' }}
-                </p>
-              </div>
+              <div class="bg-gray-50 p-4 rounded-md"><p class="text-sm text-gray-700 whitespace-pre-wrap">{{ incident.soluction || 'Nenhuma solução descrita ainda.' }}</p></div>
             </Card>
           </div>
         </template>
       </main>
     </div>
+    <AcademicExportForm v-if="showAcademicExportForm" :incident="incident" :action="academicExportAction" @close="closeAcademicExportForm" />
   </div>
 </template>
