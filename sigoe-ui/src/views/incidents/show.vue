@@ -11,11 +11,13 @@ import { formatDate } from '@/utils'
 import { can } from '@/services/permissions'
 import { find, remove } from '@/services/incidents'
 
+const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000'
 const route = useRoute()
 const router = useRouter()
 const incidentId = route.params.id
 const loading = ref(true)
 const incident = ref(null)
+const academicExportUrl = `${BASE_URL}/incidents/${incidentId}/export_to_academic_system`
 
 const breadcrumbItems = [
   { label: 'Home', href: '/' },
@@ -110,6 +112,10 @@ onMounted(loadIncident)
               <Button :disabled="!can('occurrences', 'read')" to="/ocorrencias/relatorio" customClass="mt-4 w-full bg-green-600 hover:bg-green-700">
                 <i class="fa-solid fa-print"></i>
                 Imprimir Relatório
+              </Button>
+              <Button :disabled="!can('occurrences', 'read')" :href="academicExportUrl" customClass="mt-4 w-full bg-purple-600 hover:bg-purple-700">
+                <i class="fa-solid fa-file-export"></i>
+                Exportar para Sistema Acadêmico
               </Button>
               <Button :disabled="!can('occurrences', 'destroy')" customClass="mt-4 w-full bg-red-600 hover:bg-red-700" @click="deleteIncident">
                 <i class="fa-solid fa-trash-alt"></i>
