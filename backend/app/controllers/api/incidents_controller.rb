@@ -17,7 +17,7 @@ class Api::IncidentsController < ApplicationController
 
   def options
     authorize! :create, Incident
-    render json: { assistants: User.where(set_polo).order(:name).as_json(only: %i[id name email]), sectors: Sector.where(set_polo).order(:name).as_json(only: %i[id name email]), type_incidents: Incident::TypeIncident.order(:name).as_json(only: %i[id name]), student_duties: Incident::StudentDuty.where(status: true).order(:id).as_json(only: %i[id item]), prohibition_and_responsibilities: Incident::ProhibitionAndResponsibility.where(status: true).order(:id).as_json(only: %i[id item]), sanctions: Incident.sanctions.keys.map { |key| { value: key, label: I18n.t("activerecord.attributes.incident.sanction.#{key}", default: key.humanize) } } }
+    render json: { assistants: User.where(set_polo).order(:name).as_json(only: %i[id name email]), sectors: Sector.where(set_polo).order(:name).as_json(only: %i[id name email]), type_incidents: Incident::TypeIncident.order(:name).as_json(only: %i[id name]), student_duties: Incident::StudentDuty.where(status: true).order(:id).as_json(only: %i[id item]), prohibition_and_responsibilities: Incident::ProhibitionAndResponsibility.where(status: true).order(:id).as_json(only: %i[id item]), sanctions: Incident.sanctions.keys.map { |key| { value: key, label: I18n.t("enums.incident.sanction.#{key}", default: key.humanize) } } }
   end
 
   def show
