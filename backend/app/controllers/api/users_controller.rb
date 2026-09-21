@@ -134,12 +134,12 @@ class Api::UsersController < ApplicationController
 
   def options
     authorize! :read, User
-
-    polos = Polo.order(:name)
-
-    render json: {
-      polos: polos.as_json(only: %i[id name])
-    }
+    if current_user.super_admin 
+      polos = Polo.order(:name)
+    else
+      polos = Polo.where(id: current_user.polo_id).order(:name)
+    end
+    render json: { polos: polos.as_json(only: %i[id name]) }
   end
 
   def validation
