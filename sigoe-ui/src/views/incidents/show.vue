@@ -61,8 +61,7 @@ const deleteIncident = async () => {
     try {
       await remove(incidentId)
 
-      success('Ocorrência excluída com sucesso.')
-      await router.push('/ocorrencias/ocorrencias/listar')
+      if (await success('Ocorrência excluída com sucesso.')){\n        await router.push('/ocorrencias/ocorrencias/listar')\n      }
     } catch (e) {
       error(e.response?.data?.errors?.join(', ') || 'Erro ao excluir ocorrência.')
     }
@@ -185,7 +184,7 @@ onMounted(loadIncident)
               <Card customClass="col-span-2" title="Capítulo III - Direitos e Deveres">
                 <div class="space-y-2">
                   <div v-for="item in incident.student_duties" :key="item.id" class="flex items-start">
-                    <i class="fa-solid fa-check-circle text-green-600 mt-1 mr-2"></i>
+                    <i class="fa-solid fa-check-circle text-green-600 mt-1 pr-2"></i>
                     <span class="text-sm">
                       {{ item.item }}
                     </span>
@@ -200,7 +199,7 @@ onMounted(loadIncident)
               <Card customClass="col-span-2" title="Capítulo IV - Proibições">
                 <div class="space-y-2">
                   <div v-for="item in incident.prohibition_and_responsibilities" :key="item.id" class="flex items-start">
-                    <i class="fa-solid fa-check-circle text-red-600 mt-1 mr-2"></i>
+                    <i class="fa-solid fa-check-circle text-red-600 mt-1 pr-2"></i>
                     <span class="text-sm">
                       {{ item.item }}
                     </span>
