@@ -119,8 +119,8 @@ const handleSubmit = async event => {
 
               <div class="flex justify-end">
                 <button type="submit" :disabled="isSubmitting" class="justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white focus:outline-none focus:ring-2 focus:ring-offset-2 bg-green-600 hover:bg-green-700 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed">
-                  <i v-if="isSubmitting" class="fa-solid fa-spinner fa-spin mr-2"></i>
-                  <i v-else class="fa-solid fa-save mr-2"></i>
+                  <i v-if="isSubmitting" class="fa-solid fa-spinner fa-spin pr-2"></i>
+                  <i v-else class="fa-solid fa-save pr-2"></i>
                   {{ isSubmitting ? 'Alterando...' : 'Alterar Senha' }}
                 </button>
               </div>
@@ -130,28 +130,28 @@ const handleSubmit = async event => {
           <Card title="Dicas de Segurança" icon="shield" customClass="bg-blue-50 border-blue-200">
             <ul class="space-y-2 text-sm text-gray-700">
               <li class="flex items-start">
-                <i class="fa-solid fa-check-circle text-blue-600 mr-2 mt-0.5"></i>
+                <i class="fa-solid fa-check-circle text-blue-600 pr-2 mt-0.5"></i>
                 <span>
                   Use uma combinação de letras maiúsculas, minúsculas, números e símbolos.
                 </span>
               </li>
 
               <li class="flex items-start">
-                <i class="fa-solid fa-check-circle text-blue-600 mr-2 mt-0.5"></i>
+                <i class="fa-solid fa-check-circle text-blue-600 pr-2 mt-0.5"></i>
                 <span>
                   Evite usar informações pessoais como datas de nascimento ou nomes.
                 </span>
               </li>
 
               <li class="flex items-start">
-                <i class="fa-solid fa-check-circle text-blue-600 mr-2 mt-0.5"></i>
+                <i class="fa-solid fa-check-circle text-blue-600 pr-2 mt-0.5"></i>
                 <span>
                   Não use a mesma senha em diferentes sistemas ou sites.
                 </span>
               </li>
 
               <li class="flex items-start">
-                <i class="fa-solid fa-check-circle text-blue-600 mr-2 mt-0.5"></i>
+                <i class="fa-solid fa-check-circle text-blue-600 pr-2 mt-0.5"></i>
                 <span>
                   Troque sua senha periodicamente para maior segurança.
                 </span>
