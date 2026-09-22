@@ -292,11 +292,13 @@ onMounted(loadData)
           </template>
 
           <div class="flex gap-2">
-            <Button type="submit" :disabled="saving">
+            <Button type="submit" variant="success" :disabled="saving">
+              <i class="fa-solid fa-save pr-2"></i>
               {{ saving ? 'Salvando...' : 'Salvar' }}
             </Button>
 
             <Button :to="editing ? `/ocorrencias/ocorrencias/visualizar/${incidentId}` : '/ocorrencias/ocorrencias/listar'" customClass="bg-white border-gray-200 !text-gray-900">
+              <i class="fa-solid fa-times pr-2"></i>
               Cancelar
             </Button>
           </div>
