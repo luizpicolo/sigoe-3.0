@@ -130,28 +130,28 @@ const handleSubmit = async event => {
           <Card title="Dicas de Segurança" icon="shield" customClass="bg-blue-50 border-blue-200">
             <ul class="space-y-2 text-sm text-gray-700">
               <li class="flex items-start">
-                <i class="fa-solid fa-check-circle text-blue-600 pr-2 mt-0.5"></i>
+                <i class="fa-solid fa-check-circle text-blue-600 mr-2 mt-0.5"></i>
                 <span>
                   Use uma combinação de letras maiúsculas, minúsculas, números e símbolos.
                 </span>
               </li>
 
               <li class="flex items-start">
-                <i class="fa-solid fa-check-circle text-blue-600 pr-2 mt-0.5"></i>
+                <i class="fa-solid fa-check-circle text-blue-600 mr-2 mt-0.5"></i>
                 <span>
                   Evite usar informações pessoais como datas de nascimento ou nomes.
                 </span>
               </li>
 
               <li class="flex items-start">
-                <i class="fa-solid fa-check-circle text-blue-600 pr-2 mt-0.5"></i>
+                <i class="fa-solid fa-check-circle text-blue-600 mr-2 mt-0.5"></i>
                 <span>
                   Não use a mesma senha em diferentes sistemas ou sites.
                 </span>
               </li>
 
               <li class="flex items-start">
-                <i class="fa-solid fa-check-circle text-blue-600 pr-2 mt-0.5"></i>
+                <i class="fa-solid fa-check-circle text-blue-600 mr-2 mt-0.5"></i>
                 <span>
                   Troque sua senha periodicamente para maior segurança.
                 </span>
