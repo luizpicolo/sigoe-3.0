@@ -1,20 +1,47 @@
-FROM ruby:3.3.0
- 
-RUN apt-get update -qq && apt-get install -y --no-install-recommends curl
-RUN curl -fsSL https://deb.nodesource.com/setup_16.x | bash - 
-RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add -
-RUN echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list
-RUN wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - \ 
-    && echo "deb http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list
-RUN apt-get update -qq && apt-get install -y --no-install-recommends build-essential nodejs libpq-dev yarn nano google-chrome-stable
-
-RUN mkdir /app
+FROM ruby:3.4.10-slim AS base
 
 WORKDIR /app
-ADD Gemfile /app/Gemfile
-ADD Gemfile.lock /app/Gemfile.lock
+
+ENV RAILS_ENV=production \
+    RACK_ENV=production \
+    BUNDLE_DEPLOYMENT=1 \
+    BUNDLE_PATH=/usr/local/bundle \
+    BUNDLE_WITHOUT="development:test"
+
+FROM base AS build
+
+RUN apt-get update -qq && \
+    apt-get install -y --no-install-recommends \
+        build-essential \
+        git \
+        libpq-dev \
+        libyaml-dev \
+        libffi-dev \
+        pkg-config \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY Gemfile Gemfile.lock ./
 
 RUN bundle install
-ADD . /app
 
-EXPOSE 3000
+COPY . .
+
+RUN SECRET_KEY_BASE_DUMMY=1 bundle exec rails assets:precompile
+
+FROM base AS production
+
+RUN apt-get update -qq && \
+    apt-get install -y --no-install-recommends \
+        libpq5 \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN useradd --create-home --shell /bin/bash app
+
+COPY --from=build /usr/local/bundle /usr/local/bundle
+COPY --from=build --chown=app:app /app /app
+
+USER app
+
+EXPOSE 5000
+
+CMD ["bundle", "exec", "puma", "-C", "config/puma.rb"]
