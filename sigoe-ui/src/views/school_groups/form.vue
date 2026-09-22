@@ -42,7 +42,7 @@ const save = async () => {
       await create(form.value)
     }
 
-    if (await success(editing ? 'Turma atualizada com sucesso' : 'Turma criada com sucesso')){
+    if (await success(editing ? 'Turma atualizada com sucesso' : 'Turma criada com sucesso')) {
       await router.push('/administrador/turmas/listar')
     }
   } catch (e) {
@@ -72,14 +72,14 @@ const save = async () => {
           </div>
 
           <div class="flex gap-2 mt-6">
-            <Button :disabled="editing ? !can('classes', 'update') : !can('classes', 'create')" @click="save" customClass="bg-green-600 hover:bg-green-700">
-              <i class="fa-solid fa-save pr-2"></i>
-              Salvar
-            </Button>
-
             <Button to="/administrador/turmas/listar" customClass="bg-white border-gray-200 !text-gray-900">
               <i class="fa-solid fa-times pr-2"></i>
               Cancelar
+            </Button>
+
+            <Button :disabled="editing ? !can('classes', 'update') : !can('classes', 'create')" @click="save" customClass="bg-green-600 hover:bg-green-700">
+              <i class="fa-solid fa-save pr-2"></i>
+              Salvar
             </Button>
           </div>
         </Card>
