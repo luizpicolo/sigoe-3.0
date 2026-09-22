@@ -211,7 +211,7 @@ onMounted(load)
                 </div>
 
                 <button type="button" @click="removeEntity(index)" class="text-sm text-red-600 hover:text-red-800">
-                  <i class="fa-solid fa-trash-alt mr-1"></i>
+                  <i class="fa-solid fa-trash-alt pr-2"></i>
                   Remover tela
                 </button>
               </div>
@@ -245,7 +245,7 @@ onMounted(load)
 
             <div class="flex justify-end mt-5">
               <Button @click="save" :disabled="saving" customClass="bg-green-600 hover:bg-green-700 focus:ring-green-500">
-                <i class="fa-solid fa-save mr-1"></i>
+                <i class="fa-solid fa-save pr-2"></i>
                 {{ saving ? 'Salvando...' : 'Salvar Permissões' }}
               </Button>
             </div>
