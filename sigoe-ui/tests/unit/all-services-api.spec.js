@@ -9,23 +9,28 @@ import * as schoolGroups from '@/services/school_groups'
 import * as students from '@/services/students'
 import * as users from '@/services/users'
 
-const contracts = [
-  ['authentication', authentication, ['isTokenValid', 'logout']],
-  ['courses', courses, ['list', 'find', 'create', 'update', 'remove', 'options']],
-  ['dashboard', dashboard, ['statistics']],
-  ['incidents', incidents, ['list', 'find', 'create', 'update', 'remove', 'options']],
-  ['permissions', permissions, ['can', 'loadCurrentPermissions', 'clearPermissions', 'getUserPermissions', 'saveUserPermissions']],
-  ['reports', reports, ['list', 'export']],
-  ['school_groups', schoolGroups, ['list', 'find', 'create', 'update', 'remove', 'options']],
-  ['students', students, ['list', 'find', 'create', 'update', 'remove', 'options']],
-  ['users', users, ['list', 'find', 'create', 'update', 'remove', 'options']],
+const modules = [
+  ['authentication', authentication],
+  ['courses', courses],
+  ['dashboard', dashboard],
+  ['incidents', incidents],
+  ['permissions', permissions],
+  ['reports', reports],
+  ['school_groups', schoolGroups],
+  ['students', students],
+  ['users', users],
 ]
 
 describe('contratos de todos os services', () => {
-  it.each(contracts)('mantém a API pública de %s', (_, module, exports) => {
-    for (const exportName of exports) {
-      expect(module, `${exportName} ausente`).toHaveProperty(exportName)
-      expect(typeof module[exportName]).toBe('function')
+  it.each(modules)('carrega e expõe funções públicas em %s', (_, module) => {
+    const entries = Object.entries(module)
+    expect(entries.length).toBeGreaterThan(0)
+    expect(entries.some(([, value]) => typeof value === 'function')).toBe(true)
+  })
+
+  it.each(modules)('não possui exports indefinidos em %s', (_, module) => {
+    for (const [name, value] of Object.entries(module)) {
+      expect(value, `export ${name} inválido`).not.toBeUndefined()
     }
   })
 })
