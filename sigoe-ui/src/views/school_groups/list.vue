@@ -62,10 +62,7 @@ const changeFilters = () => {
 const destroy = async id => {
   if (await confirm('Excluir esta turma?')) {
     try {
-      await remove(id)
-
-      success('Turma excluída com sucesso.')
-      await loadGroups()
+      await remove(id)\n      if (await success('Turma excluída com sucesso.')){\n        await loadGroups()\n      }
     } catch (e) {
       error(e.response?.data?.errors?.join(', ') || 'Não foi possível excluir a turma.')
     }
