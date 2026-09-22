@@ -6,44 +6,42 @@ import Button from '@/components/ui/button.vue'
 import Breadcrumb from '@/components/breadcrumb.vue'
 import Card from '@/components/ui/card.vue'
 import Input from '@/components/ui/input.vue'
-import Alert from '@/components/ui/alert.vue'
 import Header from '@/components/header.vue'
 import { create as createStudent } from '@/services/students'
+import { success, error } from '@/utils/sweetPopup2'
 
 const router = useRouter()
 
 const breadcrumbItems = [
-  { label: "Home", href: "/home" },
-  { label: "Administrador", href: "/administrador" },
-  { label: "Estudantes", href: "/administrador/estudantes/listar" },
-  { label: "Novo estudante", href: "/administrador/estudantes/novo" },
-];
+  { label: 'Home', href: '/home' },
+  { label: 'Administrador', href: '/administrador' },
+  { label: 'Estudantes', href: '/administrador/estudantes/listar' },
+  { label: 'Novo estudante', href: '/administrador/estudantes/novo' }
+]
 
 const student = ref({
-  name: "",
-  cpf: "",
-  birthdate: "",
-  password: "",
-  confirmPassword: "",
-  responsible: "",
-  contact: ""
+  name: '',
+  cpf: '',
+  birthdate: '',
+  password: '',
+  confirmPassword: '',
+  responsible: '',
+  contact: ''
 })
 
 const isSubmitting = ref(false)
-const errorMessage = ref('')
 
 const handleSubmit = async (event) => {
   event.preventDefault()
-  errorMessage.value = ''
 
   if (student.value.password !== student.value.confirmPassword) {
-    errorMessage.value = 'As senhas não coincidem.'
+    error('As senhas não coincidem.')
     return
   }
 
   isSubmitting.value = true
 
-  const response = await createStudent({
+  const payload = {
     name: student.value.name,
     cpf: student.value.cpf,
     birth_date: student.value.birthdate,
@@ -51,21 +49,23 @@ const handleSubmit = async (event) => {
     password_confirmation: student.value.confirmPassword,
     responsible: student.value.responsible,
     contact: student.value.contact
-  })
-
-  if (response?.student) {
-    await router.push(`/administrador/estudantes/visualizar/${response.student.id}`)
-  } else {
-    errorMessage.value = Array.isArray(response?.error)
-      ? response.error.join(', ')
-      : 'Erro ao cadastrar estudante. Tente novamente.'
   }
 
-  isSubmitting.value = false
-}
+  try {
+    const response = await createStudent(payload)
 
-const dismissError = () => {
-  errorMessage.value = ''
+    if (!response?.student) {
+      error(Array.isArray(response?.error) ? response.error.join(', ') : 'Erro ao cadastrar estudante. Tente novamente.')
+      return
+    }
+
+    success('Estudante cadastrado com sucesso!')
+    await router.push(`/administrador/estudantes/visualizar/${response.student.id}`)
+  } catch (e) {
+    error(e.response?.data?.errors?.join(', ') || 'Erro ao cadastrar estudante. Tente novamente.')
+  } finally {
+    isSubmitting.value = false
+  }
 }
 </script>
 
@@ -81,15 +81,6 @@ const dismissError = () => {
 
         <h1 class="text-2xl font-bold mb-6">Novo estudante</h1>
 
-        <Alert
-          v-if="errorMessage"
-          type="error"
-          :message="errorMessage"
-          dismissible
-          @dismiss="dismissError"
-          class="mb-4"
-        />
-
         <form @submit="handleSubmit" class="space-y-6">
           <Card customClass="mb-4">
             <div class="border-b border-gray-200 pb-2 mb-4">
@@ -99,53 +90,31 @@ const dismissError = () => {
             <div class="grid grid-cols-1 gap-6 mb-6">
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Nome</label>
-                <Input
-                  v-model="student.name"
-                  type="text"
-                  placeholder="Nome completo do estudante"
-                  required
-                />
+                <Input v-model="student.name" type="text" placeholder="Nome completo do estudante" required />
               </div>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">CPF</label>
-                <Input
-                  v-model="student.cpf"
-                  type="text"
-                  placeholder="000.000.000-00"
-                  required
-                />
+                <Input v-model="student.cpf" type="text" placeholder="000.000.000-00" required />
               </div>
+
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Data de Nascimento</label>
-                <Input
-                  v-model="student.birthdate"
-                  type="date"
-                  required
-                />
+                <Input v-model="student.birthdate" type="date" required />
               </div>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Senha para assinatura digital</label>
-                <Input
-                  v-model="student.password"
-                  type="password"
-                  placeholder="••••••••"
-                  required
-                />
+                <Input v-model="student.password" type="password" placeholder="••••••••" required />
               </div>
+
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Confirmar senha</label>
-                <Input
-                  v-model="student.confirmPassword"
-                  type="password"
-                  placeholder="••••••••"
-                  required
-                />
+                <Input v-model="student.confirmPassword" type="password" placeholder="••••••••" required />
               </div>
             </div>
           </Card>
@@ -158,37 +127,23 @@ const dismissError = () => {
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Responsável</label>
-                <Input
-                  v-model="student.responsible"
-                  type="text"
-                  placeholder="Responsável"
-                />
+                <Input v-model="student.responsible" type="text" placeholder="Responsável" />
               </div>
+
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Contato</label>
-                <Input
-                  v-model="student.contact"
-                  type="text"
-                  placeholder="Email / Telefone"
-                />
+                <Input v-model="student.contact" type="text" placeholder="Email / Telefone" />
               </div>
             </div>
           </Card>
 
           <div class="flex justify-start space-x-3">
-            <Button
-              variant="secondary"
-              to="/administrador/estudantes/listar"
-            >
+            <Button variant="secondary" to="/administrador/estudantes/listar">
               <i class="fa-solid fa-times mr-2"></i>
               Cancelar
             </Button>
-            <Button
-              type="submit"
-              variant="success"
-              :loading="isSubmitting"
-              :disabled="isSubmitting"
-            >
+
+            <Button type="submit" variant="success" :loading="isSubmitting" :disabled="isSubmitting">
               <i v-if="!isSubmitting" class="fa-solid fa-save mr-2"></i>
               {{ isSubmitting ? 'Salvando...' : 'Salvar' }}
             </Button>

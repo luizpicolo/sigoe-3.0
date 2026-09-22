@@ -7,6 +7,7 @@ import Breadcrumb from '@/components/breadcrumb.vue'
 import Card from '@/components/ui/card.vue'
 import Input from '@/components/ui/input.vue'
 import Button from '@/components/ui/button.vue'
+
 import { find, create, update } from '@/services/courses'
 import { can } from '@/services/permissions'
 import { success, error, confirm } from '@/utils/sweetPopup2'
@@ -15,10 +16,19 @@ const route = useRoute()
 const router = useRouter()
 const editing = !!route.params.id
 
-const form = ref({ name: '', initial: '' })
+const form = ref({
+  name: '',
+  initial: ''
+})
 
 onMounted(async () => {
-  if (editing) form.value = await find(route.params.id)
+  if (!editing) return
+
+  try {
+    form.value = await find(route.params.id)
+  } catch (e) {
+    error(e.response?.data?.errors?.join(', ') || 'Não foi possível carregar os dados do curso.')
+  }
 })
 
 const save = async () => {
@@ -29,11 +39,16 @@ const save = async () => {
   }
 
   try {
-    editing ? await update(route.params.id, payload) : await create(form.value)
-    success("Curso salvo com sucesso");
-    router.push('/administrador/cursos/listar')
+    if (editing) {
+      await update(route.params.id, payload)
+    } else {
+      await create(form.value)
+    }
+
+    success('Curso salvo com sucesso')
+    await router.push('/administrador/cursos/listar')
   } catch (e) {
-    error(e.response?.data?.errors?.join(', ') || 'Não foi possível salvar')
+    error(e.response?.data?.errors?.join(', ') || 'Não foi possível salvar o curso.')
   }
 }
 </script>
@@ -41,22 +56,28 @@ const save = async () => {
 <template>
   <div class="min-h-screen">
     <Header />
+
     <div class="flex flex-col md:flex-row">
       <Sidebar activePage="cursos" />
+
       <main class="flex-1 p-6">
         <Breadcrumb :items="[{ label: 'Home', href: '/home' }, { label: 'Administrador' }, { label: 'Cursos', href: '/administrador/cursos/listar' }, { label: editing ? 'Editar curso' : 'Novo curso' }]" />
+
         <h1 class="text-2xl font-bold mb-6">
           {{ editing ? 'Editar curso' : 'Novo curso' }}
         </h1>
+
         <Card title="Dados do curso">
           <div class="grid md:grid-cols-2 gap-4">
             <Input v-model="form.name" label="Nome" />
             <Input v-model="form.initial" label="Sigla" />
           </div>
+
           <div class="flex gap-2 mt-6">
             <Button :disabled="editing ? !can('courses', 'update') : !can('courses', 'create')" @click="save" customClass="bg-green-600">
               Salvar
             </Button>
+
             <Button to="/administrador/cursos/listar" customClass="bg-gray-500">
               Cancelar
             </Button>

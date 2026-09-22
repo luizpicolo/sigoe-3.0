@@ -1,23 +1,18 @@
-```vue
 <script setup>
 import { computed, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
-import { success, error, confirm } from '@/utils/sweetPopup2'
 import Sidebar from '@/components/sidebar.vue'
+import Header from '@/components/header.vue'
 import Breadcrumb from '@/components/breadcrumb.vue'
+import Card from '@/components/ui/card.vue'
+import Input from '@/components/ui/input.vue'
 import Button from '@/components/ui/button.vue'
 import Select from '@/components/ui/select.vue'
-import Input from '@/components/ui/input.vue'
-import Card from '@/components/ui/card.vue'
-import Header from '@/components/header.vue'
 
 import { can } from '@/services/permissions'
-import {
-  find as findIncident,
-  options as incidentOptions,
-  update as updateIncident
-} from '@/services/incidents'
+import { find as findIncident, options as incidentOptions, update as updateIncident } from '@/services/incidents'
+import { success, error, confirm } from '@/utils/sweetPopup2'
 
 const route = useRoute()
 const router = useRouter()
@@ -52,7 +47,6 @@ const prohibitions = ref([])
 
 const loading = ref(true)
 const saving = ref(false)
-const errorMessage = ref('')
 
 const assistantOptions = computed(() => options.value.assistants.map(item => ({
   value: String(item.id),
@@ -71,7 +65,6 @@ const occurrenceOptions = computed(() => options.value.type_incidents.map(item =
 
 const loadData = async () => {
   loading.value = true
-  errorMessage.value = ''
 
   try {
     const [incidentResponse, optionsResponse] = await Promise.all([
@@ -99,7 +92,7 @@ const loadData = async () => {
     prohibitions.value = (data.prohibition_and_responsibilities || []).map(item => item.id)
   } catch (err) {
     const message = err.response?.data?.errors?.join(', ') || 'Não foi possível carregar a ocorrência.'
-    error({ title: 'Erro!', text: message})
+    error({ title: 'Erro!', text: message })
   } finally {
     loading.value = false
   }
@@ -120,10 +113,10 @@ const handleSubmit = async () => {
       description: occurrenceDescription.value
     }
 
-    const response = await updateIncident(incidentId, payload)
-    if (await success('Ocorrência atualizada com sucesso.')){
-      router.push(`/ocorrencias/ocorrencias/visualizar/${incidentId}`)
-    }
+    await updateIncident(incidentId, payload)
+
+    success('Ocorrência atualizada com sucesso.')
+    await router.push(`/ocorrencias/ocorrencias/visualizar/${incidentId}`)
   } catch (err) {
     const message = err.response?.data?.errors?.join(', ') || 'Não foi possível atualizar a ocorrência.'
     error({ title: 'Erro!', text: message })
@@ -145,9 +138,13 @@ onMounted(loadData)
       <main class="flex-1 p-6">
         <Breadcrumb :items="[{ label: 'Home', href: '/' }, { label: 'Ocorrências', href: '/ocorrencias/ocorrencias/listar' }, { label: 'Editar', href: `/ocorrencias/ocorrencias/editar/${incidentId}` }]" />
 
-        <h1 class="text-2xl font-bold mb-6">Editar Ocorrência #{{ incidentId }}</h1>
+        <h1 class="text-2xl font-bold mb-6">
+          Editar Ocorrência #{{ incidentId }}
+        </h1>
 
-        <div v-if="loading">Carregando ocorrência...</div>
+        <div v-if="loading">
+          Carregando ocorrência...
+        </div>
 
         <form v-else @submit.prevent="handleSubmit" class="space-y-6">
           <Card title="Estudante">
@@ -231,15 +228,17 @@ onMounted(loadData)
             </Card>
           </template>
 
-          <p v-if="errorMessage" class="text-red-600">{{ errorMessage }}</p>
-
           <div class="flex gap-2">
-            <Button type="submit" :disabled="saving">{{ saving ? 'Salvando...' : 'Atualizar' }}</Button>
-            <Button :to="`/ocorrencias/ocorrencias/visualizar/${incidentId}`" customClass="bg-white border-gray-200 !text-gray-900">Cancelar</Button>
+            <Button type="submit" :disabled="saving">
+              {{ saving ? 'Salvando...' : 'Atualizar' }}
+            </Button>
+
+            <Button :to="`/ocorrencias/ocorrencias/visualizar/${incidentId}`" customClass="bg-white border-gray-200 !text-gray-900">
+              Cancelar
+            </Button>
           </div>
         </form>
       </main>
     </div>
   </div>
 </template>
-```

@@ -8,14 +8,12 @@ import Button from '@/components/ui/button.vue'
 import Breadcrumb from '@/components/breadcrumb.vue'
 import Card from '@/components/ui/card.vue'
 import Input from '@/components/ui/input.vue'
-import Alert from '@/components/ui/alert.vue'
+import { success, error } from '@/utils/sweetPopup2'
 
 const route = useRoute()
 const router = useRouter()
 const loading = ref(true)
 const isSubmitting = ref(false)
-const errorMessage = ref('')
-const successMessage = ref('')
 
 const form = ref({
   name: '',
@@ -36,41 +34,39 @@ const breadcrumbItems = [
   { label: 'Editar Usuário', href: `/administrador/usuarios/editar/${route.params.id}` }
 ]
 
-onMounted(async () => {
+const loadUser = async () => {
   try {
     const result = await find(route.params.id)
-    form.value = { ...form.value, ...result.user }
-  } catch (error) {
-    errorMessage.value = 'Não foi possível carregar o usuário.'
+
+    form.value = {
+      ...form.value,
+      ...result.user
+    }
+  } catch (e) {
+    error(e.response?.data?.errors?.join(', ') || 'Não foi possível carregar o usuário.')
   } finally {
     loading.value = false
   }
+}
+
+onMounted(async () => {
+  await loadUser()
 })
 
 const submit = async () => {
-  errorMessage.value = ''
-  successMessage.value = ''
   isSubmitting.value = true
 
   try {
     await update(route.params.id, form.value)
-    successMessage.value = 'Usuário atualizado com sucesso!'
-    setTimeout(() => {
-      router.push(`/administrador/usuarios/visualizar/${route.params.id}`)
-    }, 1000)
-  } catch (error) {
-    errorMessage.value = error.response?.data?.errors?.join(', ') || 'Erro ao atualizar usuário.'
+
+    success('Usuário atualizado com sucesso!')
+
+    await router.push(`/administrador/usuarios/visualizar/${route.params.id}`)
+  } catch (e) {
+    error(e.response?.data?.errors?.join(', ') || 'Erro ao atualizar usuário.')
   } finally {
     isSubmitting.value = false
   }
-}
-
-const dismissError = () => {
-  errorMessage.value = ''
-}
-
-const dismissSuccess = () => {
-  successMessage.value = ''
 }
 </script>
 
@@ -85,30 +81,15 @@ const dismissSuccess = () => {
         <Breadcrumb :items="breadcrumbItems" />
 
         <div class="flex items-center justify-between mb-6">
-          <h1 class="text-2xl font-bold">Alterar informações do usuário</h1>
+          <h1 class="text-2xl font-bold">
+            Alterar informações do usuário
+          </h1>
+
           <Button variant="secondary" :to="`/administrador/usuarios/visualizar/${route.params.id}`">
             <i class="fa-solid fa-arrow-left mr-2"></i>
             Voltar
           </Button>
         </div>
-
-        <Alert
-          v-if="errorMessage"
-          type="error"
-          :message="errorMessage"
-          dismissible
-          @dismiss="dismissError"
-          class="mb-4"
-        />
-
-        <Alert
-          v-if="successMessage"
-          type="success"
-          :message="successMessage"
-          dismissible
-          @dismiss="dismissSuccess"
-          class="mb-4"
-        />
 
         <div v-if="loading" class="py-8 text-center text-gray-600">
           Carregando informações do usuário...
@@ -141,6 +122,7 @@ const dismissSuccess = () => {
                 <input type="checkbox" v-model="form.admin" />
                 Administrador?
               </label>
+
               <label class="flex items-center gap-2">
                 <input type="checkbox" v-model="form.status" />
                 Usuário ativo?
@@ -153,6 +135,7 @@ const dismissSuccess = () => {
               <i class="fa-solid fa-times mr-2"></i>
               Cancelar
             </Button>
+
             <Button type="submit" variant="success" :loading="isSubmitting" :disabled="isSubmitting">
               <i v-if="!isSubmitting" class="fa-solid fa-save mr-2"></i>
               {{ isSubmitting ? 'Salvando...' : 'Salvar alterações' }}

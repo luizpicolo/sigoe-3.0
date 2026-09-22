@@ -1,7 +1,6 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import Swal from 'sweetalert2'
 import Sidebar from '@/components/sidebar.vue'
 import Button from '@/components/ui/button.vue'
 import Breadcrumb from '@/components/breadcrumb.vue'
@@ -10,68 +9,52 @@ import Header from '@/components/header.vue'
 import { find, remove } from '@/services/users'
 import { can } from '@/services/permissions'
 import { formatDate, avatar } from '@/utils'
+import { error, confirm, success } from '@/utils/sweetPopup2'
 
-const breadcrumbItems = [{ label: 'Home', href: '/' }, { label: 'Administrador', href: '/administrador' }, { label: 'Usuários', href: '/administrador/usuarios' }, { label: 'Visualizar', href: '/administrador/usuarios/visualizar' }]
+const breadcrumbItems = [
+  { label: 'Home', href: '/' },
+  { label: 'Administrador', href: '/administrador' },
+  { label: 'Usuários', href: '/administrador/usuarios' },
+  { label: 'Visualizar', href: '/administrador/usuarios/visualizar' }
+]
 
 const route = useRoute()
 const router = useRouter()
 const userId = ref(route.params.id)
-const user = ref('')
-const errorMessage = ref('')
-
-onMounted(() => fetchUser(userId.value))
+const user = ref(null)
+const loading = ref(false)
 
 const fetchUser = async id => {
+  loading.value = true
+
   try {
     const response = await find(id)
-    user.value = response.user
-  } catch (error) {
-    errorMessage.value = 'Não foi possível carregar o usuário.'
 
-    await Swal.fire({
-      title: 'Erro!',
-      text: errorMessage.value,
-      icon: 'error',
-      confirmButtonText: 'OK'
-    })
+    user.value = response?.user || null
+  } catch (e) {
+    error(e.response?.data?.error || e.response?.data?.errors?.join(', ') || 'Não foi possível carregar o usuário.')
+  } finally {
+    loading.value = false
   }
 }
 
 const deleteUser = async () => {
-  const confirmation = await Swal.fire({
-    title: 'Excluir usuário?',
-    text: 'Deseja realmente excluir este usuário?',
-    icon: 'warning',
-    showCancelButton: true,
-    confirmButtonText: 'Sim, excluir',
-    cancelButtonText: 'Cancelar',
-    reverseButtons: true
-  })
-
-  if (!confirmation.isConfirmed) return
+  if (!await confirm('Deseja realmente excluir este usuário?')) {
+    return
+  }
 
   try {
     await remove(userId.value)
 
-    await Swal.fire({
-      title: 'Sucesso!',
-      text: 'Usuário excluído com sucesso!',
-      icon: 'success',
-      confirmButtonText: 'OK'
-    })
+    success('Usuário excluído com sucesso!')
 
-    router.push('/administrador/usuarios/listar')
-  } catch (error) {
-    errorMessage.value = error.response?.data?.error || 'Não foi possível excluir o usuário.'
-
-    await Swal.fire({
-      title: 'Erro!',
-      text: errorMessage.value,
-      icon: 'error',
-      confirmButtonText: 'OK'
-    })
+    await router.push('/administrador/usuarios/listar')
+  } catch (e) {
+    error(e.response?.data?.error || e.response?.data?.errors?.join(', ') || 'Não foi possível excluir o usuário.')
   }
 }
+
+onMounted(() => fetchUser(userId.value))
 </script>
 
 <template>
@@ -84,25 +67,27 @@ const deleteUser = async () => {
       <main class="flex-1 p-6">
         <Breadcrumb :items="breadcrumbItems" />
 
-        <h1 class="text-2xl font-bold mb-1">
-          Detalhes do Usuário
-        </h1>
+        <div class="flex items-center justify-between mb-6">
+          <div>
+            <h1 class="text-2xl font-bold">
+              Detalhes do Usuário
+            </h1>
+          </div>
 
-        <p v-if="errorMessage" class="text-red-600 mb-4">
-          {{ errorMessage }}
-        </p>
-
-        <div class="flex justify-end">
           <Button to="/administrador/usuarios/listar" customClass="bg-white border-gray-200 !text-gray-900 hover:bg-gray-100 !focus:ring-gray-300">
             <i class="fa-solid fa-arrow-left"></i>
             Voltar
           </Button>
         </div>
 
-        <div class="grid grid-cols-4 gap-4 mb-6 mt-4 rounded-lg shadow-sm">
+        <div v-if="loading" class="py-8 text-center text-gray-600">
+          Carregando informações do usuário...
+        </div>
+
+        <div v-else-if="user" class="grid grid-cols-4 gap-4 mb-6 rounded-lg shadow-sm">
           <Card customClass="col-span-1" title="Foto">
             <div class="flex justify-center items-center mt-5 pt-2 pb-5">
-              <img :src="avatar(user?.avatar?.url)" width="200" alt="" srcset="">
+              <img :src="avatar(user?.avatar?.url)" width="200" alt="Foto do usuário" />
             </div>
           </Card>
 
@@ -134,7 +119,7 @@ const deleteUser = async () => {
                 </dt>
 
                 <dd class="text-sm text-gray-900 col-span-2">
-                  {{ user.siape }}
+                  {{ user.siape || '-' }}
                 </dd>
               </div>
 
@@ -144,7 +129,7 @@ const deleteUser = async () => {
                 </dt>
 
                 <dd class="text-sm text-gray-900 col-span-2">
-                  {{ user.polo?.name }}
+                  {{ user.polo?.name || '-' }}
                 </dd>
               </div>
             </dl>
@@ -232,6 +217,10 @@ const deleteUser = async () => {
               </div>
             </dl>
           </Card>
+        </div>
+
+        <div v-else class="py-8 text-center text-gray-500">
+          Não foi possível encontrar o usuário.
         </div>
       </main>
     </div>

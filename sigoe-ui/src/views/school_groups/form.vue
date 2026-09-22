@@ -9,16 +9,28 @@ import Input from '@/components/ui/input.vue'
 import Button from '@/components/ui/button.vue'
 import { find, create, update } from '@/services/school_groups'
 import { can } from '@/services/permissions'
-import { confirm, error, success } from '@/utils/sweetPopup2'
+import { error, success } from '@/utils/sweetPopup2'
 
 const route = useRoute()
 const router = useRouter()
 const editing = !!route.params.id
-const form = ref({ name: '', identifier: '' })
+
+const form = ref({
+  name: '',
+  identifier: ''
+})
+
+const loadSchoolGroup = async () => {
+  try {
+    form.value = await find(route.params.id)
+  } catch (e) {
+    error(e.response?.data?.errors?.join(', ') || 'Não foi possível carregar os dados da turma.')
+  }
+}
 
 onMounted(async () => {
   if (editing) {
-    form.value = await find(route.params.id)
+    await loadSchoolGroup()
   }
 })
 
@@ -26,15 +38,15 @@ const save = async () => {
   try {
     if (editing) {
       await update(route.params.id, form.value)
-      success("Turma atualizada com sucesso")
+      success('Turma atualizada com sucesso')
     } else {
       await create(form.value)
-      success("Turma criada com sucesso")
+      success('Turma criada com sucesso')
     }
 
-    router.push('/administrador/turmas/listar')
+    await router.push('/administrador/turmas/listar')
   } catch (e) {
-    error(e.response?.data?.errors?.join(', ') || 'Não foi possível salvar')
+    error(e.response?.data?.errors?.join(', ') || 'Não foi possível salvar a turma.')
   }
 }
 </script>
@@ -54,7 +66,6 @@ const save = async () => {
         </h1>
 
         <Card title="Dados da turma">
-
           <div class="grid md:grid-cols-2 gap-4">
             <Input v-model="form.name" label="Nome" />
             <Input v-model="form.identifier" label="Identificador" />

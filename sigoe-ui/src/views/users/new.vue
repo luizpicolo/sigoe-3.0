@@ -1,7 +1,7 @@
 <script setup>
 import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import Swal from 'sweetalert2'
+import { error, success, confirm } from '@/utils/sweetPopup2'
 import { create, options } from '@/services/users'
 import Sidebar from '@/components/sidebar.vue'
 import Button from '@/components/ui/button.vue'
@@ -33,19 +33,17 @@ const form = ref({
   status: true,
   avatar: null
 })
-const campuses = ref([])
+const campi = ref([])
 const photoPreview = ref('/placeholder.svg?height=48&width=48')
 const fileInput = ref(null)
 const isSubmitting = ref(false)
-const successMessage = ref('')
-const errorMessage = ref('')
 
 onMounted(async () => {
   try {
     const response = await options()
-    campuses.value = response.polos.map(polo => ({ value: polo.id, label: polo.name }))
+    campi.value = response.polos.map(polo => ({ value: polo.id, label: polo.name }))
   } catch (error) {
-    errorMessage.value = 'Não foi possível carregar os campi.'
+    error('Não foi possível carregar os campi.')
   }
 })
 
@@ -59,32 +57,29 @@ const handlePhoto = event => {
 }
 
 const handleSubmit = async event => {
-  event.preventDefault()
-  errorMessage.value = ''
-  successMessage.value = ''
+  event.preventDefault()  
   isSubmitting.value = true
 
   try {
     await create(form.value)
-    successMessage.value = 'Usuário cadastrado com sucesso!'
-    await Swal.fire({ title: 'Sucesso!', text: successMessage.value, icon: 'success', confirmButtonText: 'OK' })
-    router.push('/administrador/usuarios/listar')
+    if (await success('Usuário cadastrado com sucesso!')){
+      router.push('/administrador/usuarios/listar')
+    }
   } catch (error) {
     const errors = error.response?.data?.errors
     const message = Array.isArray(errors) ? errors.join(', ') : errors || 'Erro ao cadastrar usuário. Tente novamente.'
-    errorMessage.value = message
-    await Swal.fire({ title: 'Erro!', text: message, icon: 'error', confirmButtonText: 'OK' })
+    error(message)
   } finally {
     isSubmitting.value = false
   }
 }
 
 const dismissError = () => {
-  errorMessage.value = ''
+  error('')
 }
 
 const dismissSuccess = () => {
-  successMessage.value = ''
+  success('')
 }
 </script>
 
@@ -132,7 +127,7 @@ const dismissSuccess = () => {
                   <Input id="siape" name="siape" label="SIAPE*" v-model="form.siape" placeholder="Número SIAPE" required />
                 </div>
                 <div class="col-span-2">
-                  <Select id="campus" name="campus" label="Campus" v-model="form.polo_id" :options="[{ value: '', label: 'Selecione um campus' }, ...campuses]" />
+                  <Select id="campus" name="campus" label="Campus" v-model="form.polo_id" :options="[{ value: '', label: 'Selecione um campus' }, ...campi]" />
                 </div>
               </div>
             </Card>
