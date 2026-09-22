@@ -85,15 +85,10 @@ const handleSubmit = async (event) => {
   }
 
   try {
-    const response = await updateStudent(student.value.id, payload)
-
-    if (!response?.student) {
-      error(Array.isArray(response?.error) ? response.error.join(', ') : 'Erro ao atualizar dados do estudante. Tente novamente.')
-      return
+    await updateStudent(student.value.id, payload)
+    if (await success('Dados do estudante atualizados com sucesso!')){
+      router.push(`/administrador/estudantes/visualizar/${student.value.id}`)
     }
-
-    success('Dados do estudante atualizados com sucesso!')
-    await router.push(`/administrador/estudantes/visualizar/${student.value.id}`)
   } catch (e) {
     error(e.response?.data?.errors?.join(', ') || 'Erro ao atualizar dados do estudante. Tente novamente.')
   } finally {

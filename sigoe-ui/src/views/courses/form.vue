@@ -45,8 +45,9 @@ const save = async () => {
       await create(form.value)
     }
 
-    success('Curso salvo com sucesso')
-    await router.push('/administrador/cursos/listar')
+    if (await success('Curso salvo com sucesso')){
+      await router.push('/administrador/cursos/listar')
+    }
   } catch (e) {
     error(e.response?.data?.errors?.join(', ') || 'Não foi possível salvar o curso.')
   }

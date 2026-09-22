@@ -58,10 +58,9 @@ const submit = async () => {
 
   try {
     await update(route.params.id, form.value)
-
-    success('Usuário atualizado com sucesso!')
-
-    await router.push(`/administrador/usuarios/visualizar/${route.params.id}`)
+    if (await success('Usuário atualizado com sucesso!')){
+      router.push(`/administrador/usuarios/visualizar/${route.params.id}`)
+    }
   } catch (e) {
     error(e.response?.data?.errors?.join(', ') || 'Erro ao atualizar usuário.')
   } finally {
@@ -130,7 +129,7 @@ const submit = async () => {
             </div>
           </Card>
 
-          <div class="flex justify-end space-x-3">
+          <div class="flex justify-start space-x-3">
             <Button variant="secondary" :to="`/administrador/usuarios/visualizar/${route.params.id}`">
               <i class="fa-solid fa-times mr-2"></i>
               Cancelar
@@ -138,7 +137,7 @@ const submit = async () => {
 
             <Button type="submit" variant="success" :loading="isSubmitting" :disabled="isSubmitting">
               <i v-if="!isSubmitting" class="fa-solid fa-save mr-2"></i>
-              {{ isSubmitting ? 'Salvando...' : 'Salvar alterações' }}
+              {{ isSubmitting ? 'Salvando...' : 'Salvar' }}
             </Button>
           </div>
         </form>

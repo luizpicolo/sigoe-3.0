@@ -156,14 +156,14 @@ const dismissSuccess = () => {
               </div>
             </Card>
           </div>
-          <div class="flex justify-end space-x-3">
+          <div class="flex justify-start space-x-3">
             <Button variant="secondary" to="/administrador/usuarios/listar">
               <i class="fa-solid fa-times mr-2"></i>
               Cancelar
             </Button>
             <Button type="submit" variant="success" :loading="isSubmitting" :disabled="isSubmitting">
               <i v-if="!isSubmitting" class="fa-solid fa-save mr-2"></i>
-              {{ isSubmitting ? 'Cadastrando...' : 'Cadastrar usuário' }}
+              {{ isSubmitting ? 'Salvando...' : 'Salvar' }}
             </Button>
           </div>
         </form>

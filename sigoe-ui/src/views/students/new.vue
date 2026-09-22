@@ -53,16 +53,11 @@ const handleSubmit = async (event) => {
 
   try {
     const response = await createStudent(payload)
-
-    if (!response?.student) {
-      error(Array.isArray(response?.error) ? response.error.join(', ') : 'Erro ao cadastrar estudante. Tente novamente.')
-      return
+    if (await success('Estudante cadastrado com sucesso!')){
+      router.push(`/administrador/estudantes/visualizar/${response.student.id}`)
     }
-
-    success('Estudante cadastrado com sucesso!')
-    await router.push(`/administrador/estudantes/visualizar/${response.student.id}`)
   } catch (e) {
-    error(e.response?.data?.errors?.join(', ') || 'Erro ao cadastrar estudante. Tente novamente.')
+    error(error(e.response?.data?.errors?.join(', ') || 'Erro ao cadastrar estudante. Tente novamente.'))
   } finally {
     isSubmitting.value = false
   }
