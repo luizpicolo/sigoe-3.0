@@ -90,12 +90,10 @@ const handleSubmit = async event => {
   try {
     if (editing) {
       await update(userId, form.value)
-      success('Usuário atualizado com sucesso!')
-      await router.push(`/administrador/usuarios/visualizar/${userId}`)
+      if (await success('Usuário atualizado com sucesso!')){\n        await router.push(`/administrador/usuarios/visualizar/${userId}`)\n      }
     } else {
       await create(form.value)
-      success('Usuário cadastrado com sucesso!')
-      await router.push('/administrador/usuarios/listar')
+      if (await success('Usuário cadastrado com sucesso!')){\n        await router.push('/administrador/usuarios/listar')\n      }
     }
   } catch (e) {
     const errors = e.response?.data?.errors
@@ -127,8 +125,8 @@ onMounted(async () => {
             {{ editing ? 'Alterar informações do usuário' : 'Cadastrar Novo Usuário' }}
           </h1>
 
-          <Button v-if="editing" variant="secondary" :to="`/administrador/usuarios/visualizar/${userId}`">
-            <i class="fa-solid fa-arrow-left mr-2"></i>
+          <Button v-if="editing" variant="secondary" :to="`/administrador/usuarios/visualizar/${userId}`" customClass="bg-white border-gray-200 !text-gray-900">
+            <i class="fa-solid fa-arrow-left pr-2"></i>
             Voltar
           </Button>
         </div>
@@ -210,13 +208,13 @@ onMounted(async () => {
           </div>
 
           <div class="flex justify-start space-x-3">
-            <Button variant="secondary" :to="editing ? `/administrador/usuarios/visualizar/${userId}` : '/administrador/usuarios/listar'">
-              <i class="fa-solid fa-times mr-2"></i>
+            <Button variant="secondary" :to="editing ? `/administrador/usuarios/visualizar/${userId}` : '/administrador/usuarios/listar'" customClass="bg-white border-gray-200 !text-gray-900">
+              <i class="fa-solid fa-times pr-2"></i>
               Cancelar
             </Button>
 
             <Button type="submit" variant="success" :loading="isSubmitting" :disabled="isSubmitting">
-              <i v-if="!isSubmitting" class="fa-solid fa-save mr-2"></i>
+              <i v-if="!isSubmitting" class="fa-solid fa-save pr-2"></i>
               {{ isSubmitting ? 'Salvando...' : 'Salvar' }}
             </Button>
           </div>
