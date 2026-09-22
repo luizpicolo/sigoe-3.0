@@ -86,8 +86,7 @@ onMounted(fetchUsers)
         <div class="bg-white rounded-md shadow p-4 mb-6">
           <div class="flex flex-wrap gap-2">
             <Button :disabled="!can('users', 'create')" customClass="bg-green-600 hover:bg-green-700 focus:ring-green-500" to="/administrador/usuarios/novo">
-              <i class="fa-solid fa-user"></i>
-              Novo Usuário
+              <i class="fa-solid fa-user pr-2"></i> Novo Usuário
             </Button>
 
             <div class="flex items-center gap-2 ml-auto">
@@ -134,7 +133,7 @@ onMounted(fetchUsers)
               <Input v-model="search" type="text" placeholder="Buscar..." class="w-[200px]" @keyup.enter="handleSearch" />
 
               <button type="button" class="justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700" @click="handleSearch">
-                <i class="fa-solid fa-magnifying-glass"></i>
+                <i class="fa-solid fa-magnifying-glass pr-2"></i>
                 Busca
               </button>
             </div>
@@ -231,7 +230,7 @@ onMounted(fetchUsers)
 
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                   <Button customClass="w-full bg-green-600 hover:bg-green-700 focus:ring-green-500" :to="`/administrador/usuarios/visualizar/${user.id}`">
-                    <i class="fa-solid fa-eye"></i>
+                    <i class="fa-solid fa-eye pr-2"></i>
                     Visualizar
                   </Button>
                 </td>

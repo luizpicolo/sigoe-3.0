@@ -138,8 +138,10 @@ const handleSubmit = async () => {
 
     if (editing) {
       await updateIncident(incidentId, payload)
-      success('Ocorrência atualizada com sucesso.')
-      await router.push(`/ocorrencias/ocorrencias/visualizar/${incidentId}`)
+      if ( await success('Ocorrência atualizada com sucesso.')){
+        router.push(`/ocorrencias/ocorrencias/visualizar/${incidentId}`)
+      }
+      
     } else {
       const response = await createIncident({
         student_ids: selectedStudentIds.value,
@@ -151,8 +153,9 @@ const handleSubmit = async () => {
         return
       }
 
-      success('Ocorrência cadastrada para os estudantes selecionados.')
-      await router.push('/ocorrencias/ocorrencias/listar')
+      if (await success('Ocorrência cadastrada para os estudantes selecionados.')){
+        await router.push('/ocorrencias/ocorrencias/listar')
+      }
     }
   } catch (e) {
     error(e.response?.data?.errors?.join(', ') || e.response?.data?.error || `Não foi possível ${editing ? 'atualizar a ocorrência.' : 'cadastrar a ocorrência.'}`)

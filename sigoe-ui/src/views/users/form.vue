@@ -153,7 +153,7 @@ onMounted(async () => {
                 <div class="col-span-1">
                   <input ref="fileInput" type="file" accept="image/jpeg,image/png,image/gif" class="hidden" @change="handlePhoto">
                   <Button type="button" customClass="mt-20 w-full bg-green-600 hover:bg-green-700 focus:ring-green-500" @click="selectPhoto">
-                    <i class="fa-solid fa-edit"></i>
+                    <i class="fa-solid fa-edit pr-2"></i>
                     Selecionar foto
                   </Button>
                 </div>
