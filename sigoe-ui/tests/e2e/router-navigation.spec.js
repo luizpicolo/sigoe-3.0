@@ -1,7 +1,8 @@
-import { describe, expect, it, beforeEach } from 'vitest'
-import { createRouter, createMemoryHistory } from 'vue-router'
+import { beforeEach, describe, expect, it } from 'vitest'
+import { createMemoryHistory, createRouter } from 'vue-router'
 
 const routeModules = import.meta.glob('../../src/views/**/*.vue', { eager: true })
+const viewCases = Object.entries(routeModules).map(([path], index) => ({ path, index }))
 
 function createTestRouter() {
   const routes = Object.entries(routeModules).map(([path, module], index) => ({
@@ -25,10 +26,10 @@ describe('E2E-style view navigation integration', () => {
   })
 
   it('registers every view as a navigable route', () => {
-    expect(testRouter.getRoutes().length).toBe(Object.keys(routeModules).length)
+    expect(testRouter.getRoutes().length).toBe(viewCases.length)
   })
 
-  it.each(Object.keys(routeModules))('navigates to the route generated for %s', async (_, index) => {
+  it.each(viewCases)('navigates to the route generated for $path', async ({ index }) => {
     const route = testRouter.getRoutes()[index]
     await testRouter.push(route.path)
     await testRouter.isReady()
