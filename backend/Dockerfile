@@ -18,6 +18,8 @@ RUN apt-get update -qq && \
         libyaml-dev \
         libffi-dev \
         pkg-config \
+        imagemagick \
+        
     && rm -rf /var/lib/apt/lists/*
 
 COPY Gemfile Gemfile.lock ./
@@ -33,6 +35,7 @@ FROM base AS production
 RUN apt-get update -qq && \
     apt-get install -y --no-install-recommends \
         libpq5 \
+        imagemagick \
     && rm -rf /var/lib/apt/lists/*
 
 RUN useradd --create-home --shell /bin/bash app
