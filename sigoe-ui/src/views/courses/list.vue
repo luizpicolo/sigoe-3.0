@@ -63,9 +63,7 @@ const changeFilters = () => {
 const destroy = async (id) => {
   if (await confirm('Excluir este curso?')) {
     try {
-      await remove(id)
-      success('Curso removido com sucesso')
-      await loadCourses()
+      await remove(id)\n      if (await success('Curso removido com sucesso')){\n        await loadCourses()\n      }
     } catch (e) {
       error(e.response?.data?.errors?.join(', ') || 'Não foi possível excluir o curso.')
     }
