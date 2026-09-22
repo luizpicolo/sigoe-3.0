@@ -93,12 +93,10 @@ const handleSubmit = async event => {
   try {
     if (editing) {
       await updateStudent(studentId, payload)
-      success('Dados do estudante atualizados com sucesso!')
-      await router.push(`/administrador/estudantes/visualizar/${studentId}`)
+      if (await success('Dados do estudante atualizados com sucesso!')){\n        await router.push(`/administrador/estudantes/visualizar/${studentId}`)\n      }
     } else {
       const response = await createStudent(payload)
-      success('Estudante cadastrado com sucesso!')
-      await router.push(`/administrador/estudantes/visualizar/${response.student.id}`)
+      if (await success('Estudante cadastrado com sucesso!')){\n        await router.push(`/administrador/estudantes/visualizar/${response.student.id}`)\n      }
     }
   } catch (e) {
     error(e.response?.data?.errors?.join(', ') || `Erro ao ${editing ? 'atualizar' : 'cadastrar'} estudante. Tente novamente.`)
@@ -189,13 +187,13 @@ onMounted(loadStudent)
           </Card>
 
           <div class="flex justify-start space-x-3">
-            <Button variant="secondary" :to="editing ? `/administrador/estudantes/visualizar/${student.id}` : '/administrador/estudantes/listar'">
-              <i class="fa-solid fa-times mr-2"></i>
+            <Button variant="secondary" :to="editing ? `/administrador/estudantes/visualizar/${student.id}` : '/administrador/estudantes/listar'" customClass="bg-white border-gray-200 !text-gray-900">
+              <i class="fa-solid fa-times pr-2"></i>
               Cancelar
             </Button>
 
             <Button type="submit" variant="success" :loading="isSubmitting" :disabled="isSubmitting">
-              <i v-if="!isSubmitting" class="fa-solid fa-save mr-2"></i>
+              <i v-if="!isSubmitting" class="fa-solid fa-save pr-2"></i>
               {{ isSubmitting ? 'Salvando...' : 'Salvar' }}
             </Button>
           </div>
