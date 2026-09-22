@@ -29,10 +29,8 @@ const breadcrumbItems = [
 const actions = [
   { key: 'can_create', label: 'Criar' },
   { key: 'can_read', label: 'Visualizar / Listar' },
-  { key: 'can_read_restricted', label: 'Leitura restrita' },
   { key: 'can_update', label: 'Atualizar' },
-  { key: 'can_destroy', label: 'Deletar' },
-  { key: 'can_export_to_academic_system', label: 'Exportar' }
+  { key: 'can_destroy', label: 'Deletar' }
 ]
 
 const selectedUserName = computed(() => user.value?.name || user.value?.username || 'usuário')
@@ -228,6 +226,20 @@ onMounted(load)
                   <input v-model="permission.can_sanction" type="checkbox" class="w-5 h-5" />
                   <span class="text-sm text-gray-700">
                     Aplicar sanção
+                  </span>
+                </label>
+
+                <label v-if="isOccurrence(permission)" class="flex items-center gap-3 p-3 border border-gray-200 rounded-md cursor-pointer hover:bg-gray-50">
+                  <input v-model="permission.can_export_to_academic_system" type="checkbox" class="w-5 h-5" />
+                  <span class="text-sm text-gray-700">
+                    Exportar
+                  </span>
+                </label>
+
+                <label v-if="isOccurrence(permission)" class="flex items-center gap-3 p-3 border border-gray-200 rounded-md cursor-pointer hover:bg-gray-50">
+                  <input v-model="permission.can_read_restricted" type="checkbox" class="w-5 h-5" />
+                  <span class="text-sm text-gray-700">
+                    Leitura restrita
                   </span>
                 </label>
               </div>
