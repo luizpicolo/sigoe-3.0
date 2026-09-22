@@ -171,6 +171,7 @@ class Api::UsersController < ApplicationController
       :avatar,
       :course_id,
       :admin,
+      :avatar,
       :polo_id
     )
   end

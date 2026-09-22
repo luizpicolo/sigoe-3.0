@@ -18,7 +18,7 @@ const profileEmail = computed(() => permissionState.user?.email || '')
 
 <template>
   <aside class="w-full md:w-64 bg-white border-r border-gray-200">
-    <UserProfile :name="profileName" :email="profileEmail" />
+    <UserProfile :name="profileName" :email="profileEmail" :stateUser="permissionState" />
 
     <nav class="p-4">
       <div class="mb-6">
