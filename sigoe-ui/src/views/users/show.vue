@@ -46,9 +46,7 @@ const deleteUser = async () => {
   try {
     await remove(userId.value)
 
-    success('Usuário excluído com sucesso!')
-
-    await router.push('/administrador/usuarios/listar')
+    if (await success('Usuário excluído com sucesso!')){\n      await router.push('/administrador/usuarios/listar')\n    }
   } catch (e) {
     error(e.response?.data?.error || e.response?.data?.errors?.join(', ') || 'Não foi possível excluir o usuário.')
   }
