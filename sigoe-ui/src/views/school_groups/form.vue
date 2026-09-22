@@ -38,13 +38,13 @@ const save = async () => {
   try {
     if (editing) {
       await update(route.params.id, form.value)
-      success('Turma atualizada com sucesso')
     } else {
       await create(form.value)
-      success('Turma criada com sucesso')
     }
 
-    await router.push('/administrador/turmas/listar')
+    if (await success(editing ? 'Turma atualizada com sucesso' : 'Turma criada com sucesso')){
+      await router.push('/administrador/turmas/listar')
+    }
   } catch (e) {
     error(e.response?.data?.errors?.join(', ') || 'Não foi possível salvar a turma.')
   }
