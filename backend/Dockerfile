@@ -23,10 +23,13 @@ RUN apt-get update -qq && \
     && rm -rf /var/lib/apt/lists/*
 
 COPY Gemfile Gemfile.lock ./
+COPY config/database.yml.example /app/config/database.yml
 
 RUN bundle install
 
 COPY . .
+
+COPY config/database.yml.example config/database.yml
 
 RUN SECRET_KEY_BASE_DUMMY=1 bundle exec rails assets:precompile
 
