@@ -31,7 +31,7 @@ ActiveAdmin.register Incident do
   filter :date_incident
   filter :sanction
   filter :is_resolved
-  filter :sector_id, as: :select, collection: Sector.order(:name).pluck(:name, :id)
+  filter :sector_id, as: :select, collection: -> { Sector.order(:name).pluck(:name, :id) }
   filter :visibility
 
   form do |f|
@@ -42,7 +42,7 @@ ActiveAdmin.register Incident do
       f.input :course
       f.input :school_group
       f.input :type_incident
-      f.input :sector_id, label: 'Setor', as: :select, collection: Sector.order(:name).pluck(:name, :id)
+      f.input :sector_id, label: 'Setor', as: :select, collection: -> { Sector.order(:name).pluck(:name, :id) }
       f.input :institution
       f.input :description
       f.input :date_incident
