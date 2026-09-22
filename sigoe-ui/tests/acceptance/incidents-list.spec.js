@@ -5,7 +5,10 @@ import IncidentList from '@/views/incidents/list.vue'
 const { listMock } = vi.hoisted(() => ({ listMock: vi.fn() }))
 
 vi.mock('@/services/incidents', () => ({ list: listMock }))
-vi.mock('@/services/permissions', () => ({ can: vi.fn(() => true) }))
+vi.mock('@/services/permissions', () => ({
+  can: vi.fn(() => true),
+  permissionState: { user: { super_admin: false }, permissions: {}, admin: false },
+}))
 
 vi.mock('vue-router', () => ({ useRouter: () => ({ push: vi.fn() }) }))
 
@@ -16,7 +19,7 @@ describe('aceitação: listagem de ocorrências', () => {
   })
 
   it('carrega e apresenta as ocorrências da API', async () => {
-    const wrapper = mount(IncidentList, { global: { stubs: { Sidebar: true, Breadcrumb: true, Input: { props: ['modelValue'], emits: ['update:modelValue'], template: '<input />' }, Button: { template: '<button><slot /></button>' }, VPagination: true } } })
+    const wrapper = mount(IncidentList, { global: { stubs: { Sidebar: true, Breadcrumb: true, RouterLink: true, Input: { props: ['modelValue'], emits: ['update:modelValue'], template: '<input />' }, Button: { template: '<button><slot /></button>' }, VPagination: true } } })
 
     await flushPromises()
 
