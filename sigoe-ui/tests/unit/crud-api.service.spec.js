@@ -35,8 +35,11 @@ describe('serviços CRUD da API', () => {
   })
 
   it('não chama a API sem autenticação para estudantes', async () => {
-    localStorage.removeItem('jwt')
+    const getItemSpy = vi.spyOn(Storage.prototype, 'getItem').mockReturnValue(null)
+
     await expect(students.remove(1)).resolves.toBe(false)
     expect(axios.delete).not.toHaveBeenCalled()
+
+    getItemSpy.mockRestore()
   })
 })
