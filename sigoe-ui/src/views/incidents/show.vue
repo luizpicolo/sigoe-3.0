@@ -61,7 +61,9 @@ const deleteIncident = async () => {
     try {
       await remove(incidentId)
 
-      if (await success('Ocorrência excluída com sucesso.')){\n        await router.push('/ocorrencias/ocorrencias/listar')\n      }
+      if (await success('Ocorrência excluída com sucesso.')){
+        await router.push('/ocorrencias/ocorrencias/listar')
+      }
     } catch (e) {
       error(e.response?.data?.errors?.join(', ') || 'Erro ao excluir ocorrência.')
     }
@@ -138,12 +140,12 @@ onMounted(loadIncident)
 
             <Card customClass="col-span-1" title="Ações">
               <Button :disabled="!can('occurrences', 'update')" customClass="mt-4 w-full bg-blue-600 hover:bg-blue-700" :to="`/ocorrencias/ocorrencias/editar/${incidentId}`">
-                <i class="fa-solid fa-edit"></i>
+                <i class="fa-solid fa-edit pr-2"></i>
                 Editar Ocorrência
               </Button>
 
               <Button :disabled="!can('occurrences', 'read')" to="/ocorrencias/relatorio" customClass="mt-4 w-full bg-green-600 hover:bg-green-700">
-                <i class="fa-solid fa-print"></i>
+                <i class="fa-solid fa-print pr-2"></i>
                 Imprimir Relatório
               </Button>
 
@@ -153,7 +155,7 @@ onMounted(loadIncident)
               </Button>
 
               <Button :disabled="!can('occurrences', 'destroy')" customClass="mt-4 w-full bg-red-600 hover:bg-red-700" @click="deleteIncident">
-                <i class="fa-solid fa-trash-alt"></i>
+                <i class="fa-solid fa-trash-alt pr-2"></i>
                 Excluir Ocorrência
               </Button>
             </Card>

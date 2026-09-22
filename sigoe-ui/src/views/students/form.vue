@@ -93,10 +93,14 @@ const handleSubmit = async event => {
   try {
     if (editing) {
       await updateStudent(studentId, payload)
-      if (await success('Dados do estudante atualizados com sucesso!')){\n        await router.push(`/administrador/estudantes/visualizar/${studentId}`)\n      }
+      if (await success('Dados do estudante atualizados com sucesso!')){
+        await router.push(`/administrador/estudantes/visualizar/${studentId}`)
+      }
     } else {
       const response = await createStudent(payload)
-      if (await success('Estudante cadastrado com sucesso!')){\n        await router.push(`/administrador/estudantes/visualizar/${response.student.id}`)\n      }
+      if (await success('Estudante cadastrado com sucesso!')){
+        await router.push(`/administrador/estudantes/visualizar/${response.student.id}`)
+      }
     }
   } catch (e) {
     error(e.response?.data?.errors?.join(', ') || `Erro ao ${editing ? 'atualizar' : 'cadastrar'} estudante. Tente novamente.`)

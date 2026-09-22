@@ -88,7 +88,7 @@ onMounted(loadIncidents)
         <div class="bg-white rounded-md shadow p-4 mb-6">
           <div class="flex flex-wrap gap-2">
             <Button :disabled="!can('occurrences', 'create')" customClass="bg-green-600 hover:bg-green-700 focus:ring-green-500" to="/ocorrencias/ocorrencias/novo">
-              <i class="fa-solid fa-user"></i>
+              <i class="fa-solid fa-user pr-2"></i>
               Nova Ocorrência
             </Button>
 
@@ -113,7 +113,7 @@ onMounted(loadIncidents)
             <div class="flex items-center gap-2">
               <Input v-model="search" type="text" placeholder="Buscar..." class="w-[200px]" />
               <Button @click="searchIncidents" customClass="bg-green-600 hover:bg-green-700 focus:ring-green-500">
-                <i class="fa-solid fa-magnifying-glass"></i>
+                <i class="fa-solid fa-magnifying-glass  pr-2"></i>
                 Busca
               </Button>
             </div>
@@ -174,7 +174,7 @@ onMounted(loadIncidents)
 
                 <td class="px-3 py-4 text-sm">
                   <Button :disabled="!can('occurrences', 'read') || !canAccessIncident(incident)" customClass="w-full bg-green-600 hover:bg-green-700 focus:ring-green-500" :to="`/ocorrencias/ocorrencias/visualizar/${incident.id}`">
-                    <i class="fa-solid fa-eye"></i>
+                    <i class="fa-solid fa-eye pr-2"></i>
                     Visualizar
                   </Button>
                 </td>

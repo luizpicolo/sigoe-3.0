@@ -9,7 +9,7 @@ import SearchableSelect from '@/components/ui/searchable-select.vue'
 import Input from '@/components/ui/input.vue'
 import Header from '@/components/header.vue'
 import { getIncidentReportOptions, generateIncidentReport } from '@/services/reports/incidents'
-import { error } from '@/utils/sweetPopup2'
+import { error, warning } from '@/utils/sweetPopup2'
 
 const breadcrumbItems = [
   { label: 'Home', href: '/' },
@@ -133,7 +133,7 @@ const handleGenerateReport = async () => {
       message = err.response?.data?.error || message
     }
 
-    error(message)
+    warning(message)
   } finally {
     isGenerating.value = false
   }

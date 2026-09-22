@@ -157,22 +157,22 @@ onMounted(() => loadStudent(studentId.value))
 
           <Card customClass="col-span-1" title="Ações">
             <Button :disabled="!can('students', 'update')" variant="info" :to="`/administrador/estudantes/editar/${student.id}`" customClass="w-full">
-              <i class="fa-solid fa-edit"></i>
+              <i class="fa-solid fa-edit pr-2"></i>
               Editar Estudante
             </Button>
 
             <Button v-if="can('students', 'read')" customClass="mt-4 w-full bg-green-600 hover:bg-green-700 focus:ring-green-500">
-              <i class="fa-solid fa-print"></i>
+              <i class="fa-solid fa-print pr-2"></i>
               Imprimir Ficha
             </Button>
 
             <Button v-if="can('students', 'read')" customClass="mt-4 w-full bg-yellow-600 hover:bg-yellow-700 focus:ring-yellow-500">
-              <i class="fa-solid fa-file-alt"></i>
+              <i class="fa-solid fa-file-alt pr-2"></i>
               Histórico Escolar
             </Button>
 
             <Button :disabled="!can('students', 'destroy')" customClass="mt-4 w-full bg-red-600 hover:bg-red-700 focus:ring-red-500">
-              <i class="fa-solid fa-trash-alt"></i>
+              <i class="fa-solid fa-trash-alt pr-2"></i>
               Excluir Estudante
             </Button>
           </Card>

@@ -63,7 +63,10 @@ const changeFilters = () => {
 const destroy = async (id) => {
   if (await confirm('Excluir este curso?')) {
     try {
-      await remove(id)\n      if (await success('Curso removido com sucesso')){\n        await loadCourses()\n      }
+      await remove(id)
+      if (await success('Curso removido com sucesso')){
+        await loadCourses()
+      }
     } catch (e) {
       error(e.response?.data?.errors?.join(', ') || 'Não foi possível excluir o curso.')
     }
@@ -88,7 +91,7 @@ onMounted(loadCourses)
         <div class="bg-white rounded-md shadow p-4 mb-6">
           <div class="flex flex-wrap gap-2">
             <Button :disabled="!can('courses', 'create')" customClass="bg-green-600 hover:bg-green-700 focus:ring-green-500" to="/administrador/cursos/novo">
-              <i class="fa-solid fa-plus"></i>
+              <i class="fa-solid fa-plus pr-2"></i>
               Novo Curso
             </Button>
 
@@ -116,7 +119,7 @@ onMounted(loadCourses)
               <Input v-model="search" type="text" placeholder="Buscar..." class="w-[200px]" />
 
               <Button @click="searchCourses" customClass="bg-green-600 hover:bg-green-700 focus:ring-green-500">
-                <i class="fa-solid fa-magnifying-glass"></i>
+                <i class="fa-solid fa-magnifying-glass pr-2"></i>
                 Busca
               </Button>
             </div>
@@ -174,10 +177,12 @@ onMounted(loadCourses)
                 <td class="px-3 py-4 text-sm text-gray-500">
                   <div class="flex flex-col gap-2">
                     <Button :disabled="!can('courses', 'update')" :to="`/administrador/cursos/editar/${course.id}`" customClass="w-full bg-blue-600 hover:bg-blue-700">
+                      <i class="fa-solid fa-edit pr-2"></i>
                       Editar
                     </Button>
 
                     <Button :disabled="!can('courses', 'destroy')" @click="destroy(course.id)" customClass="w-full bg-red-600 hover:bg-red-700">
+                      <i class="fa-solid fa-trash pr-2"></i>
                       Excluir
                     </Button>
                   </div>

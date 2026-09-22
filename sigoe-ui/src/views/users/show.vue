@@ -46,7 +46,9 @@ const deleteUser = async () => {
   try {
     await remove(userId.value)
 
-    if (await success('Usuário excluído com sucesso!')){\n      await router.push('/administrador/usuarios/listar')\n    }
+    if (await success('Usuário excluído com sucesso!')){
+      await router.push('/administrador/usuarios/listar')
+    }
   } catch (e) {
     error(e.response?.data?.error || e.response?.data?.errors?.join(', ') || 'Não foi possível excluir o usuário.')
   }
@@ -73,7 +75,7 @@ onMounted(() => fetchUser(userId.value))
           </div>
 
           <Button to="/administrador/usuarios/listar" customClass="bg-white border-gray-200 !text-gray-900 hover:bg-gray-100 !focus:ring-gray-300">
-            <i class="fa-solid fa-arrow-left"></i>
+            <i class="fa-solid fa-arrow-left pr-2"></i>
             Voltar
           </Button>
         </div>
@@ -135,17 +137,17 @@ onMounted(() => fetchUser(userId.value))
 
           <Card customClass="col-span-1" title="Ações">
             <Button :disabled="!can('users', 'update')" variant="info" :to="`/administrador/usuarios/visualizar/${userId}/permissoes`" customClass="w-full">
-              <i class="fa-solid fa-shield-halved"></i>
+              <i class="fa-solid fa-shield-halved pr-2"></i>
               Gerenciar Permissões
             </Button>
 
             <Button :disabled="!can('users', 'update')" :to="`/administrador/usuarios/editar/${userId}`" customClass="mt-4 w-full">
-              <i class="fa-solid fa-edit"></i>
+              <i class="fa-solid fa-edit pr-2"></i>
               Editar Usuário
             </Button>
 
             <Button :disabled="!can('users', 'destroy')" variant="danger" @click="deleteUser" customClass="mt-4 w-full">
-              <i class="fa-solid fa-trash-alt"></i>
+              <i class="fa-solid fa-trash-alt pr-2"></i>
               Excluir Usuário
             </Button>
           </Card>

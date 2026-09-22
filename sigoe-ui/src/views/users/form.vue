@@ -90,10 +90,14 @@ const handleSubmit = async event => {
   try {
     if (editing) {
       await update(userId, form.value)
-      if (await success('Usuário atualizado com sucesso!')){\n        await router.push(`/administrador/usuarios/visualizar/${userId}`)\n      }
+      if (await success('Usuário atualizado com sucesso!')){
+        await router.push(`/administrador/usuarios/visualizar/${userId}`)
+      }
     } else {
       await create(form.value)
-      if (await success('Usuário cadastrado com sucesso!')){\n        await router.push('/administrador/usuarios/listar')\n      }
+      if (await success('Usuário cadastrado com sucesso!')){
+        await router.push('/administrador/usuarios/listar')
+      }
     }
   } catch (e) {
     const errors = e.response?.data?.errors

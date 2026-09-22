@@ -73,7 +73,7 @@ onMounted(loadStudents)
         <div class="bg-white rounded-md shadow p-4 mb-6">
           <div class="flex flex-wrap gap-2">
             <Button :disabled="!can('students', 'create')" customClass="bg-green-600 hover:bg-green-700 focus:ring-green-500" to="/administrador/estudantes/novo">
-              <i class="fa-solid fa-user"></i>
+              <i class="fa-solid fa-user pr-2"></i>
               Novo Estudante
             </Button>
 
@@ -101,7 +101,7 @@ onMounted(loadStudents)
               <Input v-model="search" type="text" placeholder="Buscar..." class="w-[200px]" />
 
               <Button @click="searchStudents" customClass="bg-green-600 hover:bg-green-700 focus:ring-green-500">
-                <i class="fa-solid fa-magnifying-glass"></i>
+                <i class="fa-solid fa-magnifying-glass pr-2"></i>
                 Busca
               </Button>
             </div>
@@ -166,7 +166,7 @@ onMounted(loadStudents)
 
                 <td class="px-3 py-4 text-sm text-gray-500">
                   <Button customClass="w-full bg-green-600 hover:bg-green-700 focus:ring-green-500" :to="`/administrador/estudantes/visualizar/${student.id}`">
-                    <i class="fa-solid fa-eye"></i>
+                    <i class="fa-solid fa-eye pr-2"></i>
                     Visualizar
                   </Button>
                 </td>
