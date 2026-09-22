@@ -22,6 +22,13 @@ export const error = message => Swal.fire({
   text: message
 })
 
+export const warning = message => Swal.fire({
+  ...baseOptions,
+  icon: 'warning',
+  title: 'Atenção',
+  text: message
+})
+
 export const confirm = message => Swal.fire({
   ...baseOptions,
   icon: 'warning',
