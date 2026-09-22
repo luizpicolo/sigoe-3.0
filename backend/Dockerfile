@@ -14,6 +14,7 @@ RUN apt-get update -qq && \
     apt-get install -y --no-install-recommends \
         build-essential \
         git \
+        curl \
         libpq-dev \
         libyaml-dev \
         libffi-dev \
@@ -22,11 +23,22 @@ RUN apt-get update -qq && \
         shared-mime-info \
     && rm -rf /var/lib/apt/lists/*
 
+RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
+    apt-get update -qq && \
+    apt-get install -y --no-install-recommends nodejs && \
+    rm -rf /var/lib/apt/lists/*
+
 COPY Gemfile Gemfile.lock ./
 
 RUN bundle install
 
+COPY package.json package-lock.json ./
+
+RUN npm ci
+
 COPY . .
+
+COPY config/database.yml.example config/database.yml
 
 RUN SECRET_KEY_BASE_DUMMY=1 bundle exec rails assets:precompile
 
