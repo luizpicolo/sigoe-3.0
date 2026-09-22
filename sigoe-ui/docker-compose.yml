@@ -1,9 +1,9 @@
 services:
-  sigeo-ui:
+  sigoe-ui:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: sigeo-ui
+    container_name: sigoe-ui
     ports:
       - "8080:3000"
     environment:
