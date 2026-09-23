@@ -1,158 +1,264 @@
 <!doctype html>
-<html>
+<html lang="pt-BR">
   <head>
-    <meta name="viewport" content="width=device-width">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <title>Simple Transactional Email</title>
-    <style>
-    /* -------------------------------------
-        INLINED WITH htmlemail.io/inline
-    ------------------------------------- */
-    /* -------------------------------------
-        RESPONSIVE AND MOBILE FRIENDLY STYLES
-    ------------------------------------- */
-    @media only screen and (max-width: 620px) {
-      table[class=body] h1 {
-        font-size: 28px !important;
-        margin-bottom: 10px !important;
-      }
-      table[class=body] p,
-            table[class=body] ul,
-            table[class=body] ol,
-            table[class=body] td,
-            table[class=body] span,
-            table[class=body] a {
-        font-size: 16px !important;
-      }
-      table[class=body] .wrapper,
-            table[class=body] .article {
-        padding: 10px !important;
-      }
-      table[class=body] .content {
-        padding: 0 !important;
-      }
-      table[class=body] .container {
-        padding: 0 !important;
-        width: 100% !important;
-      }
-      table[class=body] .main {
-        border-left-width: 0 !important;
-        border-radius: 0 !important;
-        border-right-width: 0 !important;
-      }
-      table[class=body] .btn table {
-        width: 100% !important;
-      }
-      table[class=body] .btn a {
-        width: 100% !important;
-      }
-      table[class=body] .img-responsive {
-        height: auto !important;
-        max-width: 100% !important;
-        width: auto !important;
-      }
-    }
+    <meta name="color-scheme" content="light">
+    <meta name="supported-color-schemes" content="light">
 
-    /* -------------------------------------
-        PRESERVE THESE STYLES IN THE HEAD
-    ------------------------------------- */
-    @media all {
-      .ExternalClass {
+    <title>Notificação de ocorrência - IFMS</title>
+
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        background-color: #f4f6f8;
+        font-family: Arial, Helvetica, sans-serif;
+        color: #333333;
+        -webkit-text-size-adjust: 100%;
+        -ms-text-size-adjust: 100%;
+      }
+
+      table {
+        border-collapse: collapse;
+        border-spacing: 0;
+      }
+
+      img {
+        border: 0;
+        outline: none;
+        text-decoration: none;
+        display: block;
+        max-width: 100%;
+        height: auto;
+      }
+
+      a {
+        color: #006b3f;
+        text-decoration: none;
+      }
+
+      .wrapper {
         width: 100%;
+        background-color: #f4f6f8;
+        padding: 40px 15px;
       }
-      .ExternalClass,
-            .ExternalClass p,
-            .ExternalClass span,
-            .ExternalClass font,
-            .ExternalClass td,
-            .ExternalClass div {
-        line-height: 100%;
+
+      .container {
+        width: 100%;
+        max-width: 600px;
+        margin: 0 auto;
       }
-      .apple-link a {
-        color: inherit !important;
-        font-family: inherit !important;
-        font-size: inherit !important;
-        font-weight: inherit !important;
-        line-height: inherit !important;
-        text-decoration: none !important;
+
+      .card {
+        background-color: #ffffff;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
       }
-      .btn-primary table td:hover {
-        background-color: #34495e !important;
+
+      .header {
+        padding: 28px 35px;
+        text-align: center;
+        border-bottom: 1px solid #eeeeee;
       }
-      .btn-primary a:hover {
-        background-color: #34495e !important;
-        border-color: #34495e !important;
+
+      .logo {
+        width: 180px;
+        margin: 0 auto;
       }
-    }
+
+      .content {
+        padding: 40px 45px;
+      }
+
+      .title {
+        margin: 0 0 12px;
+        font-size: 23px;
+        line-height: 1.3;
+        font-weight: 600;
+        color: #1f2933;
+      }
+
+      .subtitle {
+        margin: 0 0 28px;
+        font-size: 15px;
+        line-height: 1.6;
+        color: #667085;
+      }
+
+      .message {
+        margin: 0 0 18px;
+        font-size: 15px;
+        line-height: 1.7;
+        color: #444444;
+      }
+
+      .notice {
+        margin: 28px 0;
+        padding: 18px 20px;
+        background-color: #f0f8f4;
+        border-left: 4px solid #006b3f;
+        border-radius: 4px;
+      }
+
+      .notice p {
+        margin: 0;
+        font-size: 14px;
+        line-height: 1.6;
+        color: #3f4a45;
+      }
+
+      .button-wrapper {
+        padding: 10px 0 25px;
+        text-align: center;
+      }
+
+      .button {
+        display: inline-block;
+        padding: 13px 26px;
+        background-color: #006b3f;
+        color: #ffffff !important;
+        font-size: 15px;
+        font-weight: bold;
+        border-radius: 5px;
+      }
+
+      .footer {
+        padding: 25px 20px;
+        text-align: center;
+        color: #8a8f98;
+        font-size: 12px;
+        line-height: 1.6;
+      }
+
+      .footer strong {
+        color: #687078;
+      }
+
+      @media only screen and (max-width: 620px) {
+        .wrapper {
+          padding: 20px 10px !important;
+        }
+
+        .content {
+          padding: 30px 22px !important;
+        }
+
+        .header {
+          padding: 24px 20px !important;
+        }
+
+        .title {
+          font-size: 21px !important;
+        }
+
+        .message,
+        .subtitle {
+          font-size: 15px !important;
+        }
+
+        .button {
+          display: block !important;
+          text-align: center !important;
+        }
+      }
     </style>
   </head>
-  <body class="" style="background-color: #f6f6f6; font-family: sans-serif; -webkit-font-smoothing: antialiased; font-size: 14px; line-height: 1.4; margin: 0; padding: 0; -ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%;">
-    <table border="0" cellpadding="0" cellspacing="0" class="body" style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; background-color: #f6f6f6;">
+
+  <body>
+    <!-- Preheader -->
+    <div style="display: none; max-height: 0; overflow: hidden; opacity: 0; color: transparent;">
+      Nova ocorrência cadastrada no sistema do IFMS.
+    </div>
+
+    <table role="presentation" width="100%">
       <tr>
-        <td style="font-family: sans-serif; font-size: 14px; vertical-align: top;">&nbsp;</td>
-        <td class="container" style="font-family: sans-serif; font-size: 14px; vertical-align: top; display: block; Margin: 0 auto; max-width: 580px; padding: 10px; width: 580px;">
-          <div class="content" style="box-sizing: border-box; display: block; Margin: 0 auto; max-width: 580px; padding: 10px;">
+        <td class="wrapper">
+          <table role="presentation" class="container" width="100%">
+            <tr>
+              <td>
+                <!-- CARD -->
+                <table role="presentation" width="100%" class="card">
+                  <!-- HEADER -->
+                  <tr>
+                    <td class="header">
+                      <img src="https://selecao.ifms.edu.br/assets/images/ifms-cor.png" alt="Instituto Federal de Mato Grosso do Sul" class="logo">
+                    </td>
+                  </tr>
 
-            <!-- START CENTERED WHITE CONTAINER -->
-            <span class="preheader" style="color: transparent; display: none; height: 0; max-height: 0; max-width: 0; opacity: 0; overflow: hidden; mso-hide: all; visibility: hidden; width: 0;">This is preheader text. Some clients will show this text as a preview.</span>
-            <table class="main" style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; background: #ffffff; border-radius: 3px;">
+                  <!-- CONTENT -->
+                  <tr>
+                    <td class="content">
+                      <h1 class="title">
+                        Nova ocorrência cadastrada
+                      </h1>
 
-              <!-- START MAIN CONTENT AREA -->
-              <tr>
-                <td class="wrapper" style="font-family: sans-serif; font-size: 14px; vertical-align: top; box-sizing: border-box; padding: 20px;">
-                  <table border="0" cellpadding="0" cellspacing="0" style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%;">
-                    <tr>
-                      <td style="font-family: sans-serif; font-size: 14px; vertical-align: top; text-align: center">
-                        <img src="http://selecao.ifms.edu.br/assets/images/ifms-cor.png" alt="Instituto Federal de Mato Grosso do Sul">
-                        <p style="font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0; Margin-bottom: 15px;">Olá senhor(a) coordenador(a)</p>
-                        <p style="font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0; Margin-bottom: 15px;">Notificação de cadastro de ocorrências</p>
-                        <table border="0" cellpadding="0" cellspacing="0" class="btn btn-primary" style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; box-sizing: border-box;">
-                          <tbody>
-                            <tr>
-                              <td align="left" style="font-family: sans-serif; font-size: 14px; vertical-align: top; padding-bottom: 15px;">
-                                <table border="0" cellpadding="0" cellspacing="0" style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: auto;">
-                                  <tbody>
-                                    <tr>
-                                      <p style="font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0; Margin-bottom: 15px;">Foi adicionado em nosso sistema uma nova ocorrência relacionada ao curso que o senhor(a) coordena.</p>
-                                      <p style="font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0; Margin-bottom: 15px;">Para visualizá-la, por favor, acesse <a href="http://sistemas.na.ifms.edu.br">http://sistemas.na.ifms.edu.br</a> </p>
-                                      <p style="font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0; Margin-bottom: 15px;"><b>Email enviado automaticamente. Por favor, não responda</b></p>
-                                    </tr>
-                                  </tbody>
-                                </table>
-                              </td>
-                            </tr>
-                          </tbody>
-                        </table>
-                      </td>
-                    </tr>
-                  </table>
-                </td>
-              </tr>
+                      <p class="subtitle">
+                        Notificação destinada à coordenação do curso.
+                      </p>
 
-            <!-- END MAIN CONTENT AREA -->
-            </table>
+                      <p class="message">
+                        Olá, senhor(a) coordenador(a).
+                      </p>
 
-            <!-- START FOOTER -->
-            <div class="footer" style="clear: both; Margin-top: 10px; text-align: center; width: 100%;">
-              <table border="0" cellpadding="0" cellspacing="0" style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%;">
-                <tr>
-                  <td class="content-block" style="font-family: sans-serif; vertical-align: top; padding-bottom: 10px; padding-top: 10px; font-size: 12px; color: #999999; text-align: center;">
-                    <span class="apple-link" style="color: #999999; font-size: 12px; text-align: center;">IFMS - Instituto Federal de Mato Grosso do Sul / Campos Nova Andradina</span>
-                  </td>
-                </tr>
-                <tr>
-                  <td class="content-block powered-by" style="font-family: sans-serif; vertical-align: top; padding-bottom: 10px; padding-top: 10px; font-size: 12px; color: #999999; text-align: center;">
-                    Email enviado automaticamente. Por favor, não responda
-                  </td>
-                </tr>
-              </table>
-            </div>
-            <!-- END FOOTER -->
+                      <p class="message">
+                        Foi registrada uma nova ocorrência relacionada ao curso que o(a) senhor(a) coordena.
+                      </p>
 
-          <!-- END CENTERED WHITE CONTAINER -->
-          </div>
+                      <div class="notice">
+                        <p>
+                          Acesse o sistema para consultar os detalhes da ocorrência e realizar os procedimentos necessários.
+                        </p>
+                      </div>
+
+                      <!-- BUTTON -->
+                      <table role="presentation" width="100%">
+                        <tr>
+                          <td class="button-wrapper">
+                            <a href="https://sigoe.na.ifms.edu.br" class="button" target="_blank">
+                              Acessar o sistema
+                            </a>
+                          </td>
+                        </tr>
+                      </table>
+
+                      <p class="message" style="font-size: 13px; color: #777777; margin-bottom: 0;">
+                        Caso o botão não funcione, acesse:
+                        <a href="https://sigoe.na.ifms.edu.br">
+                          sigoe.na.ifms.edu.br
+                        </a>
+                      </p>
+                    </td>
+                  </tr>
+                </table>
+
+                <!-- FOOTER -->
+                <table role="presentation" width="100%">
+                  <tr>
+                    <td class="footer">
+                      <strong>
+                        IFMS — Instituto Federal de Mato Grosso do Sul
+                      </strong>
+
+                      <br>
+
+                      Campus Nova Andradina
+
+                      <br><br>
+
+                      Esta é uma mensagem automática enviada pelo sistema.
+
+                      <br>
+
+                      Por favor, não responda a este e-mail.
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+          </table>
         </td>
-        <td style="font-family: sans-serif; font-size: 14px; vertical-align: top;">&nbsp;</td>
       </tr>
     </table>
   </body>
