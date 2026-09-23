@@ -39,7 +39,7 @@ class IncidentsController < ApplicationController
     @incident.course = course_by_student(incident_params[:student_id])
     if @incident.save
       unless incident_params[:sector_id].empty?
-        send_email_to(Sector.find(incident_params[:sector_id]).email)
+        send_email_to(Sector.find(incident_params[:sector_id]).email, @incident)
       end
       redirect_to incidents_path, flash: { success: 'Ocorrência cadastra com sucesso' }
     else
@@ -60,7 +60,7 @@ class IncidentsController < ApplicationController
   def update
     if @incident.update(incident_params)
       unless incident_params[:sector_id].empty?
-        send_email_to(Sector.find(incident_params[:sector_id]).email)
+        send_email_to(Sector.find(incident_params[:sector_id]).email, @incident)
       end
       redirect_to incidents_path, flash: { success: 'Ocorrência atualizada com sucesso' }
     else
@@ -113,10 +113,11 @@ class IncidentsController < ApplicationController
     Student.find(student_id).course
   end
 
-  def send_email_to(sector)
+  def send_email_to(sector, insident = nil)
     return if Rails.env.test?
-
-    InsidentMailer.send_mailer(sector).deliver_now if sector.present?
+    InsidentMailer.send_mailer(sector, insident).deliver_now if sector.present?
+  rescue StandardError => e
+    Rails.logger.error("Erro ao enviar e-mail da ocorrência: #{e.message}")
   end
 
   def set_incident
