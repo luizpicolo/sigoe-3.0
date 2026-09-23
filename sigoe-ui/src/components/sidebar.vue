@@ -1,5 +1,5 @@
 <script setup>
-import { computed, onMounted } from 'vue'
+import { onMounted } from 'vue'
 import UserProfile from '@/components/userprofile.vue'
 import { can, loadCurrentPermissions, permissionState } from '@/services/permissions'
 
@@ -11,14 +11,11 @@ defineProps({
 })
 
 onMounted(() => loadCurrentPermissions())
-
-const profileName = computed(() => permissionState.user?.name || permissionState.user?.username || 'Usuário')
-const profileEmail = computed(() => permissionState.user?.email || '')
 </script>
 
 <template>
   <aside class="w-full md:w-64 bg-white border-r border-gray-200">
-    <UserProfile :name="profileName" :email="profileEmail" :stateUser="permissionState" />
+    <UserProfile :stateUser="permissionState" />
 
     <nav class="p-4">
       <div class="mb-6">
@@ -28,8 +25,7 @@ const profileEmail = computed(() => permissionState.user?.email || '')
             <router-link
               to="/administrador/usuarios/trocar-senha"
               class="block px-2 py-1 text-sm hover:bg-gray-100 rounded"
-              :class="{ 'bg-green-50 text-green-700': activePage === 'trocar-senha', 'text-gray-700': activePage !== 'trocar-senha' }"
-            >
+              :class="{ 'bg-green-50 text-green-700': activePage === 'trocar-senha', 'text-gray-700': activePage !== 'trocar-senha' }">
               Trocar senha
             </router-link>
           </li>
