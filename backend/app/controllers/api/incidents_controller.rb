@@ -89,8 +89,9 @@ class Api::IncidentsController < ApplicationController
 
   def send_email_to(sector, incident = nil)
     return if Rails.env.test?
-
-    InsidentMailer.send_mailer(sector, incident).deliver_now if sector.present?
+    Thread.new do
+      InsidentMailer.send_mailer(sector, incident).deliver_now if sector.present?
+    end
   rescue StandardError => e
     Rails.logger.error("Erro ao enviar e-mail da ocorrência: #{e.message}")
   end
