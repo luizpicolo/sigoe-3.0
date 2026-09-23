@@ -225,9 +225,9 @@ onMounted(async () => {
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               <SearchableSelect v-model="selectedOccurrenceType" :options="occurrenceOptions" placeholder="Todos os tipos" :disabled="isLoadingOptions" />
 
-              <Select v-model="selectedResident" :options="[{ value: '', label: 'Todos' }, { value: 'resident', label: 'Sim' }, { value: 'non_resident', label: 'Não' }]" />
+              <Select v-model="selectedResident" :options="[{ value: '', label: 'Residente?' }, { value: 'resident', label: 'Sim' }, { value: 'non_resident', label: 'Não' }]" />
 
-              <Select v-model="selectedResolved" :options="[{ value: '', label: 'Todas' }, { value: 'yes_', label: 'Sim' }, { value: 'no_', label: 'Não' }]" />
+              <Select v-model="selectedResolved" :options="[{ value: '', label: 'Resolvida?' }, { value: 'yes_', label: 'Sim' }, { value: 'no_', label: 'Não' }]" />
 
               <SearchableSelect v-model="selectedClass" :options="classOptions" placeholder="Todas as turmas" :disabled="isLoadingOptions" />
             </div>

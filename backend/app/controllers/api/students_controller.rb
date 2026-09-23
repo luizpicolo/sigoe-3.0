@@ -11,6 +11,7 @@ class Api::StudentsController < ApplicationController
 
     students = Student.joins(:course)
                       .where(params_return)
+                      .where(course_situation: 5)
                       .order("#{set_order}": :desc)
                       .search(params[:search])
                       .page(params[:page])

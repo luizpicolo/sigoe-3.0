@@ -9,7 +9,7 @@ class Api::ReportIncidentsController < ApplicationController
     authorize! :read, Incident
 
     render json: {
-      students: Student.where(params_return).order(:name).as_json(only: %i[id name]),
+      students: Student.where(params_return).where(course_situation: 5).order(:name).as_json(only: %i[id name]),
       courses: Course.where(params_return).order(:name).as_json(only: %i[id name]),
       school_groups: SchoolGroup.where(params_return).order(:name).as_json(only: %i[id name]),
       type_incidents: Incident::TypeIncident.order(:name).as_json(only: %i[id name])
