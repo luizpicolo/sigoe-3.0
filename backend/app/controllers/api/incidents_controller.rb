@@ -42,6 +42,11 @@ class Api::IncidentsController < ApplicationController
         incident
       end
     end
+
+    unless incident_params[:sector_id].empty?
+      send_email_to(Sector.find(incident_params[:sector_id]).email, @incident)
+    end
+    
     render json: { incidents: incidents.map { |incident| incident_json(incident) } }, status: :created
   rescue ActiveRecord::RecordInvalid, ActiveRecord::RecordNotFound => e
     render json: { errors: [e.message] }, status: :unprocessable_entity
@@ -54,6 +59,11 @@ class Api::IncidentsController < ApplicationController
     @incident.student_duty_ids = incident_params[:student_duty_ids] if incident_params.key?(:student_duty_ids)
     @incident.prohibition_and_responsibility_ids = incident_params[:prohibition_and_responsibility_ids] if incident_params.key?(:prohibition_and_responsibility_ids)
     @incident.save!
+
+    unless incident_params[:sector_id].empty?
+      send_email_to(Sector.find(incident_params[:sector_id]).email, @incident)
+    end
+
     render json: { incident: incident_json(@incident) }
   rescue ActiveRecord::RecordInvalid => e
     render json: { errors: e.record.errors.full_messages }, status: :unprocessable_entity
@@ -66,6 +76,13 @@ class Api::IncidentsController < ApplicationController
   end
 
   private
+
+  def send_email_to(sector, insident = nil)
+    return if Rails.env.test?
+    InsidentMailer.send_mailer(sector, insident).deliver_now if sector.present?
+  rescue StandardError => e
+    Rails.logger.error("Erro ao enviar e-mail da ocorrência: #{e.message}")
+  end
 
   def set_incident
     @incident = Incident.includes(:student, :course, :type_incident, :user, :assistant, :student_duties, :prohibition_and_responsibilities).where(params_return).find(params[:id])
