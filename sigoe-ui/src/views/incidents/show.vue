@@ -165,7 +165,7 @@ onMounted(loadIncident)
             <template v-if="can('occurrences', 'sanction')">
               <Card customClass="col-span-3" title="Status da Ocorrência">
                 <dl class="divide-y divide-gray-200">
-                  <div v-for="item in [{ label: 'Sanção aplicada', value: sanctionLabels[incident.sanction] || 'Nenhuma sanção aplicada' }, { label: 'Ocorrência resolvida', value: incident.is_resolved ? 'Sim' : 'Não' }, { label: 'Visibilidade', value: incident.visibility ? 'Visível' : 'Oculta' }, { label: 'Verificada', value: incident.signed_in ? 'Verificada' : 'Pendente' }]" :key="item.label" class="py-3 grid grid-cols-3">
+                  <div v-for="item in [{ label: 'Sanção aplicada', value: sanctionLabels[incident.sanction] || 'Nenhuma sanção aplicada' }, { label: 'Ocorrência resolvida', value: incident.is_resolved ? 'Sim' : 'Não' }, { label: 'Visibilidade', value: incident.visibility ? 'Visível' : 'Oculta' }, { label: 'Verificada', value: incident.is_resolved ? 'Verificada' : 'Pendente' }]" :key="item.label" class="py-3 grid grid-cols-3">
                     <dt class="text-sm font-medium text-gray-500">
                       {{ item.label }}
                     </dt>
