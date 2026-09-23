@@ -128,7 +128,7 @@ onMounted(loadIncident)
 
             <Card customClass="col-span-3" title="Informações da Ocorrência">
               <dl class="divide-y divide-gray-200">
-                <div v-for="item in [{ label: 'Data da ocorrência', value: formatDate(incident.date_incident) }, { label: 'Horário', value: formatTime(incident.time_incident) }, { label: 'Tipo de ocorrência', value: incident.type_incident?.name }, { label: 'Tipo de acesso', value: incident.visibility ? 'Público' : 'Privado' }, { label: 'Assistente responsável', value: incident.assistant?.name || incident.user?.name }, { label: 'Encaminhado para', value: incident.sector_id || 'Não encaminhado' }]" :key="item.label" class="py-3 grid grid-cols-3">
+                <div v-for="item in [{ label: 'Data da ocorrência', value: formatDate(incident.date_incident) }, { label: 'Horário', value: formatTime(incident.time_incident) }, { label: 'Tipo de ocorrência', value: incident.type_incident?.name }, { label: 'Tipo de acesso', value: incident.visibility ? 'Público' : 'Privado' }, { label: 'Assistente responsável', value: incident.assistant?.name || incident.user?.name }, { label: 'Email do setor', value: incident.sector?.email || 'Não encaminhado' }]" :key="item.label" class="py-3 grid grid-cols-3">
                   <dt class="text-sm font-medium text-gray-500">
                     {{ item.label }}
                   </dt>

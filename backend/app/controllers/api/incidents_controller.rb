@@ -99,6 +99,6 @@ class Api::IncidentsController < ApplicationController
   end
 
   def incident_json(incident)
-    incident.as_json(include: { student: { only: %i[id name ra photo] }, course: { only: %i[id name initial polo_id], include: { polo: { only: %i[id name] } } }, type_incident: { only: %i[id name] }, user: { only: %i[id name] }, assistant: { only: %i[id name email] }, student_duties: { only: %i[id item] }, prohibition_and_responsibilities: { only: %i[id item] } })
+    incident.as_json(include: { student: { only: %i[id name ra photo] }, course: { only: %i[id name initial polo_id], include: { polo: { only: %i[id name] } } }, type_incident: { only: %i[id name] }, sector: { only: %i[id name email] }, user: { only: %i[id name] }, assistant: { only: %i[id name email] }, student_duties: { only: %i[id item] }, prohibition_and_responsibilities: { only: %i[id item] } })
   end
 end
