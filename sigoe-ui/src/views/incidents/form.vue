@@ -11,6 +11,8 @@ import Button from '@/components/ui/button.vue'
 import Select from '@/components/ui/select.vue'
 import StudentSearchableSelect from '@/components/ui/student-searchable-select.vue'
 
+const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
+
 import { can } from '@/services/permissions'
 import { create as createIncident, find as findIncident, options as incidentOptions, update as updateIncident } from '@/services/incidents'
 import { success, error } from '@/utils/sweetPopup2'
@@ -188,7 +190,7 @@ onMounted(loadData)
         <form v-else @submit.prevent="handleSubmit" class="space-y-6">
           <Card title="Estudante">
             <div v-if="editing" class="flex items-center gap-4">
-              <img :src="incident.student?.photo || '/placeholder.svg?height=96&width=96'" class="h-24 w-24 rounded-full object-cover" alt="Foto do estudante">
+              <img :src="BASE_URL + incident.student?.photo?.thumb?.url" class="h-24 w-24 rounded-full object-cover" width="200" alt="Foto do estudante" />
 
               <div>
                 <p class="font-medium">

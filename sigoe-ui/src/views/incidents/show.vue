@@ -104,7 +104,7 @@ onMounted(loadIncident)
           <div class="grid grid-cols-4 gap-4 mb-6 mt-4 rounded-lg shadow-sm">
             <Card customClass="col-span-1" title="Estudante">
               <div class="flex justify-center items-center mt-5 pt-2 pb-5">
-                <img :src="BASE_URL + incident.student?.photo?.thumb?.url" width="200" alt="Foto do estudante" />
+                <img :src="BASE_URL + incident.student?.photo?.thumb?.url" class="h-24 w-24 rounded-full object-cover" alt="Foto do estudante" />
               </div>
 
               <div class="text-center">
