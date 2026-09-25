@@ -89,14 +89,6 @@ const add = () => {
 }
 
 const save = async () => {
-  const confirmed = await confirm(
-    'Deseja salvar as alterações de permissões deste usuário?'
-  )
-
-  if (!confirmed) {
-    return
-  }
-
   saving.value = true
 
   try {
