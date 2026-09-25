@@ -1,16 +1,187 @@
 <script setup>
-import { onMounted,ref } from 'vue'
+import { onMounted, ref } from 'vue'
+
 import MobileLayout from '@/layouts/MobileLayout.vue'
 import { list } from '@/services/users'
-import { can,permissionState } from '@/services/permissions'
+import { can } from '@/services/permissions'
 import { error } from '@/utils/sweetPopup2'
-const page=ref(1),amount=ref(10),order=ref('id'),search=ref(''),users=ref([]),total=ref(0),loading=ref(false),errorMessage=ref('')
-const load=async()=>{loading.value=true;try{const r=await list(page.value,order.value,search.value,amount.value);users.value=r?.users||[];total.value=r?.total||0}catch(e){await error(e.response?.data?.errors?.join(', ') || 'Não foi possível carregar os usuários.')}finally{loading.value=false}}
+
+const page = ref(1)
+const amount = ref(10)
+const order = ref('id')
+const search = ref('')
+const users = ref([])
+const total = ref(0)
+const loading = ref(false)
+const errorMessage = ref('')
+
+const load = async () => {
+  loading.value = true
+
+  try {
+    const response = await list(
+      page.value,
+      order.value,
+      search.value,
+      amount.value
+    )
+
+    users.value = response?.users || []
+    total.value = response?.total || 0
+  } catch (e) {
+    await error(
+      e.response?.data?.errors?.join(', ') ||
+        'Não foi possível carregar os usuários.'
+    )
+  } finally {
+    loading.value = false
+  }
+}
+
 onMounted(load)
 </script>
-<template><MobileLayout mobile-title="Usuários"><div class="space-y-4">
-<div class="flex items-center justify-between"><div><h2 class="text-lg font-semibold">Usuários</h2><p class="text-xs text-gray-500">{{total}} registro(s)</p></div><RouterLink v-if="can('users','create')" to="/mobile/users/new" class="rounded-lg bg-green-600 px-3 py-2 text-sm text-white">Novo</RouterLink></div>
-<div class="rounded-xl bg-white p-3 shadow-sm"><div class="flex gap-2"><input v-model="search" @keyup.enter="page=1;load()" placeholder="Buscar usuário..." class="min-w-0 flex-1 rounded-lg border px-3 py-2 text-sm"><button @click="page=1;load()" class="rounded-lg bg-gray-100 px-3 py-2"><i class="fa-solid fa-search"></i></button></div><select v-model="order" @change="page=1;load()" class="mt-2 w-full rounded-lg border px-3 py-2 text-sm"><option value="id">Ordenar por ID</option><option value="name">Ordenar por nome</option></select></div>
-<div v-if="loading" class="py-10 text-center text-sm text-gray-500">Carregando usuários...</div><div v-else-if="errorMessage" class="rounded-xl bg-red-50 p-4 text-sm text-red-700">{{errorMessage}}</div><div v-else class="space-y-3"><article v-for="u in users" :key="u.id" class="rounded-xl bg-white p-4 shadow-sm"><div class="flex justify-between gap-3"><div><p class="text-xs text-gray-500">#{{u.id}}</p><h3 class="font-semibold">{{u.name}}</h3><p class="text-sm text-gray-500">{{u.username}}</p><p class="text-xs text-gray-500">{{u.email}}</p></div><div class="text-right text-xs"><p :class="u.admin?'text-green-700':'text-gray-500'">{{u.admin?'Admin':'Usuário'}}</p><p :class="u.status?'text-green-700':'text-red-700'">{{u.status?'Ativo':'Inativo'}}</p></div></div><RouterLink v-if="can('users','read')" :to="`/mobile/users/${u.id}`" class="mt-3 block rounded-lg bg-gray-100 px-3 py-2 text-center text-sm">Visualizar</RouterLink></article><div v-if="!users.length" class="rounded-xl bg-white p-6 text-center text-sm text-gray-500">Nenhum usuário encontrado.</div></div>
-<div v-if="!loading&&total>amount" class="flex justify-between rounded-xl bg-white p-3 text-sm"><button :disabled="page<=1" @click="page--;load()" class="rounded-lg bg-gray-100 px-3 py-2">Anterior</button><span>{{page}} / {{Math.ceil(total/amount)}}</span><button :disabled="page>=Math.ceil(total/amount)" @click="page++;load()" class="rounded-lg bg-gray-100 px-3 py-2">Próxima</button></div>
-</div></MobileLayout></template>
+
+<template>
+  <MobileLayout mobile-title="Usuários">
+    <div class="space-y-4">
+      <div class="flex items-center justify-between">
+        <div>
+          <h2 class="text-lg font-semibold">Usuários</h2>
+          <p class="text-xs text-gray-500">
+            {{ total }} registro(s)
+          </p>
+        </div>
+
+        <RouterLink
+          v-if="can('users', 'create')"
+          to="/mobile/users/new"
+          class="rounded-lg bg-green-600 px-3 py-2 text-sm text-white"
+        >
+          Novo
+        </RouterLink>
+      </div>
+
+      <div class="rounded-xl bg-white p-3 shadow-sm">
+        <div class="flex gap-2">
+          <input
+            v-model="search"
+            @keyup.enter="page = 1; load()"
+            placeholder="Buscar usuário..."
+            class="min-w-0 flex-1 rounded-lg border px-3 py-2 text-sm"
+          />
+
+          <button
+            @click="page = 1; load()"
+            class="rounded-lg bg-gray-100 px-3 py-2"
+          >
+            <i class="fa-solid fa-search"></i>
+          </button>
+        </div>
+
+        <select
+          v-model="order"
+          @change="page = 1; load()"
+          class="mt-2 w-full rounded-lg border px-3 py-2 text-sm"
+        >
+          <option value="id">Ordenar por ID</option>
+          <option value="name">Ordenar por nome</option>
+        </select>
+      </div>
+
+      <div
+        v-if="loading"
+        class="py-10 text-center text-sm text-gray-500"
+      >
+        Carregando usuários...
+      </div>
+
+      <div
+        v-else-if="errorMessage"
+        class="rounded-xl bg-red-50 p-4 text-sm text-red-700"
+      >
+        {{ errorMessage }}
+      </div>
+
+      <div
+        v-else
+        class="space-y-3"
+      >
+        <article
+          v-for="user in users"
+          :key="user.id"
+          class="rounded-xl bg-white p-4 shadow-sm"
+        >
+          <div class="flex justify-between gap-3">
+            <div>
+              <p class="text-xs text-gray-500">
+                #{{ user.id }}
+              </p>
+
+              <h3 class="font-semibold">
+                {{ user.name }}
+              </h3>
+
+              <p class="text-sm text-gray-500">
+                {{ user.username }}
+              </p>
+
+              <p class="text-xs text-gray-500">
+                {{ user.email }}
+              </p>
+            </div>
+
+            <div class="text-right text-xs">
+              <p :class="user.admin ? 'text-green-700' : 'text-gray-500'">
+                {{ user.admin ? 'Admin' : 'Usuário' }}
+              </p>
+
+              <p :class="user.status ? 'text-green-700' : 'text-red-700'">
+                {{ user.status ? 'Ativo' : 'Inativo' }}
+              </p>
+            </div>
+          </div>
+
+          <RouterLink
+            v-if="can('users', 'read')"
+            :to="`/mobile/users/${user.id}`"
+            class="mt-3 block rounded-lg bg-gray-100 px-3 py-2 text-center text-sm"
+          >
+            Visualizar
+          </RouterLink>
+        </article>
+
+        <div
+          v-if="!users.length"
+          class="rounded-xl bg-white p-6 text-center text-sm text-gray-500"
+        >
+          Nenhum usuário encontrado.
+        </div>
+      </div>
+
+      <div
+        v-if="!loading && total > amount"
+        class="flex justify-between rounded-xl bg-white p-3 text-sm"
+      >
+        <button
+          :disabled="page <= 1"
+          @click="page--; load()"
+          class="rounded-lg bg-gray-100 px-3 py-2"
+        >
+          Anterior
+        </button>
+
+        <span>
+          {{ page }} / {{ Math.ceil(total / amount) }}
+        </span>
+
+        <button
+          :disabled="page >= Math.ceil(total / amount)"
+          @click="page++; load()"
+          class="rounded-lg bg-gray-100 px-3 py-2"
+        >
+          Próxima
+        </button>
+      </div>
+    </div>
+  </MobileLayout>
+</template>
