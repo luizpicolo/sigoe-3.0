@@ -5,6 +5,7 @@ import Input from '@/components/ui/input.vue'
 import Button from '@/components/ui/button.vue'
 import { isTokenValid } from '@/services/authentication'
 import { error } from '@/utils/sweetPopup2'
+import { getInitialRoute } from '@/utils/device'
 import axios from 'axios'
 
 const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000'
@@ -18,7 +19,7 @@ onMounted(async () => {
   const isValid = await isTokenValid()
 
   if (isValid) {
-    await router.push('/home')
+    await router.push(getInitialRoute())
   } else {
     await router.push('/')
   }
