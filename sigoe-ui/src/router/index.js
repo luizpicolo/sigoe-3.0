@@ -6,12 +6,22 @@ import MobileDashboard from "@/views/mobile/Dashboard.vue"
 import MobileIncidentList from "@/views/mobile/incidents/Index.vue"
 import MobileIncidentForm from "@/views/mobile/incidents/Form.vue"
 import MobileIncidentShow from "@/views/mobile/incidents/Show.vue"
+import MobileCourseList from "@/views/mobile/courses/Index.vue"
+import MobileCourseForm from "@/views/mobile/courses/Form.vue"
+import MobileSchoolGroupList from "@/views/mobile/school-groups/Index.vue"
+import MobileSchoolGroupForm from "@/views/mobile/school-groups/Form.vue"
 const routes = [
 {path:"/mobile/dashboard",component:MobileDashboard,meta:{auth:true,mobile:true,mobileTitle:"Dashboard"}},
 {path:"/mobile/incidents",component:MobileIncidentList,meta:{auth:true,mobile:true,mobileTitle:"Ocorrências",permission:{entity:"occurrences",action:"read"}}},
 {path:"/mobile/incidents/new",component:MobileIncidentForm,meta:{auth:true,mobile:true,mobileTitle:"Nova ocorrência",permission:{entity:"occurrences",action:"create"}}},
 {path:"/mobile/incidents/:id",component:MobileIncidentShow,meta:{auth:true,mobile:true,mobileTitle:"Detalhes da ocorrência",permission:{entity:"occurrences",action:"read"}}},
 {path:"/mobile/incidents/:id/edit",component:MobileIncidentForm,meta:{auth:true,mobile:true,mobileTitle:"Editar ocorrência",permission:{entity:"occurrences",action:"update"}}},
+{path:"/mobile/courses",component:MobileCourseList,meta:{auth:true,mobile:true,mobileTitle:"Cursos",permission:{entity:"courses",action:"read"}}},
+{path:"/mobile/courses/new",component:MobileCourseForm,meta:{auth:true,mobile:true,mobileTitle:"Novo curso",permission:{entity:"courses",action:"create"}}},
+{path:"/mobile/courses/:id/edit",component:MobileCourseForm,meta:{auth:true,mobile:true,mobileTitle:"Editar curso",permission:{entity:"courses",action:"update"}}},
+{path:"/mobile/school-groups",component:MobileSchoolGroupList,meta:{auth:true,mobile:true,mobileTitle:"Turmas",permission:{entity:"classes",action:"read"}}},
+{path:"/mobile/school-groups/new",component:MobileSchoolGroupForm,meta:{auth:true,mobile:true,mobileTitle:"Nova turma",permission:{entity:"classes",action:"create"}}},
+{path:"/mobile/school-groups/:id/edit",component:MobileSchoolGroupForm,meta:{auth:true,mobile:true,mobileTitle:"Editar turma",permission:{entity:"classes",action:"update"}}},
 {path:"/",component:Login,meta:{auth:false}},{path:"/home",component:Home,meta:{auth:true}},{path:"/sem-permissao",component:Forbidden,meta:{auth:true}},
 {path:"/administrador/usuarios/listar",component:UserList,meta:{auth:true,permission:{entity:"users",action:"read"}}},{path:"/administrador/usuarios/visualizar/:id",component:UserView,meta:{auth:true,permission:{entity:"users",action:"read"}}},{path:"/administrador/usuarios/novo",component:UserForm,meta:{auth:true,permission:{entity:"users",action:"create"}}},{path:"/administrador/usuarios/editar/:id",component:UserForm,meta:{auth:true,permission:{entity:"users",action:"update"}}},{path:"/administrador/usuarios/visualizar/:id/permissoes",component:UserPermissions,meta:{auth:true,permission:{entity:"users",action:"update",adminOnly:true}}},{path:"/administrador/usuarios/trocar-senha",component:ChangePassword,meta:{auth:true}},
 {path:"/administrador/estudantes/listar",component:StudentList,meta:{auth:true,permission:{entity:"students",action:"read"}}},{path:"/administrador/estudantes/novo",component:StudentForm,meta:{auth:true,permission:{entity:"students",action:"create"}}},{path:"/administrador/estudantes/visualizar/:id",component:StudentView,meta:{auth:true,permission:{entity:"students",action:"read"}}},{path:"/administrador/estudantes/editar/:id",component:StudentForm,meta:{auth:true,permission:{entity:"students",action:"update"}}},
