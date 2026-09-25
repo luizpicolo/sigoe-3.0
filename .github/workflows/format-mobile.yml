@@ -1,0 +1,36 @@
+name: Format mobile Vue code
+
+on:
+  push:
+    branches:
+      - feat/mobile-adaptation-vue
+
+permissions:
+  contents: write
+
+jobs:
+  format:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: feat/mobile-adaptation-vue
+
+      - name: Format
+        run: npx --yes prettier@3.6.2 --write \
+          sigoe-ui/src/layouts/MobileLayout.vue \
+          sigoe-ui/src/views/mobile \
+          sigoe-ui/src/views/login.vue \
+          sigoe-ui/src/utils/device.js
+
+      - name: Commit formatting
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if git diff --quiet; then
+            exit 0
+          fi
+          git add sigoe-ui/src/layouts/MobileLayout.vue sigoe-ui/src/views/mobile sigoe-ui/src/views/login.vue sigoe-ui/src/utils/device.js
+          git commit -m "style: format mobile Vue code"
+          git push origin HEAD:feat/mobile-adaptation-vue
