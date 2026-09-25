@@ -53,7 +53,7 @@ const handleSubmit = async () => {
     }
 
     localStorage.setItem('jwt', token)
-    await router.push('/home')
+    await router.push(getInitialRoute())
   } catch (requestError) {
     error(requestError.response?.data?.error || requestError.response?.data?.errors?.join(', ') || 'Não foi possível realizar o login.')
   } finally {
