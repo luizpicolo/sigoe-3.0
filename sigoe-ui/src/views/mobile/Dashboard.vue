@@ -53,7 +53,7 @@ onMounted(async () => {
           <div>
             <h3 class="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-500">Acadêmico</h3>
             <div class="grid grid-cols-2 gap-3">
-              <RouterLink v-if="can('students','read')" to="/administrador/estudantes/listar" class="flex flex-col items-center gap-2 rounded-xl bg-gray-100 p-4 text-center text-sm">
+              <RouterLink v-if="can('students','read')" to="/mobile/students" class="flex flex-col items-center gap-2 rounded-xl bg-gray-100 p-4 text-center text-sm">
                 <i class="fa-solid fa-user-graduate text-lg"></i>
                 <span>Estudantes</span>
               </RouterLink>
@@ -71,7 +71,7 @@ onMounted(async () => {
           <div v-if="can('users','read')">
             <h3 class="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-500">Administração</h3>
             <div class="grid grid-cols-2 gap-3">
-              <RouterLink to="/administrador/usuarios/listar" class="flex flex-col items-center gap-2 rounded-xl bg-gray-100 p-4 text-center text-sm">
+              <RouterLink to="/mobile/users" class="flex flex-col items-center gap-2 rounded-xl bg-gray-100 p-4 text-center text-sm">
                 <i class="fa-solid fa-user-gear text-lg"></i>
                 <span>Usuários</span>
               </RouterLink>
