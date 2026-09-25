@@ -128,7 +128,7 @@ const renderIncidentPdfHtml = incident => {
   return `
     <article class="incident-report">
 
-      <img src="${BASE_URL}/c_report.png" style="width: 210mm; max-width: 100%;"/>
+      <img src="/c_report.png" style="width: 210mm; max-width: 100%;"/>
 
       <h1>Relatório de ocorrências</h1>
 
