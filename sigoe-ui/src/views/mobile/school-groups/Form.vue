@@ -4,6 +4,7 @@ import { useRoute, useRouter } from 'vue-router'
 import MobileLayout from '@/layouts/MobileLayout.vue'
 import { find, create, update } from '@/services/school_groups'
 import { can } from '@/services/permissions'
+import { error, success } from '@/utils/sweetPopup2'
 
 const route = useRoute(), router = useRouter(), editing = !!route.params.id
 const form = ref({ name: '', identifier: '' }), loading = ref(false), errorMessage = ref('')
@@ -11,15 +12,15 @@ const form = ref({ name: '', identifier: '' }), loading = ref(false), errorMessa
 onMounted(async () => {
   if (!editing) return
   try { form.value = { ...form.value, ...(await find(route.params.id)) } }
-  catch (e) { errorMessage.value = e.response?.data?.errors?.join(', ') || 'Não foi possível carregar a turma.' }
+  catch (e) { await error(e.response?.data?.errors?.join(', ') || 'Não foi possível carregar a turma.') }
 })
 const save = async () => {
   loading.value = true; errorMessage.value = ''
   try {
-    if (editing) await update(route.params.id, form.value); else await create(form.value)
+    if (editing) { await update(route.params.id, form.value); await success('Turma atualizada com sucesso!') } else { await create(form.value); await success('Turma cadastrada com sucesso!') }
     await router.push('/mobile/school-groups')
   } catch (e) {
-    errorMessage.value = e.response?.data?.errors?.join(', ') || 'Não foi possível salvar a turma.'
+    await error(e.response?.data?.errors?.join(', ') || 'Não foi possível salvar a turma.')
   } finally { loading.value = false }
 }
 </script>
