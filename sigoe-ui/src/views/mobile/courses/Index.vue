@@ -3,6 +3,7 @@ import { onMounted, ref } from 'vue'
 import MobileLayout from '@/layouts/MobileLayout.vue'
 import { list, remove } from '@/services/courses'
 import { can } from '@/services/permissions'
+import { error, success, confirm } from '@/utils/sweetPopup2'
 
 const page = ref(1), amount = ref(10), order = ref('id'), search = ref('')
 const courses = ref([]), total = ref(0), loading = ref(false), errorMessage = ref('')
@@ -18,9 +19,9 @@ const load = async () => {
 }
 const searchCourses = () => { page.value = 1; load() }
 const destroy = async id => {
-  if (!window.confirm('Excluir este curso?')) return
-  try { await remove(id); await load() } catch (e) {
-    errorMessage.value = e.response?.data?.errors?.join(', ') || 'Não foi possível excluir o curso.'
+  if (!await confirm('Deseja realmente excluir este curso?')) return
+  try { await remove(id); await success('Curso excluído com sucesso!'); await load() } catch (e) {
+    await error(e.response?.data?.errors?.join(', ') || 'Não foi possível excluir o curso.')
   }
 }
 onMounted(load)
