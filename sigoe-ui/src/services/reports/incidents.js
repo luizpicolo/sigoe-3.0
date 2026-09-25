@@ -378,3 +378,28 @@ export const generateIncidentReport = async filters => {
 
   createIncidentPdf(response.data)
 }
+
+export const generateIncidentReportFromIncident = incident => {
+  if (!incident) {
+    throw new Error('Ocorrência não encontrada.')
+  }
+
+  const regulations = [
+    ...(Array.isArray(incident.student_duties) ? incident.student_duties : []),
+    ...(Array.isArray(incident.prohibition_and_responsibilities) ? incident.prohibition_and_responsibilities : [])
+  ]
+    .map(item => typeof item === 'string' ? item : item?.item)
+    .filter(Boolean)
+
+  createIncidentPdf([{
+    student: incident.student?.name || incident.student_name || '',
+    course: incident.course?.name || incident.course_name || '',
+    date_incident: incident.date_incident,
+    time_incident: incident.time_incident,
+    type_incident: incident.type_incident?.name || incident.type_incident || '',
+    description: incident.description,
+    sanction: incident.sanction || '',
+    solution: incident.soluction || incident.solution || '',
+    regulations
+  }])
+}
