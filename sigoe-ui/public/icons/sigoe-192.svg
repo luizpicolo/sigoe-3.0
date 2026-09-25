@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="96" fill="#15803d"/>
+  <rect x="56" y="56" width="400" height="400" rx="72" fill="#ffffff"/>
+  <text x="256" y="286" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="104" font-weight="700" fill="#15803d">SIGOE</text>
+  <text x="256" y="348" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="28" font-weight="600" fill="#166534">IFMS</text>
+</svg>
