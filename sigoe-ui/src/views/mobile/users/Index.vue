@@ -3,8 +3,9 @@ import { onMounted,ref } from 'vue'
 import MobileLayout from '@/layouts/MobileLayout.vue'
 import { list } from '@/services/users'
 import { can,permissionState } from '@/services/permissions'
+import { error } from '@/utils/sweetPopup2'
 const page=ref(1),amount=ref(10),order=ref('id'),search=ref(''),users=ref([]),total=ref(0),loading=ref(false),errorMessage=ref('')
-const load=async()=>{loading.value=true;try{const r=await list(page.value,order.value,search.value,amount.value);users.value=r?.users||[];total.value=r?.total||0}catch(e){errorMessage.value='Não foi possível carregar os usuários.'}finally{loading.value=false}}
+const load=async()=>{loading.value=true;try{const r=await list(page.value,order.value,search.value,amount.value);users.value=r?.users||[];total.value=r?.total||0}catch(e){await error(e.response?.data?.errors?.join(', ') || 'Não foi possível carregar os usuários.')}finally{loading.value=false}}
 onMounted(load)
 </script>
 <template><MobileLayout mobile-title="Usuários"><div class="space-y-4">
