@@ -11,6 +11,7 @@ import AcademicExportForm from '@/components/incidents/academic-export-form.vue'
 import { formatDate, formatTime } from '@/utils'
 import { can } from '@/services/permissions'
 import { find, remove } from '@/services/incidents'
+import { generateIncidentReportFromIncident } from '@/services/reports/incidents'
 
 const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
@@ -21,6 +22,7 @@ const loading = ref(true)
 const incident = ref(null)
 const showAcademicExportForm = ref(false)
 const academicExportAction = ref('')
+const isPrintingReport = ref(false)
 
 const sanctionLabels = {
   verbal_warning: 'Advertência Verbal',
@@ -47,6 +49,20 @@ const loadIncident = async () => {
     error('Não foi possível carregar a ocorrência.')
   } finally {
     loading.value = false
+  }
+}
+
+const printIncidentReport = async () => {
+  if (!incident.value || isPrintingReport.value) return
+
+  isPrintingReport.value = true
+
+  try {
+    await generateIncidentReportFromIncident(incident.value)
+  } catch (exception) {
+    error(exception.message || 'Não foi possível gerar o relatório da ocorrência.')
+  } finally {
+    isPrintingReport.value = false
   }
 }
 
@@ -146,9 +162,9 @@ onMounted(loadIncident)
                 Editar Ocorrência
               </Button>
 
-              <Button :disabled="!can('occurrences', 'read')" to="/ocorrencias/relatorio" customClass="mt-4 w-full bg-green-600 hover:bg-green-700">
+              <Button :disabled="!can('occurrences', 'read') || isPrintingReport" customClass="mt-4 w-full bg-green-600 hover:bg-green-700" @click="printIncidentReport">
                 <i class="fa-solid fa-print pr-2"></i>
-                Imprimir Relatório
+                {{ isPrintingReport ? 'Gerando...' : 'Imprimir Relatório' }}
               </Button>
 
               <Button :disabled="!can('occurrences', 'can_export_to_academic_system')" customClass="mt-4 w-full bg-purple-600 hover:bg-purple-700" @click="openAcademicExportForm">
