@@ -4,6 +4,7 @@ import { useRouter } from 'vue-router'
 import MobileLayout from '@/layouts/MobileLayout.vue'
 import { list } from '@/services/incidents'
 import { can, permissionState } from '@/services/permissions'
+import { error } from '@/utils/sweetPopup2'
 
 const router = useRouter()
 const incidents = ref([])
@@ -22,7 +23,8 @@ const load = async () => {
     const response = await list(page.value, 'id', search.value || null, amount.value)
     incidents.value = response?.incidents || []
     total.value = response?.total || 0
-  } finally { loading.value = false }
+  } catch (e) { error(e.response?.data?.errors?.join(', ') || 'Não foi possível carregar as ocorrências.') }
+  finally { loading.value = false }
 }
 
 const formatDate = value => value ? new Date(value + 'T00:00:00').toLocaleDateString('pt-BR') : '-'
