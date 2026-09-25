@@ -4,6 +4,7 @@ import { useRoute, useRouter } from 'vue-router'
 import MobileLayout from '@/layouts/MobileLayout.vue'
 import { find, create, update } from '@/services/courses'
 import { can } from '@/services/permissions'
+import { error, success } from '@/utils/sweetPopup2'
 
 const route = useRoute(), router = useRouter(), editing = !!route.params.id
 const form = ref({ name: '', initial: '', polo_id: null }), loading = ref(false), errorMessage = ref('')
@@ -17,10 +18,10 @@ const save = async () => {
   loading.value = true; errorMessage.value = ''
   try {
     const payload = { name: form.value.name, initial: form.value.initial, polo_id: form.value.polo_id }
-    if (editing) await update(route.params.id, payload); else await create(payload)
+    if (editing) { await update(route.params.id, payload); await success('Curso atualizado com sucesso!') } else { await create(payload); await success('Curso cadastrado com sucesso!') }
     await router.push('/mobile/courses')
   } catch (e) {
-    errorMessage.value = e.response?.data?.errors?.join(', ') || 'Não foi possível salvar o curso.'
+    await error(e.response?.data?.errors?.join(', ') || 'Não foi possível salvar o curso.')
   } finally { loading.value = false }
 }
 </script>
