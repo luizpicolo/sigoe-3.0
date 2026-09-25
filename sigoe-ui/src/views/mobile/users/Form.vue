@@ -4,10 +4,11 @@ import { useRoute,useRouter } from 'vue-router'
 import MobileLayout from '@/layouts/MobileLayout.vue'
 import { create,find,update,options } from '@/services/users'
 import { can } from '@/services/permissions'
+import { error, success } from '@/utils/sweetPopup2'
 const route=useRoute(),router=useRouter(),editing=!!route.params.id
 const form=ref({name:'',email:'',siape:'',polo_id:'',username:'',password:'',password_confirmation:'',admin:false,status:true,avatar:null}),campi=ref([]),loading=ref(false),errorMessage=ref('')
 onMounted(async()=>{try{const o=await options();campi.value=o?.polos||[];if(editing){const r=await find(route.params.id);form.value={...form.value,...r.user}}}catch(e){errorMessage.value='Não foi possível carregar os dados do usuário.'}})
-const save=async()=>{loading.value=true;try{if(editing)await update(route.params.id,form.value);else await create(form.value);await router.push(editing?`/mobile/users/${route.params.id}`:'/mobile/users')}catch(e){errorMessage.value=e.response?.data?.errors?.join(', ')||'Não foi possível salvar o usuário.'}finally{loading.value=false}}
+const save=async()=>{loading.value=true;try{if(editing){await update(route.params.id,form.value);await success('Usuário atualizado com sucesso!')}else{await create(form.value);await success('Usuário cadastrado com sucesso!')}await router.push(editing?`/mobile/users/${route.params.id}`:'/mobile/users')}catch(e){await error(e.response?.data?.errors?.join(', ')||'Não foi possível salvar o usuário.')}finally{loading.value=false}}
 </script>
 <template><MobileLayout :mobile-title="editing?'Editar usuário':'Novo usuário'"><form @submit.prevent="save" class="space-y-4">
 <div class="rounded-xl bg-white p-4 shadow-sm"><h2 class="font-semibold">Dados pessoais</h2><div class="mt-4 space-y-3"><input v-model="form.name" required placeholder="Nome completo" class="w-full rounded-lg border px-3 py-3"><input v-model="form.email" type="email" required placeholder="Email institucional" class="w-full rounded-lg border px-3 py-3"><input v-model="form.siape" placeholder="SIAPE" class="w-full rounded-lg border px-3 py-3"></div></div>
