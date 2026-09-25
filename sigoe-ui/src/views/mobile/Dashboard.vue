@@ -27,11 +27,56 @@ onMounted(async () => {
           <div class="rounded-lg bg-gray-50 p-3"><span class="text-gray-500">Cursos</span><p class="mt-1 font-medium">{{ dashboard?.by_courses?.length || 0 }}</p></div>
         </div>
       </section>
-      <section v-if="can('occurrences','read')" class="rounded-xl bg-white p-4 shadow-sm">
-        <h2 class="font-semibold">Acesso rápido</h2>
-        <div class="mt-3 grid grid-cols-2 gap-3">
-          <RouterLink to="/mobile/incidents" class="rounded-lg bg-gray-100 p-3 text-center text-sm">Ocorrências</RouterLink>
-          <RouterLink v-if="can('occurrences','create')" to="/mobile/incidents/new" class="rounded-lg bg-green-600 p-3 text-center text-sm text-white">Nova ocorrência</RouterLink>
+      <section class="rounded-xl bg-white p-4 shadow-sm">
+        <h2 class="font-semibold">Menu</h2>
+        <p class="mt-1 text-xs text-gray-500">Acesse as funcionalidades disponíveis para seu perfil.</p>
+
+        <div class="mt-4 space-y-4">
+          <div>
+            <h3 class="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-500">Ocorrências</h3>
+            <div class="grid grid-cols-2 gap-3">
+              <RouterLink v-if="can('occurrences','read')" to="/mobile/incidents" class="flex flex-col items-center gap-2 rounded-xl bg-gray-100 p-4 text-center text-sm">
+                <i class="fa-solid fa-clipboard-list text-lg"></i>
+                <span>Ocorrências</span>
+              </RouterLink>
+              <RouterLink v-if="can('occurrences','create')" to="/mobile/incidents/new" class="flex flex-col items-center gap-2 rounded-xl bg-green-600 p-4 text-center text-sm text-white">
+                <i class="fa-solid fa-plus text-lg"></i>
+                <span>Nova ocorrência</span>
+              </RouterLink>
+              <RouterLink v-if="can('occurrences','read')" to="/ocorrencias/relatorio" class="flex flex-col items-center gap-2 rounded-xl bg-gray-100 p-4 text-center text-sm">
+                <i class="fa-solid fa-chart-column text-lg"></i>
+                <span>Relatórios</span>
+              </RouterLink>
+            </div>
+          </div>
+
+          <div>
+            <h3 class="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-500">Acadêmico</h3>
+            <div class="grid grid-cols-2 gap-3">
+              <RouterLink v-if="can('students','read')" to="/administrador/estudantes/listar" class="flex flex-col items-center gap-2 rounded-xl bg-gray-100 p-4 text-center text-sm">
+                <i class="fa-solid fa-user-graduate text-lg"></i>
+                <span>Estudantes</span>
+              </RouterLink>
+              <RouterLink v-if="can('courses','read')" to="/administrador/cursos/listar" class="flex flex-col items-center gap-2 rounded-xl bg-gray-100 p-4 text-center text-sm">
+                <i class="fa-solid fa-book-open text-lg"></i>
+                <span>Cursos</span>
+              </RouterLink>
+              <RouterLink v-if="can('classes','read')" to="/administrador/turmas/listar" class="flex flex-col items-center gap-2 rounded-xl bg-gray-100 p-4 text-center text-sm">
+                <i class="fa-solid fa-users text-lg"></i>
+                <span>Turmas</span>
+              </RouterLink>
+            </div>
+          </div>
+
+          <div v-if="can('users','read')">
+            <h3 class="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-500">Administração</h3>
+            <div class="grid grid-cols-2 gap-3">
+              <RouterLink to="/administrador/usuarios/listar" class="flex flex-col items-center gap-2 rounded-xl bg-gray-100 p-4 text-center text-sm">
+                <i class="fa-solid fa-user-gear text-lg"></i>
+                <span>Usuários</span>
+              </RouterLink>
+            </div>
+          </div>
         </div>
       </section>
     </div>
