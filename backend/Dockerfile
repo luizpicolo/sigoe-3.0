@@ -22,6 +22,7 @@ RUN apt-get update -qq && \
         imagemagick \
         shared-mime-info \
         wkhtmltopdf \
+        xvfb \
     && rm -rf /var/lib/apt/lists/*
 
 RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
@@ -53,6 +54,7 @@ RUN apt-get update -qq && \
         libpq5 \
         shared-mime-info \
         wkhtmltopdf \
+        xvfb \
     && rm -rf /var/lib/apt/lists/*
 
 RUN useradd --create-home --shell /bin/bash app
