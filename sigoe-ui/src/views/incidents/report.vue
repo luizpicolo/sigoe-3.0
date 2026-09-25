@@ -181,26 +181,31 @@ onMounted(async () => {
             Relatório de Ocorrências
           </h1>
 
-          <Button v-if="hasFilters" @click="clearFilters" customClass="bg-gray-500 hover:bg-gray-600 focus:ring-gray-500">
+          <Button v-if="hasFilters" @click="clearFilters"
+            customClass="bg-gray-500 hover:bg-gray-600 focus:ring-gray-500">
             Limpar Filtros
           </Button>
         </div>
 
         <Card customClass="mb-4" title="Filtros Rápidos" icon="filter">
           <div class="flex flex-wrap gap-2">
-            <Button @click="setQuickFilter(7)" :customClass="selectedQuickFilter === 7 ? 'bg-green-700 text-sm' : 'bg-blue-500 hover:bg-blue-600 text-sm'">
+            <Button @click="setQuickFilter(7)"
+              :customClass="selectedQuickFilter === 7 ? 'bg-green-700 text-sm' : 'bg-blue-500 hover:bg-blue-600 text-sm'">
               Últimos 7 dias
             </Button>
 
-            <Button @click="setQuickFilter(30)" :customClass="selectedQuickFilter === 30 ? 'bg-green-700 text-sm' : 'bg-blue-500 hover:bg-blue-600 text-sm'">
+            <Button @click="setQuickFilter(30)"
+              :customClass="selectedQuickFilter === 30 ? 'bg-green-700 text-sm' : 'bg-blue-500 hover:bg-blue-600 text-sm'">
               Últimos 30 dias
             </Button>
 
-            <Button @click="setQuickFilter(90)" :customClass="selectedQuickFilter === 90 ? 'bg-green-700 text-sm' : 'bg-blue-500 hover:bg-blue-600 text-sm'">
+            <Button @click="setQuickFilter(90)"
+              :customClass="selectedQuickFilter === 90 ? 'bg-green-700 text-sm' : 'bg-blue-500 hover:bg-blue-600 text-sm'">
               Últimos 3 meses
             </Button>
 
-            <Button @click="setQuickFilter(365)" :customClass="selectedQuickFilter === 365 ? 'bg-green-700 text-sm' : 'bg-blue-500 hover:bg-blue-600 text-sm'">
+            <Button @click="setQuickFilter(365)"
+              :customClass="selectedQuickFilter === 365 ? 'bg-green-700 text-sm' : 'bg-blue-500 hover:bg-blue-600 text-sm'">
               Último ano
             </Button>
           </div>
@@ -216,25 +221,32 @@ onMounted(async () => {
 
           <Card customClass="mb-4" title="Estudante e Curso" icon="user-graduate">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <SearchableSelect v-model="selectedStudent" :options="studentOptions" placeholder="Todos os estudantes" :disabled="isLoadingOptions" />
-              <SearchableSelect v-model="selectedCourse" :options="courseOptions" placeholder="Todos os cursos" :disabled="isLoadingOptions" />
+              <SearchableSelect v-model="selectedStudent" :options="studentOptions" placeholder="Todos os estudantes"
+                :disabled="isLoadingOptions" />
+              <SearchableSelect v-model="selectedCourse" :options="courseOptions" placeholder="Todos os cursos"
+                :disabled="isLoadingOptions" />
             </div>
           </Card>
 
           <Card customClass="mb-4" title="Dados da Ocorrência" icon="exclamation-triangle">
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              <SearchableSelect v-model="selectedOccurrenceType" :options="occurrenceOptions" placeholder="Todos os tipos" :disabled="isLoadingOptions" />
+              <SearchableSelect v-model="selectedOccurrenceType" :options="occurrenceOptions"
+                placeholder="Todos os tipos" :disabled="isLoadingOptions" />
 
-              <Select v-model="selectedResident" :options="[{ value: '', label: 'Residente?' }, { value: 'resident', label: 'Sim' }, { value: 'non_resident', label: 'Não' }]" />
+              <Select v-model="selectedResident"
+                :options="[{ value: '', label: 'Residente?' }, { value: 'resident', label: 'Sim' }, { value: 'non_resident', label: 'Não' }]" />
 
-              <Select v-model="selectedResolved" :options="[{ value: '', label: 'Resolvida?' }, { value: 'yes_', label: 'Sim' }, { value: 'no_', label: 'Não' }]" />
+              <Select v-model="selectedResolved"
+                :options="[{ value: '', label: 'Resolvida?' }, { value: 'yes_', label: 'Sim' }, { value: 'no_', label: 'Não' }]" />
 
-              <SearchableSelect v-model="selectedClass" :options="classOptions" placeholder="Todas as turmas" :disabled="isLoadingOptions" />
+              <SearchableSelect v-model="selectedClass" :options="classOptions" placeholder="Todas as turmas"
+                :disabled="isLoadingOptions" />
             </div>
           </Card>
 
           <div>
-            <Button type="submit" :disabled="!isFormValid || isGenerating || isLoadingOptions" customClass="bg-green-600 hover:bg-green-700">
+            <Button type="submit" :disabled="!isFormValid || isGenerating || isLoadingOptions"
+              customClass="bg-green-600 hover:bg-green-700">
               {{ isGenerating ? 'Gerando...' : 'Exportar PDF' }}
             </Button>
           </div>
