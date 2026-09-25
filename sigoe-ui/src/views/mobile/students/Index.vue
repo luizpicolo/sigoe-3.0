@@ -3,11 +3,12 @@ import { onMounted, ref } from 'vue'
 import MobileLayout from '@/layouts/MobileLayout.vue'
 import { list } from '@/services/students'
 import { can, permissionState } from '@/services/permissions'
+import { error } from '@/utils/sweetPopup2'
 
 const page=ref(1), amount=ref(10), order=ref('id'), search=ref('')
 const students=ref([]), total=ref(0), loading=ref(false), errorMessage=ref('')
 const showCampus=()=>permissionState.user?.super_admin===true
-const load=async()=>{loading.value=true;errorMessage.value='';try{const r=await list(page.value,order.value,search.value,amount.value);students.value=r?.students||[];total.value=r?.total||0}catch(e){errorMessage.value='Não foi possível carregar os estudantes.'}finally{loading.value=false}}
+const load=async()=>{loading.value=true;errorMessage.value='';try{const r=await list(page.value,order.value,search.value,amount.value);students.value=r?.students||[];total.value=r?.total||0}catch(e){await error(e.response?.data?.errors?.join(', ') || 'Não foi possível carregar os estudantes.'); errorMessage.value='' }finally{loading.value=false}}
 const searchStudents=()=>{page.value=1;load()}
 onMounted(load)
 </script>
