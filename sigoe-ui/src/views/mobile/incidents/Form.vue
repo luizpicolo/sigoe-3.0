@@ -5,6 +5,7 @@ import MobileLayout from '@/layouts/MobileLayout.vue'
 import StudentSearchableSelect from '@/components/ui/student-searchable-select.vue'
 import { create, find, options, update } from '@/services/incidents'
 import { can } from '@/services/permissions'
+import { error, success } from '@/utils/sweetPopup2'
 
 const route = useRoute(), router = useRouter()
 const editing = computed(() => Boolean(route.params.id))
@@ -32,20 +33,22 @@ onMounted(async () => {
 })
 
 const save = async () => {
-  if (!editing.value && !students.value.length) { errorMessage.value = 'Selecione pelo menos um estudante.'; return }
+  if (!editing.value && !students.value.length) { await error('Selecione pelo menos um estudante.'); return }
   saving.value = true; errorMessage.value = ''
   try {
     const payload = { ...form.value, student_duty_ids:duties.value, prohibition_and_responsibility_ids:prohibitions.value }
     if (editing.value) {
       const response = await update(id.value, payload)
       if (response.error) throw new Error(Array.isArray(response.error) ? response.error.join(', ') : response.error)
+      await success('Ocorrência atualizada com sucesso!')
       await router.push('/mobile/incidents/' + id.value)
     } else {
       const response = await create({ ...payload, student_ids:students.value.map(s => s.id) })
       if (response.error) throw new Error(Array.isArray(response.error) ? response.error.join(', ') : response.error)
+      await success('Ocorrência cadastrada com sucesso!')
       await router.push('/mobile/incidents')
     }
-  } catch (e) { errorMessage.value = e.response?.data?.errors?.join(', ') || e.message || 'Não foi possível salvar a ocorrência.' }
+  } catch (e) { await error(e.response?.data?.errors?.join(', ') || e.message || 'Não foi possível salvar a ocorrência.') }
   finally { saving.value = false }
 }
 </script>
