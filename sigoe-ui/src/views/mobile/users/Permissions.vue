@@ -4,11 +4,12 @@ import { useRoute,useRouter } from 'vue-router'
 import MobileLayout from '@/layouts/MobileLayout.vue'
 import { getUserPermissions,saveUserPermissions } from '@/services/permissions'
 import { can } from '@/services/permissions'
+import { error, success } from '@/utils/sweetPopup2'
 const route=useRoute(),router=useRouter(),user=ref(null),entities=ref([]),permissions=ref([]),selected=ref(''),loading=ref(false),saving=ref(false),errorMessage=ref('')
 const actions=[{key:'can_create',label:'Criar'},{key:'can_read',label:'Visualizar / Listar'},{key:'can_update',label:'Atualizar'},{key:'can_destroy',label:'Deletar'}]
-const load=async()=>{loading.value=true;try{const r=await getUserPermissions(route.params.id);user.value=r?.user;entities.value=r?.entities||[];permissions.value=Object.entries(r?.permissions||{}).map(([entity,values])=>({entity,...values}))}catch(e){errorMessage.value=e.response?.data?.error||'Não foi possível carregar as permissões.'}finally{loading.value=false}}
+const load=async()=>{loading.value=true;try{const r=await getUserPermissions(route.params.id);user.value=r?.user;entities.value=r?.entities||[];permissions.value=Object.entries(r?.permissions||{}).map(([entity,values])=>({entity,...values}));await success('Permissões salvas com sucesso!')}catch(e){await error(e.response?.data?.error||'Não foi possível carregar as permissões.')}finally{loading.value=false}}
 const add=()=>{if(!selected.value||permissions.value.some(p=>p.entity===selected.value))return;permissions.value.push({entity:selected.value,can_create:false,can_read:false,can_update:false,can_destroy:false,can_read_restricted:false,can_extras:false,can_sanction:false,can_export_to_academic_system:false});selected.value=''}
-const save=async()=>{saving.value=true;try{const r=await saveUserPermissions(route.params.id,permissions.value);permissions.value=Object.entries(r?.permissions||{}).map(([entity,values])=>({entity,...values}))}catch(e){errorMessage.value=e.response?.data?.error||'Não foi possível salvar as permissões.'}finally{saving.value=false}}
+const save=async()=>{saving.value=true;try{const r=await saveUserPermissions(route.params.id,permissions.value);permissions.value=Object.entries(r?.permissions||{}).map(([entity,values])=>({entity,...values}))}catch(e){await error(e.response?.data?.error||'Não foi possível salvar as permissões.')}finally{saving.value=false}}
 const entityName=id=>entities.value.find(e=>e.id===id)?.name||id
 onMounted(load)
 </script>
