@@ -57,11 +57,11 @@ onMounted(async () => {
                 <i class="fa-solid fa-user-graduate text-lg"></i>
                 <span>Estudantes</span>
               </RouterLink>
-              <RouterLink v-if="can('courses','read')" to="/administrador/cursos/listar" class="flex flex-col items-center gap-2 rounded-xl bg-gray-100 p-4 text-center text-sm">
+              <RouterLink v-if="can('courses','read')" to="/mobile/courses" class="flex flex-col items-center gap-2 rounded-xl bg-gray-100 p-4 text-center text-sm">
                 <i class="fa-solid fa-book-open text-lg"></i>
                 <span>Cursos</span>
               </RouterLink>
-              <RouterLink v-if="can('classes','read')" to="/administrador/turmas/listar" class="flex flex-col items-center gap-2 rounded-xl bg-gray-100 p-4 text-center text-sm">
+              <RouterLink v-if="can('classes','read')" to="/mobile/school-groups" class="flex flex-col items-center gap-2 rounded-xl bg-gray-100 p-4 text-center text-sm">
                 <i class="fa-solid fa-users text-lg"></i>
                 <span>Turmas</span>
               </RouterLink>
