@@ -4,9 +4,10 @@ import { useRoute, useRouter } from 'vue-router'
 import { logout } from '@/services/authentication'
 import { can } from '@/services/permissions'
 
+const props = defineProps({ mobileTitle: { type: String, default: '' } })
 const route = useRoute()
 const router = useRouter()
-const title = computed(() => route.meta.mobileTitle || 'SIGOE')
+const title = computed(() => props.mobileTitle || route.meta.mobileTitle || 'SIGOE')
 
 const go = path => router.push(path)
 const signOut = async () => { await logout(); await router.push('/') }
