@@ -4,9 +4,10 @@ import { useRoute,useRouter } from 'vue-router'
 import MobileLayout from '@/layouts/MobileLayout.vue'
 import { find,remove } from '@/services/users'
 import { can } from '@/services/permissions'
+import { error, success, confirm } from '@/utils/sweetPopup2'
 const route=useRoute(),router=useRouter(),user=ref(null),loading=ref(false),errorMessage=ref('')
 const load=async()=>{loading.value=true;try{user.value=(await find(route.params.id))?.user}catch(e){errorMessage.value='Não foi possível carregar o usuário.'}finally{loading.value=false}}
-const del=async()=>{if(!window.confirm('Deseja realmente excluir este usuário?'))return;try{await remove(route.params.id);await router.push('/mobile/users')}catch(e){errorMessage.value='Não foi possível excluir o usuário.'}}
+const del=async()=>{if(!await confirm('Deseja realmente excluir este usuário?'))return;try{await remove(route.params.id);await success('Usuário excluído com sucesso!');await router.push('/mobile/users')}catch(e){await error(e.response?.data?.errors?.join(', ')||'Não foi possível excluir o usuário.')}}
 onMounted(load)
 </script>
 <template><MobileLayout mobile-title="Detalhes do usuário"><div v-if="loading" class="py-10 text-center">Carregando...</div><div v-else-if="errorMessage" class="rounded-xl bg-red-50 p-4 text-sm text-red-700">{{errorMessage}}</div><div v-else-if="user" class="space-y-4">
