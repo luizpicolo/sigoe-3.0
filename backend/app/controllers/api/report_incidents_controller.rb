@@ -6,16 +6,26 @@ class Api::ReportIncidentsController < ApplicationController
   before_action :authenticate_user!
 
   def options
-    authorize! :read, Incident
-    
-    p "Plo"
-    p params_return
+  authorize! :read, Incident
 
-    render json: {
-      students: Student.joins(:course).where(params_return).where(course_situation: 5).order(:name).as_json(only: %i[id name]),
-      courses: Course.where(params_return).order(:name).as_json(only: %i[id name]),
-      school_groups: SchoolGroup.joins(:polo).where(polo: params_return[:courses][:polo]).order(:name).as_json(only: %i[id name]),
-      type_incidents: Incident::TypeIncident.order(:name).as_json(only: %i[id name])
+  render json: {
+      students: Student
+        .joins(:course)
+        .where(params_return)
+        .where(course_situation: 5)
+        .order(:name)
+        .as_json(only: %i[id name]),
+
+      courses: Course
+        .where(params_return)
+        .order(:name)
+        .as_json(only: %i[id name]),
+
+      school_groups: school_groups,
+
+      type_incidents: Incident::TypeIncident
+        .order(:name)
+        .as_json(only: %i[id name])
     }
   end
 
@@ -55,12 +65,44 @@ class Api::ReportIncidentsController < ApplicationController
 
   private
 
+  def school_groups
+    scope = SchoolGroup.joins(:polo)
+
+    unless current_user.super_admin?
+      scope = scope.where(polo: params_return[:courses][:polo])
+    end
+
+    scope.order(:name).as_json(only: %i[id name])
+  end
+
   def filtered_incidents
-    Incident.joins(:student, :course)
-            .where(params_return)
-            .search(search_params)
-            .where(date_incident: date_start..date_final)
-            .order(date_incident: :desc)
+    can_read_restricted = current_user.permissions.exists?(
+      entity: 'Incident',
+      can_read_restricted: true
+    )
+
+    scope = Incident.joins(:student, :course)
+
+    if can_read_restricted
+      # Pode visualizar somente as ocorrências que ele criou
+      scope = scope.where(user_id: current_user.id)
+    else
+      # Pode visualizar todas as públicas
+      # + privadas criadas por ele
+      scope = scope.where(
+        "incidents.visibility = :public OR
+        (incidents.visibility = :private AND incidents.user_id = :user_id)",
+        public: 'public',
+        private: 'private',
+        user_id: current_user.id
+      )
+    end
+
+    scope
+      .where(params_return)
+      .search(search_params)
+      .where(date_incident: date_start..date_final)
+      .order(date_incident: :desc)
   end
 
   def date_start
@@ -85,7 +127,7 @@ class Api::ReportIncidentsController < ApplicationController
   def params_return
     return {} if current_user.super_admin?
     return set_polo if set_polo.empty?
-
+    
     { courses: set_polo }
   end
 end
