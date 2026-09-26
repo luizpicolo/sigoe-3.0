@@ -25,7 +25,6 @@ O sistema permite:
 - PostgreSQL
 - Vue.js 3
 - Vite
-- ActiveAdmin
 - Devise / JWT
 
 ## Estrutura do repositório
