@@ -14,27 +14,22 @@ class ApplicationController < ActionController::Base
   def current_user
     return @current_user if defined?(@current_user)
 
-    @current_user = super
-    return @current_user if @current_user
-
     token = request.headers['Authorization']&.split(' ')&.last
+    return @current_user = nil if token.blank?
 
-    begin
-      payload, = JWT.decode(
-        token,
-        Rails.application.credentials.jwt_secret_key,
-        true,
-        { algorithm: 'HS256' }
-      )
+    payload, = JWT.decode(
+      token,
+      Rails.application.credentials.jwt_secret_key,
+      true,
+      { algorithm: 'HS256' }
+    )
 
-      @current_user = User.find_by(id: payload['sub'])
-    rescue JWT::DecodeError, ActiveRecord::RecordNotFound
-      @current_user = nil
-    end
+    @current_user = User.find_by(id: payload['sub'])
+  rescue JWT::DecodeError, ActiveRecord::RecordNotFound
+    @current_user = nil
   end
 
   rescue_from CanCan::AccessDenied do |_exception|
     render json: { error: 'Acesso negado' }, status: :forbidden
   end
-
 end
