@@ -1,3 +1,5 @@
+# syntax=docker/dockerfile:1
+
 FROM ruby:3.4.10-slim-bookworm AS base
 
 WORKDIR /app
@@ -7,6 +9,11 @@ ENV RAILS_ENV=production \
     BUNDLE_DEPLOYMENT=1 \
     BUNDLE_PATH=/usr/local/bundle \
     BUNDLE_WITHOUT="development:test"
+
+
+# ==================================================
+# BUILD
+# ==================================================
 
 FROM base AS build
 
@@ -21,10 +28,10 @@ RUN apt-get update -qq && \
         pkg-config \
         imagemagick \
         shared-mime-info \
-        wkhtmltopdf \
-        xvfb \
     && rm -rf /var/lib/apt/lists/*
 
+
+# Node.js + Yarn
 RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
     apt-get update -qq && \
     apt-get install -y --no-install-recommends nodejs && \
@@ -33,19 +40,35 @@ RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
     corepack prepare yarn@1.22.22 --activate && \
     rm -rf /var/lib/apt/lists/*
 
+
+# Ruby dependencies
 COPY Gemfile Gemfile.lock ./
 
-RUN bundle install
+RUN --mount=type=cache,target=/usr/local/bundle/cache \
+    bundle install
 
+
+# JavaScript dependencies
 COPY package.json package-lock.json ./
 
-RUN npm ci
+RUN --mount=type=cache,target=/root/.npm \
+    npm ci
 
+
+# Application
 COPY . .
 
 COPY config/database.yml.example config/database.yml
 
-RUN SECRET_KEY_BASE_DUMMY=1 bundle exec rails assets:precompile
+
+# Assets
+RUN SECRET_KEY_BASE_DUMMY=1 \
+    bundle exec rails assets:precompile
+
+
+# ==================================================
+# PRODUCTION
+# ==================================================
 
 FROM base AS production
 
@@ -53,17 +76,29 @@ RUN apt-get update -qq && \
     apt-get install -y --no-install-recommends \
         libpq5 \
         shared-mime-info \
-        wkhtmltopdf \
-        xvfb \
     && rm -rf /var/lib/apt/lists/*
 
-RUN useradd --create-home --shell /bin/bash app
+
+RUN useradd \
+    --create-home \
+    --shell /bin/bash \
+    app
+
 
 COPY --from=build /usr/local/bundle /usr/local/bundle
-COPY --from=build --chown=app:app /app /app
 
-RUN mkdir -p /app/tmp/pids /app/tmp/cache /app/tmp/sockets && \
+COPY --from=build \
+    --chown=app:app \
+    /app \
+    /app
+
+
+RUN mkdir -p \
+        /app/tmp/pids \
+        /app/tmp/cache \
+        /app/tmp/sockets && \
     chown -R app:app /app/tmp
+
 
 USER app
 
