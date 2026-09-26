@@ -290,8 +290,7 @@ GEM
       thor (>= 0.14, < 2.0)
     jquery-turbolinks (2.1.0)
       railties (>= 3.1.0)
-      turbolinks
-    jquery-ui-rails (8.0.0)
+        jquery-ui-rails (8.0.0)
       railties (>= 3.2.16)
     json (2.11.3)
     jwt (3.3.0)
@@ -595,8 +594,7 @@ GEM
       railties (>= 4.0.0)
       sassc (>= 2.0)
       sprockets (> 3.0)
-      sprockets-rails
-      tilt
+          tilt
     search_cop (1.6.0)
       treetop
     securerandom (0.4.1)
@@ -729,7 +727,6 @@ DEPENDENCIES
   httparty
   jbuilder (~> 2.11)
   json (~> 2.11.3)
-  kaminari
   listen
   loofah (>= 2.2.3)
   mechanize
@@ -748,7 +745,6 @@ DEPENDENCIES
   rails-env
   rails-erd
   rails-i18n
-  rails_12factor
   rails_best_practices
   randumb
   rb-readline
