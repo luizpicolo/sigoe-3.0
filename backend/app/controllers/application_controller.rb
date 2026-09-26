@@ -37,7 +37,4 @@ class ApplicationController < ActionController::Base
     render json: { error: 'Acesso negado' }, status: :forbidden
   end
 
-  def authenticate_admin!
-    redirect_to new_user_session_path unless current_user&.super_admin?
-  end
 end
