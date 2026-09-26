@@ -57,19 +57,6 @@ GEM
       erubi (~> 1.11)
       rails-dom-testing (~> 2.2)
       rails-html-sanitizer (~> 1.6)
-    active_link_to (1.0.5)
-      actionpack
-      addressable
-    activeadmin (3.5.2)
-      arbre (~> 1.2, >= 1.2.1)
-      csv
-      formtastic (>= 3.1)
-      formtastic_i18n (>= 0.4)
-      inherited_resources (~> 1.7)
-      jquery-rails (>= 4.2)
-      kaminari (>= 1.2.1)
-      railties (>= 6.1)
-      ransack (>= 4.0)
     activejob (7.2.3)
       activesupport (= 7.2.3)
       globalid (>= 0.3.6)
