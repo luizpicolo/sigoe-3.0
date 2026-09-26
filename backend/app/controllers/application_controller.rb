@@ -16,7 +16,7 @@ class ApplicationController < ActionController::Base
 
     token = request.headers['Authorization']&.split(' ')&.last
 
-    @current_user = if token.present?
+    begin
       payload, = JWT.decode(
         token,
         Rails.application.credentials.jwt_secret_key,
@@ -24,9 +24,9 @@ class ApplicationController < ActionController::Base
         { algorithm: 'HS256' }
       )
 
-      User.find_by(id: payload['sub'])
+      @current_user = User.find_by(id: payload['sub'])
     rescue JWT::DecodeError, ActiveRecord::RecordNotFound
-      nil
+      @current_user = nil
     end
   end
 
