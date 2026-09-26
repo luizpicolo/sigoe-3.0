@@ -13,7 +13,6 @@ class Api::SessionsController < Devise::SessionsController
       return
     end
 
-    sign_in(:user, user)
     token = JWT.encode(
       {
         sub: user.id,
