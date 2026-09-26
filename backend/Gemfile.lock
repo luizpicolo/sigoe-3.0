@@ -716,23 +716,16 @@ PLATFORMS
   x86_64-linux
 
 DEPENDENCIES
-  active_link_to
-  activeadmin
-  alert_message (~> 2.0)
   annotate
   bcrypt (~> 3.1.19)
   better_errors
   binding_of_caller
   bootsnap (>= 1.4.2)
   brakeman
-  breadcrumbs_on_rails
   byebug
   cancancan
   capybara (>= 2.15)
   carrierwave
-  chartkick (>= 3.2.0)
-  clipboard-rails
-  coffee-rails
   database_rewinder
   devise (>= 4.7.1)
   devise-i18n
@@ -742,16 +735,12 @@ DEPENDENCIES
   factory_bot_rails
   faker
   figaro
-  font-awesome-sass
   friendly_id (~> 5.5.0)
   fuubar
   groupdate
   htmlcompressor
   httparty
   jbuilder (~> 2.11)
-  jquery-rails
-  jquery-turbolinks
-  jquery-ui-rails
   json (~> 2.11.3)
   kaminari
   listen
@@ -760,7 +749,6 @@ DEPENDENCIES
   mimemagic (~> 0.3.10)
   mini_magick (>= 4.11.0)
   mini_racer (~> 0.6.3)
-  modernizr-rails
   nokogiri (>= 1.13.4)
   pdfkit
   pg
@@ -784,8 +772,6 @@ DEPENDENCIES
   rubocop-rails
   rubycritic
   rubyzip (>= 1.3.0)
-  sass-rails (>= 5)
-  sassc
   search_cop
   seed_migration
   selenium-webdriver
@@ -794,12 +780,8 @@ DEPENDENCIES
   spreadsheet
   spring
   spring-watcher-listen (~> 2.1.0)
-  sprockets (~> 4.2)
-  sprockets-rails
-  turbolinks
   turnout
   tzinfo-data
-  uglifier
   web-console
   webdrivers
   whenever
