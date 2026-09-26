@@ -14,6 +14,9 @@ class ApplicationController < ActionController::Base
   def current_user
     return @current_user if defined?(@current_user)
 
+    @current_user = super
+    return @current_user if @current_user
+
     token = request.headers['Authorization']&.split(' ')&.last
 
     begin
