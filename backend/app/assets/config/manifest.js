@@ -1,3 +1,2 @@
-//= link_tree ../images
-//= link 'application.css'
-//= link_directory ../javascripts/ .js
+//= link active_admin.css
+//= link active_admin.js
