@@ -83,7 +83,8 @@ const addEntity = entityId => {
     can_destroy: false,
     can_extras: false,
     can_sanction: false,
-    can_export_to_academic_system: false
+    can_export_to_academic_system: false,
+    can_attach_pdf: false
   })
 
   selectedEntity.value = ''
