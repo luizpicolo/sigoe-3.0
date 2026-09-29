@@ -61,6 +61,11 @@ const deleteAttachment = async attachment => {
 
 <template>
   <Card customClass="col-span-4" title="Arquivos PDF">
+    <div class="mb-4 flex items-start gap-2 rounded-md border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800" role="alert">
+      <i class="fa-solid fa-triangle-exclamation mt-0.5"></i>
+      <span>Espaço destinado a ocorrências assinadas pelo estudante.</span>
+    </div>
+    
     <div class="space-y-3">
       <div v-if="canUpdate" class="flex items-center gap-3">
         <input
