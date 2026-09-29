@@ -253,7 +253,8 @@ onMounted(loadIncident)
           <IncidentAttachments
             :incident-id="incident.id"
             :attachments="incident.attachments"
-            :can-update="can('occurrences', 'update')"
+            :can-upload="can('occurrences', 'attach_pdf')"
+            :can-delete="can('occurrences', 'update')"
             @uploaded="attachmentUploaded"
             @deleted="attachmentDeleted"
           />
