@@ -53,7 +53,7 @@ class Api::IncidentAttachmentsController < ApplicationController
   def attachment_json(attachment)
     {
       id: attachment.id,
-      filename: attachment.file.original_filename,
+      filename: attachment.file.file.original_filename,
       url: attachment.file.url,
       created_at: attachment.created_at
     }
