@@ -106,7 +106,11 @@ class Api::PermissionsController < ApplicationController
       seen[entity_key] = true
       {
         entity: config[:model].name,
-        **ACTIONS.index_with { |attribute| ActiveModel::Type::Boolean.new.cast(attributes[attribute]) }
+        **ACTIONS.index_with do |attribute|
+          next false if attribute == 'can_attach_pdf' && entity_key != 'occurrences'
+
+          ActiveModel::Type::Boolean.new.cast(attributes[attribute])
+        end
       }
     end
   end
