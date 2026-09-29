@@ -82,7 +82,8 @@ const add = () => {
     can_read_restricted: false,
     can_extras: false,
     can_sanction: false,
-    can_export_to_academic_system: false
+    can_export_to_academic_system: false,
+    can_attach_pdf: false
   })
 
   selected.value = ''
