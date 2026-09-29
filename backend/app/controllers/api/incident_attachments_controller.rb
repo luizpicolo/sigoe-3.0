@@ -4,7 +4,8 @@ class Api::IncidentAttachmentsController < ApplicationController
   before_action :authenticate_user!
   before_action :set_incident
   before_action :authorize_private_incident!
-  before_action :authorize_incident_update!, only: %i[create destroy]
+  before_action :authorize_incident_attachment!, only: :create
+  before_action :authorize_incident_update!, only: :destroy
 
   def create
     attachment = @incident.attachments.build(attachment_params)
@@ -26,6 +27,12 @@ class Api::IncidentAttachmentsController < ApplicationController
 
   def set_incident
     @incident = Incident.includes(:attachments).where(params_return).find(params[:incident_id])
+  end
+
+  def authorize_incident_attachment!
+    return if current_user.admin? || current_user.super_admin?
+
+    authorize! :attach_pdf, @incident
   end
 
   def authorize_incident_update!

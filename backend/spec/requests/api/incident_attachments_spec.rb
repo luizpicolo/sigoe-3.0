@@ -26,6 +26,42 @@ RSpec.describe 'Api::IncidentAttachments', type: :request do
       expect(body.dig('attachment', 'url')).to be_present
     end
 
+
+    it 'exige a permissão de envio de PDF para usuários não administradores' do
+      user = create(:user)
+      sign_in user
+
+      post "/api/incidents/#{incident.id}/attachments",
+           params: {
+             attachment: {
+               file: Rack::Test::UploadedFile.new(
+                 Rails.root.join('spec/fixtures/files/sample.pdf'),
+                 'application/pdf'
+               )
+             }
+           }
+
+      expect(response).to have_http_status(:forbidden)
+    end
+
+    it 'permite o envio quando o usuário possui a permissão de PDF em ocorrências' do
+      user = create(:user)
+      create(:permission, user: user, entity: 'Incident', can_attach_pdf: true)
+      sign_in user
+
+      post "/api/incidents/#{incident.id}/attachments",
+           params: {
+             attachment: {
+               file: Rack::Test::UploadedFile.new(
+                 Rails.root.join('spec/fixtures/files/sample.pdf'),
+                 'application/pdf'
+               )
+             }
+           }
+
+      expect(response).to have_http_status(:created)
+    end
+
     it 'rejeita arquivo que não é PDF' do
       post "/api/incidents/#{incident.id}/attachments",
            params: {

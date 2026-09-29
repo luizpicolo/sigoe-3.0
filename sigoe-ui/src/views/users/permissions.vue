@@ -83,7 +83,8 @@ const addEntity = entityId => {
     can_destroy: false,
     can_extras: false,
     can_sanction: false,
-    can_export_to_academic_system: false
+    can_export_to_academic_system: false,
+    can_attach_pdf: false
   })
 
   selectedEntity.value = ''
@@ -240,6 +241,13 @@ onMounted(load)
                   <input v-model="permission.can_read_restricted" type="checkbox" class="w-5 h-5" />
                   <span class="text-sm text-gray-700">
                     Leitura restrita
+                  </span>
+                </label>
+
+                <label v-if="isOccurrence(permission)" class="flex items-center gap-3 p-3 border border-gray-200 rounded-md cursor-pointer hover:bg-gray-50">
+                  <input v-model="permission.can_attach_pdf" type="checkbox" class="w-5 h-5" />
+                  <span class="text-sm text-gray-700">
+                    Enviar PDF
                   </span>
                 </label>
               </div>

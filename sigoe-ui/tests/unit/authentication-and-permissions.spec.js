@@ -61,6 +61,16 @@ describe('permissões', () => {
     expect(can('users', 'delete')).toBe(false)
   })
 
+  it('permite enviar PDF quando a permissão de ocorrência está ativa', () => {
+    permissionState.permissions = { occurrences: { can_attach_pdf: true } }
+    expect(can('occurrences', 'attach_pdf')).toBe(true)
+  })
+
+  it('permite todas as ações para super administrador', () => {
+    permissionState.super_admin = true
+    expect(can('qualquer-entidade', 'qualquer-acao')).toBe(true)
+  })
+
   it('permite todas as ações para administrador', () => {
     permissionState.admin = true
     expect(can('qualquer-entidade', 'qualquer-acao')).toBe(true)

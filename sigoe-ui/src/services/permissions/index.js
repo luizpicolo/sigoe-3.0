@@ -11,6 +11,7 @@ export const permissionState = reactive({
   loaded: false,
   loading: false,
   admin: false,
+  super_admin: false,
   user: null,
   entities: [],
   permissions: {}
@@ -20,6 +21,7 @@ const resetState = () => {
   permissionState.loaded = false
   permissionState.loading = false
   permissionState.admin = false
+  permissionState.super_admin = false
   permissionState.user = null
   permissionState.entities = []
   permissionState.permissions = {}
@@ -51,7 +53,7 @@ export const loadCurrentPermissions = async (force = false) => {
 }
 
 export const can = (entity, action = 'read') => {
-  if (permissionState.admin) return true
+  if (permissionState.admin || permissionState.super_admin) return true
 
   const entityPermissions = permissionState.permissions?.[entity]
   if (!entityPermissions) return false

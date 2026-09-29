@@ -10,7 +10,8 @@ const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000'
 const props = defineProps({
   incidentId: { type: [String, Number], required: true },
   attachments: { type: Array, default: () => [] },
-  canUpdate: { type: Boolean, default: false }
+  canUpload: { type: Boolean, default: false },
+  canDelete: { type: Boolean, default: false }
 })
 
 const emit = defineEmits(['uploaded', 'deleted'])
@@ -67,7 +68,7 @@ const deleteAttachment = async attachment => {
     </div>
     
     <div class="space-y-3">
-      <div v-if="canUpdate" class="flex items-center gap-3">
+      <div v-if="canUpload" class="flex items-center gap-3">
         <input
           ref="fileInput"
           type="file"
@@ -106,7 +107,7 @@ const deleteAttachment = async attachment => {
           </a>
 
           <Button
-            v-if="canUpdate"
+            v-if="canDelete"
             customClass="bg-red-600 hover:bg-red-700"
             @click="deleteAttachment(attachment)"
           >

@@ -19,7 +19,8 @@ const mountComponent = props => mount(IncidentAttachments, {
   props: {
     incidentId: 1,
     attachments: [],
-    canUpdate: true,
+    canUpload: true,
+    canDelete: true,
     ...props
   },
   global: {

@@ -82,7 +82,8 @@ const add = () => {
     can_read_restricted: false,
     can_extras: false,
     can_sanction: false,
-    can_export_to_academic_system: false
+    can_export_to_academic_system: false,
+    can_attach_pdf: false
   })
 
   selected.value = ''
@@ -230,6 +231,17 @@ onMounted(load)
                 type="checkbox"
               />
               Leitura restrita
+            </label>
+
+            <label
+              v-if="permission.entity === 'occurrences'"
+              class="flex items-center gap-2 rounded-lg bg-gray-50 p-3 text-sm"
+            >
+              <input
+                v-model="permission.can_attach_pdf"
+                type="checkbox"
+              />
+              Enviar PDF
             </label>
           </div>
         </div>

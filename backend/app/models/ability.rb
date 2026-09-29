@@ -18,6 +18,7 @@ class Ability
         can [:confirmation], eval(permission.entity) if permission.can_extras?
         can [:sign], eval(permission.entity) if permission.can_extras?
       end
+      can [:attach_pdf], Incident if permission.can_attach_pdf? && permission.entity == 'Incident'
       can [:create], eval(permission.entity) if permission.can_create?
       can [:read_restricted], eval(permission.entity) if permission.can_read_restricted?
       can [:export_to_academic_system], eval(permission.entity) if permission.can_export_to_academic_system?
