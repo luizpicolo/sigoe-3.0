@@ -243,6 +243,13 @@ onMounted(load)
                     Leitura restrita
                   </span>
                 </label>
+
+                <label v-if="isOccurrence(permission)" class="flex items-center gap-3 p-3 border border-gray-200 rounded-md cursor-pointer hover:bg-gray-50">
+                  <input v-model="permission.can_attach_pdf" type="checkbox" class="w-5 h-5" />
+                  <span class="text-sm text-gray-700">
+                    Enviar PDF
+                  </span>
+                </label>
               </div>
             </div>
 
