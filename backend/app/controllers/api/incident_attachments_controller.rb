@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class Api::IncidentAttachmentsController < ApplicationController
+  include ParamsSearch
+
   before_action :authenticate_user!
   before_action :set_incident
   before_action :authorize_private_incident!
@@ -26,7 +28,7 @@ class Api::IncidentAttachmentsController < ApplicationController
   private
 
   def set_incident
-    @incident = Incident.includes(:attachments).where(params_return).find(params[:incident_id])
+    @incident = Incident.joins(:course).includes(:attachments).where(params_return).find(params[:incident_id])
   end
 
   def authorize_incident_attachment!

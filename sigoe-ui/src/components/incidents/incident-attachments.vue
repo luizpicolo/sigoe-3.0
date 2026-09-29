@@ -4,14 +4,13 @@ import { error, success, confirm } from '@/utils/sweetPopup2'
 import { uploadAttachment, removeAttachment } from '@/services/incidents'
 import Button from '@/components/ui/button.vue'
 import Card from '@/components/ui/card.vue'
+import { can } from '@/services/permissions'
 
 const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000'
 
 const props = defineProps({
   incidentId: { type: [String, Number], required: true },
   attachments: { type: Array, default: () => [] },
-  canUpload: { type: Boolean, default: false },
-  canDelete: { type: Boolean, default: false }
 })
 
 const emit = defineEmits(['uploaded', 'deleted'])
@@ -68,19 +67,9 @@ const deleteAttachment = async attachment => {
     </div>
     
     <div class="space-y-3">
-      <div v-if="canUpload" class="flex items-center gap-3">
-        <input
-          ref="fileInput"
-          type="file"
-          accept="application/pdf,.pdf"
-          class="hidden"
-          @change="upload"
-        />
-        <Button
-          :disabled="isUploading"
-          customClass="bg-blue-600 hover:bg-blue-700"
-          @click="selectFile"
-        >
+      <div class="flex items-center gap-3">
+        <input ref="fileInput" type="file" accept="application/pdf,.pdf" class="hidden" @change="upload" />
+        <Button :disabled="!can('occurrences', 'attach_pdf')" customClass="bg-blue-600 hover:bg-blue-700" @click="selectFile">
           <i class="fa-solid fa-file-arrow-up pr-2"></i>
           {{ isUploading ? 'Enviando...' : 'Adicionar PDF' }}
         </Button>
@@ -91,27 +80,14 @@ const deleteAttachment = async attachment => {
       </div>
 
       <ul v-else class="divide-y divide-gray-200">
-        <li
-          v-for="attachment in attachments"
-          :key="attachment.id"
-          class="py-3 flex items-center justify-between gap-3"
-        >
-          <a
-            :href="BASE_URL + attachment.url"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="text-sm text-blue-600 hover:underline flex items-center gap-2"
-          >
+        <li v-for="attachment in attachments" :key="attachment.id" class="py-3 flex items-center justify-between gap-3">
+          <a :href="BASE_URL + attachment.url" target="_blank" rel="noopener noreferrer" class="text-sm text-blue-600 hover:underline flex items-center gap-2">
             <i class="fa-solid fa-file-pdf"></i>
             {{ attachment.filename }}
           </a>
 
-          <Button
-            v-if="canDelete"
-            customClass="bg-red-600 hover:bg-red-700"
-            @click="deleteAttachment(attachment)"
-          >
-            <i class="fa-solid fa-trash"></i>
+          <Button :disabled="!can('occurrences', 'attach_pdf')" customClass="bg-red-600 hover:bg-red-700" @click="deleteAttachment(attachment)">
+            <i class="fa-solid fa-trash p-1"></i>
             Excluir
           </Button>
         </li>
