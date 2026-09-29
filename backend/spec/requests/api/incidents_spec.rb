@@ -24,6 +24,18 @@ RSpec.describe 'Api::Incidents', type: :request do
       expect(body['incidents'].map { |item| item['id'] }).to include(incident.id)
     end
 
+    it 'retorna os PDFs anexados ao visualizar uma ocorrência' do
+      attachment = create(:incident_attachment, incident: incident)
+
+      get "/api/incidents/#{incident.id}"
+
+      expect(response).to have_http_status(:ok)
+      body = JSON.parse(response.body)
+      expect(body.dig('incident', 'attachments')).to include(
+        hash_including('id' => attachment.id, 'filename' => 'sample.pdf')
+      )
+    end
+
     it 'filtra ocorrências por busca' do
       get '/api/incidents', params: { search: incident.id.to_s }
 

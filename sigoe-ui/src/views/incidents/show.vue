@@ -8,6 +8,7 @@ import Breadcrumb from '@/components/breadcrumb.vue'
 import Card from '@/components/ui/card.vue'
 import Header from '@/components/header.vue'
 import AcademicExportForm from '@/components/incidents/academic-export-form.vue'
+import IncidentAttachments from '@/components/incidents/incident-attachments.vue'
 import { formatDate, formatTime } from '@/utils'
 import { can } from '@/services/permissions'
 import { find, remove } from '@/services/incidents'
@@ -72,6 +73,14 @@ const openAcademicExportForm = () => {
 
 const closeAcademicExportForm = () => {
   showAcademicExportForm.value = false
+}
+
+const attachmentUploaded = attachment => {
+  incident.value.attachments = [...(incident.value.attachments || []), attachment]
+}
+
+const attachmentDeleted = attachmentId => {
+  incident.value.attachments = (incident.value.attachments || []).filter(attachment => attachment.id !== attachmentId)
 }
 
 const deleteIncident = async () => {
@@ -240,6 +249,14 @@ onMounted(loadIncident)
               </Card>
             </template>
           </div>
+
+          <IncidentAttachments
+            :incident-id="incident.id"
+            :attachments="incident.attachments"
+            :can-update="can('occurrences', 'update')"
+            @uploaded="attachmentUploaded"
+            @deleted="attachmentDeleted"
+          />
         </template>
       </main>
     </div>

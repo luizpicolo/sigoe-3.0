@@ -44,3 +44,14 @@ export const remove = async id => {
     return { error: error.response?.data?.errors || 'Não foi possível excluir a ocorrência.' }
   }
 }
+
+export const uploadAttachment = async (id, file) => {
+  const formData = new FormData()
+  formData.append('attachment[file]', file)
+  const response = await axios.post(`${BASE_URL}/api/incidents/${id}/attachments`, formData, config())
+  return response.data
+}
+
+export const removeAttachment = async (incidentId, attachmentId) => {
+  await axios.delete(`${BASE_URL}/api/incidents/${incidentId}/attachments/${attachmentId}`, config())
+}

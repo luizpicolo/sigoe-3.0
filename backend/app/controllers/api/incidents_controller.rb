@@ -97,7 +97,7 @@ class Api::IncidentsController < ApplicationController
   end
 
   def set_incident
-    @incident = Incident.includes(:student, :course, :type_incident, :user, :assistant, :student_duties, :prohibition_and_responsibilities).where(params_return).find(params[:id])
+    @incident = Incident.includes(:student, :course, :type_incident, :user, :assistant, :student_duties, :prohibition_and_responsibilities, :attachments).where(params_return).find(params[:id])
   end
 
   def authorize_private_incident!
@@ -128,6 +128,15 @@ class Api::IncidentsController < ApplicationController
   end
 
   def incident_json(incident)
-    incident.as_json(include: { student: { only: %i[id name ra photo] }, course: { only: %i[id name initial polo_id], include: { polo: { only: %i[id name] } } }, type_incident: { only: %i[id name] }, sector: { only: %i[id name email] }, user: { only: %i[id name] }, assistant: { only: %i[id name email] }, student_duties: { only: %i[id item] }, prohibition_and_responsibilities: { only: %i[id item] } })
+    incident.as_json(include: { student: { only: %i[id name ra photo] }, course: { only: %i[id name initial polo_id], include: { polo: { only: %i[id name] } } }, type_incident: { only: %i[id name] }, sector: { only: %i[id name email] }, user: { only: %i[id name] }, assistant: { only: %i[id name email] }, student_duties: { only: %i[id item] }, prohibition_and_responsibilities: { only: %i[id item] } }).merge('attachments' => incident.attachments.map { |attachment| attachment_json(attachment) })
+  end
+
+  def attachment_json(attachment)
+    {
+      id: attachment.id,
+      filename: attachment.file.original_filename,
+      url: attachment.file.url,
+      created_at: attachment.created_at
+    }
   end
 end

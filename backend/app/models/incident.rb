@@ -18,6 +18,7 @@ class Incident < ApplicationRecord
   belongs_to :school_group, optional: true
   belongs_to :type_incident
   belongs_to :sector, optional: true
+  has_many :attachments, class_name: 'IncidentAttachment', dependent: :destroy
   has_and_belongs_to_many :prohibition_and_responsibilities
   has_and_belongs_to_many :student_duties
 
