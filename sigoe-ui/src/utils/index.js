@@ -8,14 +8,19 @@ export const formatDate = (date) => {
 }
 
 export const formatTime = (time) => {
-  if (!time) return '';
+  if (!time) return ''
+
+  if (/^\d{2}:\d{2}(:\d{2})?$/.test(time)) {
+    return time.slice(0, 5)
+  }
+
   try {
     return new Date(time).toLocaleTimeString('pt-BR', {
       hour: '2-digit',
       minute: '2-digit',
-    });
+    })
   } catch {
-    return '';
+    return ''
   }
 }
 
