@@ -101,10 +101,7 @@ const loadIncident = async () => {
   occurrenceTime.value = data.time_incident || ''
   occurrenceDescription.value = data.description || ''
   solutionDescription.value = data.soluction || ''
-
-  // Correção dos vetores
   studentDuties.value = (data.student_duties || []).map(item => item.id)
-
   prohibitions.value = (data.prohibition_and_responsibilities || []).map(item => item.id)
 }
 
