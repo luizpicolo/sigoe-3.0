@@ -127,15 +127,21 @@ const handleSubmit = async () => {
   saving.value = true
 
   try {
+
     const payload = {
       type_student: selectedStudentType.value,
-      assistant_id: selectedAssistant.value,
+      assistant_id: selectedAssistant.value || null,
       sector_id: selectedSector.value || null,
       type_incident_id: selectedOccurrenceType.value,
       visibility: selectedAccessType.value,
       date_incident: occurrenceDate.value,
       time_incident: occurrenceTime.value,
-      description: occurrenceDescription.value
+      description: occurrenceDescription.value,
+      is_resolved: occurrenceResolved.value,
+      sanction: selectedSanction.value || null,
+      soluction: solutionDescription.value || null,
+      student_duties: studentDuties.value,
+      prohibition_and_responsibilities: prohibitions.value
     }
 
     if (editing) {
