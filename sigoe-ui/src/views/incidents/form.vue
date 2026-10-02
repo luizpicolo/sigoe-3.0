@@ -101,7 +101,10 @@ const loadIncident = async () => {
   occurrenceTime.value = data.time_incident || ''
   occurrenceDescription.value = data.description || ''
   solutionDescription.value = data.soluction || ''
+
+  // Correção dos vetores
   studentDuties.value = (data.student_duties || []).map(item => item.id)
+
   prohibitions.value = (data.prohibition_and_responsibilities || []).map(item => item.id)
 }
 
@@ -146,10 +149,11 @@ const handleSubmit = async () => {
 
     if (editing) {
       await updateIncident(incidentId, payload)
-      if ( await success('Ocorrência atualizada com sucesso.')){
+
+      if (await success('Ocorrência atualizada com sucesso.')) {
         router.push(`/ocorrencias/ocorrencias/visualizar/${incidentId}`)
       }
-      
+
     } else {
       const response = await createIncident({
         student_ids: selectedStudentIds.value,
@@ -161,7 +165,7 @@ const handleSubmit = async () => {
         return
       }
 
-      if (await success('Ocorrência cadastrada para os estudantes selecionados.')){
+      if (await success('Ocorrência cadastrada para os estudantes selecionados.')) {
         await router.push('/ocorrencias/ocorrencias/listar')
       }
     }
@@ -196,25 +200,42 @@ onMounted(loadData)
         <form v-else @submit.prevent="handleSubmit" class="space-y-6">
           <Card title="Estudante">
             <div v-if="editing" class="flex items-center gap-4">
-              <img :src="BASE_URL + incident.student?.photo?.thumb?.url" class="h-24 w-24 rounded-full object-cover" width="200" alt="Foto do estudante" />
+              <img
+                :src="BASE_URL + incident.student?.photo?.thumb?.url"
+                class="h-24 w-24 rounded-full object-cover"
+                width="200"
+                alt="Foto do estudante"
+              />
 
               <div>
                 <p class="font-medium">
                   {{ incident.student?.name }}
                 </p>
+
                 <p class="text-sm text-gray-500">
                   R.A.: {{ incident.student?.ra || 'Não informado' }}
                 </p>
+
                 <p class="text-sm text-gray-500">
                   Turma: {{ incident.course?.name || 'Não informado' }}
                 </p>
+
                 <p class="text-sm text-gray-500">
                   Campus: {{ incident.course?.polo?.name || 'Não informado' }}
                 </p>
               </div>
 
               <div class="ml-auto">
-                <Select id="studentType" label="Estudante é?" v-model="selectedStudentType" :options="[{ value: 'non_resident', label: 'Não residente' }, { value: 'resident', label: 'Residente' }]" />
+                <Select id="studentType" label="Estudante é?" v-model="selectedStudentType" :options="[
+                  {
+                    value: 'non_resident',
+                    label: 'Não residente'
+                  },
+                  {
+                    value: 'resident',
+                    label: 'Residente'
+                  }
+                ]" />
               </div>
             </div>
 
@@ -224,7 +245,16 @@ onMounted(loadData)
               </div>
 
               <div class="col-span-2">
-                <Select id="studentType" label="Estudante é?" v-model="selectedStudentType" :options="[{ value: 'non_resident', label: 'Não residente' }, { value: 'resident', label: 'Residente' }]" />
+                <Select id="studentType" label="Estudante é?" v-model="selectedStudentType" :options="[
+                  {
+                    value: 'non_resident',
+                    label: 'Não residente'
+                  },
+                  {
+                    value: 'resident',
+                    label: 'Residente'
+                  }
+                ]" />
               </div>
             </div>
           </Card>
@@ -236,7 +266,13 @@ onMounted(loadData)
               </div>
 
               <div class="col-span-3">
-                <Select id="sector" label="Encaminhar para" v-model="selectedSector" :options="[{ value: '', label: 'Não enviar notificação' }, ...sectorOptions]" />
+                <Select id="sector" label="Encaminhar para" v-model="selectedSector" :options="[
+                  {
+                    value: '',
+                    label: 'Não enviar notificação'
+                  },
+                  ...sectorOptions
+                ]" />
               </div>
             </div>
           </Card>
@@ -256,7 +292,16 @@ onMounted(loadData)
               </div>
 
               <div class="col-span-3">
-                <Select id="accessType" label="Tipo de acesso" v-model="selectedAccessType" :options="[{ value: 'public', label: 'Público' }, { value: 'private', label: 'Privado' }]" />
+                <Select id="accessType" label="Tipo de acesso" v-model="selectedAccessType" :options="[
+                  {
+                    value: 'public',
+                    label: 'Público'
+                  },
+                  {
+                    value: 'private',
+                    label: 'Privado'
+                  }
+                ]" />
               </div>
             </div>
 
@@ -264,11 +309,26 @@ onMounted(loadData)
 
             <div v-if="can('occurrences', 'sanction')" class="grid grid-cols-6 gap-6 mt-4">
               <div class="col-span-3">
-                <Select id="sanction" label="Sanção aplicada" v-model="selectedSanction" :options="[{ value: '', label: 'Não se aplica' }, ...options.sanctions]" />
+                <Select id="sanction" label="Sanção aplicada" v-model="selectedSanction" :options="[
+                  {
+                    value: '',
+                    label: 'Não se aplica'
+                  },
+                  ...options.sanctions
+                ]" />
               </div>
 
               <div class="col-span-3">
-                <Select id="resolved" label="Ocorrência resolvida?" v-model="occurrenceResolved" :options="[{ value: 'no_', label: 'Não' }, { value: 'yes_', label: 'Sim' }]" />
+                <Select id="resolved" label="Ocorrência resolvida?" v-model="occurrenceResolved" :options="[
+                  {
+                    value: 'no_',
+                    label: 'Não'
+                  },
+                  {
+                    value: 'yes_',
+                    label: 'Sim'
+                  }
+                ]" />
               </div>
             </div>
           </Card>
@@ -276,7 +336,7 @@ onMounted(loadData)
           <template v-if="can('occurrences', 'sanction')">
             <Card title="Capítulo III - Direitos e Deveres">
               <label v-for="item in options.student_duties" :key="item.id" class="flex gap-2 mb-2">
-                <input type="checkbox" :value="item.id" v-model="studentDuties">
+                <input type="checkbox" :value="item.id" v-model="studentDuties" />
 
                 <span>
                   {{ item.item }}
@@ -286,7 +346,7 @@ onMounted(loadData)
 
             <Card title="Capítulo IV - Proibições">
               <label v-for="item in options.prohibition_and_responsibilities" :key="item.id" class="flex gap-2 mb-2">
-                <input type="checkbox" :value="item.id" v-model="prohibitions">
+                <input type="checkbox" :value="item.id" v-model="prohibitions" />
 
                 <span>
                   {{ item.item }}
@@ -300,7 +360,9 @@ onMounted(loadData)
           </template>
 
           <div class="flex gap-2">
-            <Button :to="editing ? `/ocorrencias/ocorrencias/visualizar/${incidentId}` : '/ocorrencias/ocorrencias/listar'" customClass="bg-white border-gray-200 !text-gray-900">
+            <Button :to="editing
+              ? `/ocorrencias/ocorrencias/visualizar/${incidentId}`
+              : '/ocorrencias/ocorrencias/listar'" customClass="bg-white border-gray-200 !text-gray-900">
               <i class="fa-solid fa-times pr-2"></i>
               Cancelar
             </Button>
