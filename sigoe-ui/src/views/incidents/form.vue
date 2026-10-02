@@ -140,8 +140,8 @@ const handleSubmit = async () => {
       is_resolved: occurrenceResolved.value,
       sanction: selectedSanction.value || null,
       soluction: solutionDescription.value || null,
-      student_duties: studentDuties.value,
-      prohibition_and_responsibilities: prohibitions.value
+      student_duty_ids: studentDuties.value,
+      prohibition_and_responsibility_ids: prohibitions.value
     }
 
     if (editing) {
