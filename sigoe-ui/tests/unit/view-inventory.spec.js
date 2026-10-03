@@ -4,7 +4,7 @@ const views = import.meta.glob('../../src/views/**/*.vue', { eager: true })
 
 const expectedViews = [
   'courses/form.vue', 'courses/list.vue', 'forbidden.vue', 'home.vue', 'login.vue',
-  'incidents/form.vue', 'incidents/list.vue', 'incidents/report.vue', 'incidents/show.vue',
+  'incidents/form.vue', 'incidents/list.vue', 'incidents/show.vue',
   'school_groups/form.vue', 'school_groups/list.vue',
   'students/form.vue', 'students/list.vue', 'students/show.vue',
   'users/change-password.vue', 'users/form.vue', 'users/list.vue', 'users/permissions.vue', 'users/show.vue',

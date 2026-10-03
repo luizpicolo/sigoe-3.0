@@ -1,6 +1,4 @@
 class Api::SessionsController < Devise::SessionsController
-  layout false
-  skip_before_action :verify_authenticity_token
   respond_to :json
 
   def create
@@ -12,7 +10,6 @@ class Api::SessionsController < Devise::SessionsController
       return
     end
 
-    sign_in(:user, user)
     token = JWT.encode(
       {
         sub: user.id,

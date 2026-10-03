@@ -19,7 +19,6 @@ RUN apt-get update -qq && \
     apt-get install -y --no-install-recommends \
         build-essential \
         git \
-        curl \
         libpq-dev \
         libyaml-dev \
         libffi-dev \
@@ -29,16 +28,6 @@ RUN apt-get update -qq && \
     && rm -rf /var/lib/apt/lists/*
 
 
-# Node.js + Yarn
-RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
-    apt-get update -qq && \
-    apt-get install -y --no-install-recommends nodejs && \
-    npm install -g corepack && \
-    corepack enable && \
-    corepack prepare yarn@1.22.22 --activate && \
-    rm -rf /var/lib/apt/lists/*
-
-
 # Ruby dependencies
 COPY Gemfile Gemfile.lock ./
 
@@ -46,22 +35,10 @@ RUN --mount=type=cache,target=/usr/local/bundle/cache \
     bundle install
 
 
-# JavaScript dependencies
-COPY package.json package-lock.json ./
-
-RUN --mount=type=cache,target=/root/.npm \
-    npm ci
-
-
 # Application
 COPY . .
 
 COPY config/database.yml.example config/database.yml
-
-
-# Assets
-RUN SECRET_KEY_BASE_DUMMY=1 \
-    bundle exec rails assets:precompile
 
 
 # ==================================================

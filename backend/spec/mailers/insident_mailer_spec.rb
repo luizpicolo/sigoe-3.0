@@ -5,7 +5,8 @@ require 'rails_helper'
 RSpec.describe InsidentMailer, type: :mailer do
   describe '#send_mailer' do
     let(:coordenation) { 'admin@admin.com' }
-    let(:mail) { InsidentMailer.send_mailer(coordenation) }
+    let(:incident) { create(:incident) }
+    let(:mail) { InsidentMailer.send_mailer(coordenation, incident) }
 
     it 'Renders the headers' do
       expect(mail.subject).to eq('Nova ocorrência cadastrada')

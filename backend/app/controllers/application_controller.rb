@@ -1,14 +1,11 @@
 # frozen_string_literal: true
 
-class ApplicationController < ActionController::Base
-  protect_from_forgery with: :null_session
+class ApplicationController < ActionController::API
+  include Devise::Controllers::Helpers
+
   before_action :authenticate_user!
 
-  rescue_from CanCan::AccessDenied do |_exception|
-    redirect_back(fallback_location: root_path)
-  end
-
-  def authenticate_admin!
-    redirect_to new_user_session_path unless current_user.super_admin?
+  rescue_from CanCan::AccessDenied do |exception|
+    render json: { error: exception.message }, status: :forbidden
   end
 end
