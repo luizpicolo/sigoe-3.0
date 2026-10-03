@@ -1,6 +1,14 @@
 import axios from 'axios'
+import { formatTime } from '../../utils'
 
 const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000'
+
+const sanctionLabels = {
+  verbal_warning: 'Advertência Verbal',
+  written_warning: 'Advertência escrita',
+  suspension: 'Suspensão',
+  quitting_school: 'Desligamento'
+}
 
 const config = () => ({
   headers: {
@@ -118,7 +126,7 @@ const renderIncidentDate = incident => {
   if (date && time) {
     return renderField(
       'Data ocorrência',
-      `${date} às ${time}`,
+      `${date} às ${formatTime(time)}`,
       true
     )
   }
@@ -180,8 +188,18 @@ const renderIncidentPdfHtml = incident => {
 
       ${renderField(
         'Sanção adotada',
-        incident.sanction,
+        sanctionLabels[incident.sanction],
         true
+      )}
+
+      ${renderField(
+        'Segundo o Capítulo III, Art 4º que trata sobre os direitos e deveres do estudante',
+        incident.studentDuties
+      )}
+
+      ${renderField(
+        'Segundo o Capítulo IV que trata sobre as proibições e responsabilidades',
+        incident.prohibitionAndResponsibilities
       )}
 
       ${renderField(
@@ -189,18 +207,7 @@ const renderIncidentPdfHtml = incident => {
         incident.solution
       )}
 
-      ${renderField(
-        'Deveres do aluno',
-        incident.studentDuties
-      )}
-
-      ${renderField(
-        'Proibições e responsabilidades',
-        incident.prohibitionAndResponsibilities
-      )}
-
       <div class="signatures">
-
         <div class="signature">
           <div class="signature-line"></div>
           <div>
@@ -214,23 +221,14 @@ const renderIncidentPdfHtml = incident => {
             Responsável
           </div>
         </div>
-
       </div>
 
       <div class="final-dates">
-
         <div>
           Data de comparecimento do responsável:
           ____ de _____________ de 20___
         </div>
-
-        <div>
-          Arquivado na pasta do estudante em:
-          ____ de _____________ de 20___
-        </div>
-
       </div>
-
     </article>
   `
 }
@@ -310,13 +308,11 @@ const createIncidentPdf = incidents => {
           }
 
           .regulation {
-            margin-top: 3mm;
-            white-space: pre-wrap;
-            overflow-wrap: anywhere;
+            
           }
 
           .signatures {
-            margin-top: 35mm;
+            margin-top: 20mm;
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 25mm;
