@@ -18,7 +18,9 @@ export const getIncidentReportOptions = async () => {
 }
 
 const formatDate = value => {
-  if (!value) return ''
+  if (!value) {
+    return ''
+  }
 
   const date = new Date(`${value}T00:00:00`)
 
@@ -58,120 +60,159 @@ const hasValue = value => {
   return true
 }
 
-const renderField = (label, value) => {
+const renderField = (label, value, inline = false) => {
   if (!hasValue(value)) {
     return ''
   }
 
+  let className = 'field'
+
+  if (inline) {
+    className = 'field inline-field'
+  }
+
+  if (Array.isArray(value)) {
+    const items = value
+      .filter(hasValue)
+      .map(item => `
+        <div class="regulation">
+          ${escapeHtml(item)}
+        </div>
+      `)
+      .join('')
+
+    if (!items) {
+      return ''
+    }
+
+    return `
+      <div class="${className}">
+        <strong>
+          ${escapeHtml(label)}:
+        </strong>
+
+        ${items}
+      </div>
+    `
+  }
+
   return `
-    <div class="field">
-      <div class="label">${escapeHtml(label)}</div>
-      <div class="value">${escapeHtml(value)}</div>
+    <div class="${className}">
+      <strong>
+        ${escapeHtml(label)}:
+      </strong>
+      ${escapeHtml(value)}
     </div>
   `
 }
 
+const renderIncidentDate = incident => {
+  const date = formatDate(incident.date_incident)
+
+  let time = ''
+
+  if (hasValue(incident.time_incident)) {
+    time = escapeHtml(incident.time_incident)
+  }
+
+  if (date && time) {
+    return renderField(
+      'Data ocorrência',
+      `${date} às ${time}`,
+      true
+    )
+  }
+
+  if (date) {
+    return renderField(
+      'Data ocorrência',
+      date,
+      true
+    )
+  }
+
+  if (time) {
+    return renderField(
+      'Data ocorrência',
+      time,
+      true
+    )
+  }
+
+  return ''
+}
+
 const renderIncidentPdfHtml = incident => {
-  const dataOcorrencia = formatDate(incident.date_incident)
-
-  const horaOcorrencia = hasValue(incident.time_incident)
-    ? ` às ${escapeHtml(incident.time_incident)}`
-    : ''
-
-  const dataHtml =
-    dataOcorrencia
-      ? `
-        <div class="field inline-field">
-          <strong>Data ocorrência:</strong>
-          ${escapeHtml(dataOcorrencia)}${horaOcorrencia}
-        </div>
-      `
-      : horaOcorrencia
-        ? `
-          <div class="field inline-field">
-            <strong>Data ocorrência:</strong>
-            ${escapeHtml(horaOcorrencia.replace(' às ', ''))}
-          </div>
-        `
-        : ''
-
-  const tipoHtml = hasValue(incident.type_incident)
-    ? `
-      <div class="field inline-field">
-        <strong>Tipo da ocorrência:</strong>
-        ${escapeHtml(incident.type_incident)}
-      </div>
-    `
-    : ''
-
-  const sanctionHtml = hasValue(incident.sanction)
-    ? `
-      <div class="field inline-field">
-        <strong>Sanção adotada:</strong>
-        ${escapeHtml(incident.sanction)}
-      </div>
-    `
-    : ''
-
-  const regulationsHtml =
-    Array.isArray(incident.regulations)
-      ? incident.regulations
-          .filter(hasValue)
-          .map(regulation => `
-            <div class="regulation">
-              ${escapeHtml(regulation)}
-            </div>
-          `)
-          .join('')
-      : ''
-
   return `
     <article class="incident-report">
 
-      <img src="/c_report.png" style="width: 210mm; max-width: 100%;"/>
+      <img
+        src="/c_report.png"
+        style="width: 210mm; max-width: 100%;"
+      />
 
-      <h1>Relatório de ocorrências</h1>
+      <h1>
+        Relatório de ocorrências
+      </h1>
 
-      ${renderField('Aluno(a)', incident.student)}
+      ${renderField(
+        'Aluno(a)',
+        incident.student
+      )}
 
-      ${renderField('Curso', incident.course)}
+      ${renderField(
+        'Curso',
+        incident.course
+      )}
 
-      ${dataHtml}
+      ${renderIncidentDate(incident)}
 
-      ${tipoHtml}
+      ${renderField(
+        'Tipo da ocorrência',
+        incident.type_incident,
+        true
+      )}
 
       ${renderField(
         'Problema ocorrido',
         incident.description
       )}
 
-      ${sanctionHtml}
+      ${renderField(
+        'Sanção adotada',
+        incident.sanction,
+        true
+      )}
 
       ${renderField(
         'Solução adotada para o problema',
         incident.solution
       )}
 
-      ${
-        regulationsHtml
-          ? `
-            <div class="regulations">
-              ${regulationsHtml}
-            </div>
-          `
-          : ''
-      }
+      ${renderField(
+        'Deveres do aluno',
+        incident.studentDuties
+      )}
+
+      ${renderField(
+        'Proibições e responsabilidades',
+        incident.prohibitionAndResponsibilities
+      )}
 
       <div class="signatures">
 
         <div class="signature">
           <div class="signature-line"></div>
-          <div>Aluno(a)</div>
+          <div>
+            Aluno(a)
+          </div>
         </div>
 
         <div class="signature">
           <div class="signature-line"></div>
-          <div>Responsável</div>
+          <div>
+            Responsável
+          </div>
         </div>
 
       </div>
@@ -195,9 +236,13 @@ const renderIncidentPdfHtml = incident => {
 }
 
 const createIncidentPdf = incidents => {
-  const reports = Array.isArray(incidents)
-    ? incidents
-    : [incidents]
+  let reports = []
+
+  if (Array.isArray(incidents)) {
+    reports = incidents
+  } else {
+    reports = [incidents]
+  }
 
   const html = `
     <!DOCTYPE html>
@@ -260,27 +305,12 @@ const createIncidentPdf = incidents => {
             break-inside: avoid;
           }
 
-          .label {
-            margin-bottom: 1.5mm;
-            font-weight: bold;
-          }
-
-          .value {
-            white-space: pre-wrap;
-            overflow-wrap: anywhere;
-          }
-
           .inline-field {
             margin-bottom: 3mm;
           }
 
-          .regulations {
-            margin-top: 6mm;
-            page-break-inside: avoid;
-          }
-
           .regulation {
-            margin-bottom: 3mm;
+            margin-top: 3mm;
             white-space: pre-wrap;
             overflow-wrap: anywhere;
           }
@@ -384,22 +414,91 @@ export const generateIncidentReportFromIncident = incident => {
     throw new Error('Ocorrência não encontrada.')
   }
 
-  const regulations = [
-    ...(Array.isArray(incident.student_duties) ? incident.student_duties : []),
-    ...(Array.isArray(incident.prohibition_and_responsibilities) ? incident.prohibition_and_responsibilities : [])
-  ]
-    .map(item => typeof item === 'string' ? item : item?.item)
-    .filter(Boolean)
+  let studentDuties = []
 
-  createIncidentPdf([{
-    student: incident.student?.name || incident.student_name || '',
-    course: incident.course?.name || incident.course_name || '',
-    date_incident: incident.date_incident,
-    time_incident: incident.time_incident,
-    type_incident: incident.type_incident?.name || incident.type_incident || '',
-    description: incident.description,
-    sanction: incident.sanction || '',
-    solution: incident.soluction || incident.solution || '',
-    regulations
-  }])
+  if (Array.isArray(incident.student_duties)) {
+    studentDuties = incident.student_duties
+      .map(item => {
+        if (typeof item === 'string') {
+          return item
+        }
+
+        if (item) {
+          return item.item
+        }
+
+        return undefined
+      })
+      .filter(Boolean)
+  }
+
+  let prohibitionAndResponsibilities = []
+
+  if (
+    Array.isArray(
+      incident.prohibition_and_responsibilities
+    )
+  ) {
+    prohibitionAndResponsibilities =
+      incident.prohibition_and_responsibilities
+        .map(item => {
+          if (typeof item === 'string') {
+            return item
+          }
+
+          if (item) {
+            return item.item
+          }
+
+          return undefined
+        })
+        .filter(Boolean)
+  }
+
+  let student = ''
+
+  if (incident.student?.name) {
+    student = incident.student.name
+  } else if (incident.student_name) {
+    student = incident.student_name
+  }
+
+  let course = ''
+
+  if (incident.course?.name) {
+    course = incident.course.name
+  } else if (incident.course_name) {
+    course = incident.course_name
+  }
+
+  let typeIncident = ''
+
+  if (incident.type_incident?.name) {
+    typeIncident = incident.type_incident.name
+  } else if (incident.type_incident) {
+    typeIncident = incident.type_incident
+  }
+
+  let solution = ''
+
+  if (incident.soluction) {
+    solution = incident.soluction
+  } else if (incident.solution) {
+    solution = incident.solution
+  }
+
+  createIncidentPdf([
+    {
+      student,
+      course,
+      date_incident: incident.date_incident,
+      time_incident: incident.time_incident,
+      type_incident: typeIncident,
+      description: incident.description,
+      sanction: incident.sanction || '',
+      solution,
+      studentDuties,
+      prohibitionAndResponsibilities
+    }
+  ])
 }
