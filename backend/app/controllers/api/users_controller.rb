@@ -6,7 +6,7 @@ class Api::UsersController < ApplicationController
   def index
     authorize! :read, User
 
-    users = User.where(set_polo)
+    users = campus_scope(User).includes(:course, :polo, :permissions)
                 .order("#{set_order}": :desc)
                 .search(params[:search])
                 .page(params[:page])
@@ -23,7 +23,7 @@ class Api::UsersController < ApplicationController
   def show
     authorize! :read, User
 
-    user = User.find(params[:id])
+    user = scoped_user(params[:id])
 
     render json: {
       user: user.as_json(
@@ -52,20 +52,9 @@ class Api::UsersController < ApplicationController
   def update
     authorize! :update, User
 
-    user = User.find(params[:id])
+    user = scoped_user(params[:id], write: true)
 
-    attributes = params.require(:user).permit(
-      :name,
-      :email,
-      :username,
-      :siape,
-      :polo_id,
-      :admin,
-      :status,
-      :password,
-      :password_confirmation,
-      :avatar
-    )
+    attributes = user_params
 
     attributes.delete(:password) if attributes[:password].blank?
     attributes.delete(:password_confirmation) if attributes[:password_confirmation].blank?
@@ -119,7 +108,7 @@ class Api::UsersController < ApplicationController
   def destroy
     authorize! :destroy, User
 
-    user = User.find(params[:id])
+    user = scoped_user(params[:id], write: true)
 
     if user.id == current_user.id
       return render json: {
@@ -160,20 +149,7 @@ class Api::UsersController < ApplicationController
   private
 
   def user_params
-    params.require(:user).permit(
-      :name,
-      :siape,
-      :username,
-      :email,
-      :password,
-      :password_confirmation,
-      :status,
-      :avatar,
-      :course_id,
-      :admin,
-      :avatar,
-      :polo_id
-    )
+    permitted_user_attributes
   end
 
   def get_user_from_token
@@ -183,7 +159,7 @@ class Api::UsersController < ApplicationController
 
     jwt_payload, = JWT.decode(
       token,
-      Rails.application.credentials.jwt_secret_key,
+      (ENV['JWT_SECRET_KEY'].presence || Rails.application.credentials.jwt_secret_key),
       true,
       { algorithm: 'HS256' }
     )

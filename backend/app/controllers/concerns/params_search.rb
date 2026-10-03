@@ -12,6 +12,7 @@ module ParamsSearch
   end
 
   def set_amount_return
-    params[:return].presence || '15'
+    amount = (params[:amount].presence || params[:return].presence || 15).to_i
+    amount.positive? ? [amount, 100].min : 15
   end
 end

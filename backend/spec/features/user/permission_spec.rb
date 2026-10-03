@@ -21,7 +21,7 @@ context 'Check access permissions' do
           entity: entity,
           can_read: value
         )
-        sign_in @user
+        sign_in_via_form @user
       end
 
       scenario "link for manager #{value}" do

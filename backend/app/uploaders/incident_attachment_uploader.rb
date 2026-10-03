@@ -3,6 +3,11 @@
 class IncidentAttachmentUploader < CarrierWave::Uploader::Base
   storage :file
 
+  # Never serve disciplinary records directly from public/.
+  def root
+    Rails.root.join('storage', Rails.env, 'private')
+  end
+
   def store_dir
     "uploads/#{model.class.to_s.underscore}/#{mounted_as}/#{model.incident_id}"
   end

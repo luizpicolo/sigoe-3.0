@@ -18,7 +18,7 @@ RSpec.describe UsersController, type: :controller do
     context 'params with empty value' do
       it 'renders page with error message' do
         add_permission @entity, @user, create: true
-        sign_in @user
+        sign_in @user, scope: :user
         post :create, params: { "#{@entity.downcase}": { name: '' } }
         expect(response).to render_template(:new)
         expect(flash[:error]).to_not be_nil
@@ -30,8 +30,8 @@ RSpec.describe UsersController, type: :controller do
   describe 'PUT #update' do
     context 'params with empty value' do
       it 'renders page with error message' do
-        add_permission @entity, @user, update: false
-        sign_in @user
+        add_permission @entity, @user, update: true
+        sign_in @user, scope: :user
         put :update,
             params: { id: @model.id, commit: 'Salvar',
                       "#{@entity.downcase}": { email: nil, password: '' } }
@@ -48,7 +48,7 @@ RSpec.describe UsersController, type: :controller do
         expect_any_instance_of(User).to receive(:destroy).and_return(false)
 
         add_permission @entity, @user, destroy: true
-        sign_in @user
+        sign_in @user, scope: :user
         delete :destroy, params: { id: @model.id }
         expect(response).to render_template(:new)
         expect(flash[:error]).to_not be_nil

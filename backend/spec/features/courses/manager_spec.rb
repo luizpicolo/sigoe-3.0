@@ -11,7 +11,7 @@ context 'Manager (crud) entity Course' do
       user: @user,
       entity: Course
     )
-    sign_in @user
+    sign_in_via_form @user
   end
 
   feature 'create' do
@@ -23,10 +23,11 @@ context 'Manager (crud) entity Course' do
       expect(page).to have_content('Curso cadastro com sucesso')
     end
 
-    scenario 'with existent title' do
+    scenario 'allows the same name for distinct course records' do
       visit new_course_path
       create_new_course name: @course.name
-      expect(page).to have_content('Nome já está em uso')
+      expect(page).to have_content('Curso cadastro com sucesso')
+      expect(Course.where(name: @course.name, polo_id: @user.polo_id).count).to eq(2)
     end
   end
 

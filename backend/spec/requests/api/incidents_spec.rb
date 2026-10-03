@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.describe 'Api::Incidents', type: :request do
   let!(:admin) { create(:user, admin: true) }
-  let!(:incident) { create(:incident) }
+  let!(:incident) { create(:incident, course: create(:course, polo: admin.polo)) }
 
   describe 'sem autenticação' do
     it 'retorna não autorizado' do
@@ -13,7 +13,7 @@ RSpec.describe 'Api::Incidents', type: :request do
   end
 
   describe 'com autenticação' do
-    before { sign_in admin }
+    before { sign_in admin, scope: :user }
 
     it 'lista ocorrências' do
       get '/api/incidents', params: { page: 1, amount: 10 }

@@ -1,12 +1,11 @@
 <script setup>
 import { ref } from 'vue'
 import { error, success, confirm } from '@/utils/sweetPopup2'
-import { uploadAttachment, removeAttachment } from '@/services/incidents'
+import { uploadAttachment, removeAttachment, downloadAttachment } from '@/services/incidents'
 import Button from '@/components/ui/button.vue'
 import Card from '@/components/ui/card.vue'
 import { can } from '@/services/permissions'
 
-const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000'
 
 const props = defineProps({
   incidentId: { type: [String, Number], required: true },
@@ -46,6 +45,22 @@ const upload = async event => {
   }
 }
 
+const download = async attachment => {
+  try {
+    const blob = await downloadAttachment(props.incidentId, attachment.id)
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = attachment.filename
+    document.body.appendChild(link)
+    link.click()
+    link.remove()
+    setTimeout(() => URL.revokeObjectURL(url), 1000)
+  } catch {
+    error('Não foi possível baixar o PDF.')
+  }
+}
+
 const deleteAttachment = async attachment => {
   if (!(await confirm('Excluir o arquivo "' + attachment.filename + '"?'))) return
 
@@ -81,12 +96,12 @@ const deleteAttachment = async attachment => {
 
       <ul v-else class="divide-y divide-gray-200">
         <li v-for="attachment in attachments" :key="attachment.id" class="py-3 flex items-center justify-between gap-3">
-          <a :href="BASE_URL + attachment.url" target="_blank" rel="noopener noreferrer" class="text-sm text-blue-600 hover:underline flex items-center gap-2">
+          <button type="button" @click="download(attachment)" class="text-sm text-blue-600 hover:underline flex items-center gap-2">
             <i class="fa-solid fa-file-pdf"></i>
             {{ attachment.filename }}
-          </a>
+          </button>
 
-          <Button :disabled="!can('occurrences', 'attach_pdf')" customClass="bg-red-600 hover:bg-red-700" @click="deleteAttachment(attachment)">
+          <Button :disabled="!can('occurrences', 'update')" customClass="bg-red-600 hover:bg-red-700" @click="deleteAttachment(attachment)">
             <i class="fa-solid fa-trash p-1"></i>
             Excluir
           </Button>

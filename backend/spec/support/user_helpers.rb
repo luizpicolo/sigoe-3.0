@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
 module UserHelpers
-  def sign_in(user, options = {})
+  def sign_in_via_form(user, options = {})
     password = options[:password] || user.password
 
-    visit root_path
+    visit new_user_session_path
 
     fill_in 'Usuário', with: user.username
     fill_in 'Senha', with: password

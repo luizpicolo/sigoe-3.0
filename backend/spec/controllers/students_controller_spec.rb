@@ -8,7 +8,7 @@ RSpec.describe StudentsController, type: :controller do
     @attr = FactoryBot.attributes_for(:student)
         .merge(course_id: FactoryBot.create(:course, polo: @user.polo).id)
         .merge(school_group_id: FactoryBot.create(:school_group, polo: @user.polo).id)
-    @model = FactoryBot.create(:student)
+    @model = FactoryBot.create(:student, course_id: @attr[:course_id], school_group_id: @attr[:school_group_id])
     @entity = 'Student'
     @path = students_path
   end

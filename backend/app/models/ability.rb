@@ -10,21 +10,24 @@ class Ability
   def initialize(user)
     user ||= User.new
 
-    can [:manage], :all if user.admin?
+    can [:manage], :all if user.admin? || user.super_admin?
     user.permissions.each do |permission|
+      entity = permission.entity.to_s.safe_constantize
+      next unless entity.is_a?(Class) && entity <= ApplicationRecord
       # Permissões extras para ocorrências
       if permission.can_extras?
-        can [:sanction], eval(permission.entity) if permission.can_extras?
-        can [:confirmation], eval(permission.entity) if permission.can_extras?
-        can [:sign], eval(permission.entity) if permission.can_extras?
+        can [:sanction], entity if permission.can_extras?
+        can [:confirmation], entity if permission.can_extras?
+        can [:sign], entity if permission.can_extras?
       end
       can [:attach_pdf], Incident if permission.can_attach_pdf? && permission.entity == 'Incident'
-      can [:create], eval(permission.entity) if permission.can_create?
-      can [:read_restricted], eval(permission.entity) if permission.can_read_restricted?
-      can [:export_to_academic_system], eval(permission.entity) if permission.can_export_to_academic_system?
-      can [:read], eval(permission.entity) if permission.can_read?
-      can [:update], eval(permission.entity) if permission.can_update?
-      can [:destroy], eval(permission.entity) if permission.can_destroy?
+      can [:create], entity if permission.can_create?
+      can [:read], entity if permission.can_read_restricted?
+      can [:read_restricted], entity if permission.can_read_restricted?
+      can [:export_to_academic_system], entity if permission.can_export_to_academic_system?
+      can [:read], entity if permission.can_read?
+      can [:update], entity if permission.can_update?
+      can [:destroy], entity if permission.can_destroy?
     end
   end
 end

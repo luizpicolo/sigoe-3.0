@@ -3,6 +3,8 @@
 class PermissionsController < ApplicationController
   include ParamsSearch
 
+  before_action :authorize_permission_management!
+
   load_and_authorize_resource
 
   before_action :set_permission, only: %i[edit destroy update]
@@ -66,8 +68,13 @@ class PermissionsController < ApplicationController
 
   private
 
+  def authorize_permission_management!
+    raise CanCan::AccessDenied unless current_user.admin? || current_user.super_admin?
+    @permission_user = scoped_user(params[:user_id], write: true)
+  end
+
   def set_permission
-    @permission = Permission.find(params[:id])
+    @permission = @permission_user.permissions.find(params[:id])
   end
 
   def permission_params

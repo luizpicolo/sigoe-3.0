@@ -14,7 +14,7 @@ context 'When keeping Incident' do
       user: @user,
       entity: Incident
     )
-    sign_in @user
+    sign_in_via_form @user
   end
 
   feature 'i should create an entry' do

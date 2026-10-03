@@ -27,6 +27,7 @@ config/initializers/secret_token.rb
 
 # Ignore uploader folder
 /public/uploads/*
+/storage/
 /public/assets/*
 
 # Ignore application configuration

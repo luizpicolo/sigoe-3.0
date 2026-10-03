@@ -8,7 +8,7 @@ class Api::CoursesController < ApplicationController
 
   def index
     authorize! :read, Course
-    courses = Course.where(set_polo)
+    courses = campus_scope(Course)
                     .order("#{set_order}": :desc)
                     .search(params[:search])
                     .page(params[:page])
@@ -34,7 +34,6 @@ class Api::CoursesController < ApplicationController
 
   def update
     authorize! :update, Course
-    p course_params
     if @course.update(course_params)
       render json: { course: course_json(@course) }
     else
@@ -52,8 +51,8 @@ class Api::CoursesController < ApplicationController
 
   private
 
-  def set_course = @course = Course.find(params[:id])
-  def course_params = params.require(:course).permit(:name, :initial, :polo_id)
+  def set_course = @course = campus_scope(Course).find(params[:id])
+  def course_params = campus_attributes(params.require(:course).permit(:name, :initial, :polo_id))
   def course_json(course)
     course.as_json(only: %i[id name initial polo_id], include: { polo: { only: %i[id name] } })
   end

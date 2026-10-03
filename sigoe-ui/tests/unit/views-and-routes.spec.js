@@ -4,7 +4,7 @@ import router from '@/router'
 const viewModules = import.meta.glob('../../src/views/**/*.vue', { eager: true })
 
 describe('Views', () => {
-  it.each(Object.entries(viewModules))('discovers %s', ([, module]) => {
+  it.each(Object.entries(viewModules))('discovers %s', (_, module) => {
     expect(module).toBeDefined()
   })
 })

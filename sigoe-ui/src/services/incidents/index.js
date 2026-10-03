@@ -55,3 +55,10 @@ export const uploadAttachment = async (id, file) => {
 export const removeAttachment = async (incidentId, attachmentId) => {
   await axios.delete(`${BASE_URL}/api/incidents/${incidentId}/attachments/${attachmentId}`, config())
 }
+
+export const downloadAttachment = async (incidentId, attachmentId) => {
+  const response = await axios.get(`${BASE_URL}/api/incidents/${incidentId}/attachments/${attachmentId}`, {
+    ...config(), responseType: 'blob'
+  })
+  return response.data
+}

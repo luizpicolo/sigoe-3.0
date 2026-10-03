@@ -11,7 +11,7 @@ context 'Find key by your search scope' do
       user: @user,
       entity: Course
     )
-    sign_in @user
+    sign_in_via_form @user
   end
 
   feature 'search user' do

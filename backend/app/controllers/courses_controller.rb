@@ -12,7 +12,7 @@ class CoursesController < ApplicationController
     add_breadcrumb 'Administrador'
     add_breadcrumb 'Cursos'
 
-    @courses = Course.where(set_polo)
+    @courses = campus_scope(Course)
         .order("#{set_order}": :desc)
         .search(params[:search])
         .page(params[:page]).per(set_amount_return)
@@ -64,10 +64,10 @@ class CoursesController < ApplicationController
   private
 
   def set_course
-    @courses = Course.find(params[:id])
+    @courses = campus_scope(Course).find(params[:id])
   end
 
   def course_params
-    params.require(:course).permit(:name, :initial)
+    campus_attributes(params.require(:course).permit(:name, :initial, :polo_id))
   end
 end
