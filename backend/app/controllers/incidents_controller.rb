@@ -8,7 +8,6 @@ class IncidentsController < ApplicationController
   before_action :set_incident, only: %i[
       edit destroy update confirmation sign show export_to_academic_system
   ]
-  before_action :authorize_private_incident!, only: %i[edit destroy update confirmation sign show export_to_academic_system]
 
   add_breadcrumb 'Home', :root_path
 
@@ -16,8 +15,7 @@ class IncidentsController < ApplicationController
     add_breadcrumb 'Ocorrências'
     add_breadcrumb 'Lista de Ocorrências'
 
-    @incidents = Incident.joins(:course)
-                         .where(params_return)
+    @incidents = Incident.visible_to(current_user).includes(:student, :course, :type_incident, :user)
                          .order("#{set_order}": :desc)
                          .search(params[:search])
                          .page(params[:page]).per(set_amount_return)
@@ -38,7 +36,7 @@ class IncidentsController < ApplicationController
     @incident.user = current_user
     @incident.course = course_by_student(incident_params[:student_id])
     if @incident.save
-      unless incident_params[:sector_id].empty?
+      if incident_params[:sector_id].present?
         send_email_to(Sector.find(incident_params[:sector_id]).email, @incident)
       end
       redirect_to incidents_path, flash: { success: 'Ocorrência cadastra com sucesso' }
@@ -59,7 +57,7 @@ class IncidentsController < ApplicationController
 
   def update
     if @incident.update(incident_params)
-      unless incident_params[:sector_id].empty?
+      if incident_params[:sector_id].present?
         send_email_to(Sector.find(incident_params[:sector_id]).email, @incident)
       end
       redirect_to incidents_path, flash: { success: 'Ocorrência atualizada com sucesso' }
@@ -110,7 +108,7 @@ class IncidentsController < ApplicationController
   private
 
   def course_by_student(student_id)
-    Student.find(student_id).course
+    campus_scope(Student).find(student_id).course
   end
 
   def send_email_to(sector, insident = nil)
@@ -121,14 +119,7 @@ class IncidentsController < ApplicationController
   end
 
   def set_incident
-    @incident = Incident.find(params[:id] || params[:incident_id])
-  end
-
-  def authorize_private_incident!
-    return if @incident.visibility != 'private'
-    return if current_user.super_admin? || @incident.user_id == current_user.id
-
-    raise CanCan::AccessDenied
+    @incident = Incident.visible_to(current_user).find(params[:id] || params[:incident_id])
   end
 
   def params_return
@@ -139,8 +130,15 @@ class IncidentsController < ApplicationController
   end
 
   def incident_params
-    params.require(:incident).permit(
-      :type_incident_id, :student_id, :course_id, :date_incident, :sector_id, :assistant_id, :time_incident, :institution, :description, :soluction, :is_resolved, :visibility, :type_student, :sanction, prohibition_and_responsibility_ids: [], student_duty_ids: []
+    permitted = params.require(:incident).permit(
+      :type_incident_id, :student_id, :date_incident, :sector_id, :assistant_id, :time_incident, :institution, :description, :soluction, :is_resolved, :visibility, :type_student, :sanction, prohibition_and_responsibility_ids: [], student_duty_ids: []
     )
+    validate_campus_links!(permitted, student_id: Student, assistant_id: User, sector_id: Sector)
+    if permitted[:student_id].present?
+      permitted[:course_id] = campus_scope(Student).find(permitted[:student_id]).course_id
+    end
+    return permitted if can?(:sanction, Incident)
+
+    permitted.except(:soluction, :is_resolved, :sanction, :student_duty_ids, :prohibition_and_responsibility_ids)
   end
 end

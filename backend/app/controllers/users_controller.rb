@@ -13,7 +13,7 @@ class UsersController < ApplicationController
     add_breadcrumb 'Administrador'
     add_breadcrumb 'Usuários'
 
-    @users = User.where(set_polo)
+    @users = campus_scope(User)
         .order("#{set_order}": :desc)
         .search(params[:search])
         .page(params[:page])
@@ -45,7 +45,14 @@ class UsersController < ApplicationController
   end
 
   def update
-    if @user.update(check_password(user_params))
+    if params[:commit] == 'Trocar senha' && @user == current_user
+      attributes = params.require(:user).permit(:current_password, :password, :password_confirmation)
+      saved = @user.update_with_password(attributes)
+    else
+      authorize! :update, @user
+      saved = @user.update(check_password(user_params))
+    end
+    if saved
       redirect_to users_path, flash: { success: 'Usuário atualizado com sucesso' }
     else
       flash.now[:error] = @user.errors.full_messages
@@ -73,11 +80,11 @@ class UsersController < ApplicationController
   private
 
   def set_user
-    @user = User.find(params[:id])
+    @user = scoped_user(params[:id], write: true)
   end
 
   def check_password(user_params)
-    if user_params[:password].empty?
+    if user_params[:password].blank?
       user_params.delete(:password)
       user_params.delete(:password_confirmation)
     end
@@ -91,9 +98,6 @@ class UsersController < ApplicationController
   end
 
   def user_params
-    params.require(:user).permit(
-      :name, :siape, :username, :email, :password,
-      :password_confirmation, :status, :avatar, :course_id, :admin, :polo_id
-    )
+    permitted_user_attributes
   end
 end

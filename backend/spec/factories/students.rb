@@ -31,7 +31,7 @@ FactoryBot.define do
     course factory: :course
     school_group factory: :school_group
     ra { '12345678' }
-    photo { Faker::Placeholdit.image }
+    photo { nil }
     responsible { Faker::Name.name }
     responsible_contact { Faker::Internet.email }
     contact { Faker::Internet.email }

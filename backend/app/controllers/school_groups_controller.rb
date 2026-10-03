@@ -12,7 +12,7 @@ class SchoolGroupsController < ApplicationController
     add_breadcrumb 'Administrador'
     add_breadcrumb 'Turmas'
 
-    @school_groups = SchoolGroup.where(set_polo)
+    @school_groups = campus_scope(SchoolGroup)
         .order("#{set_order}": :desc)
         .search(params[:search])
         .page(params[:page]).per(set_amount_return)
@@ -68,10 +68,10 @@ class SchoolGroupsController < ApplicationController
   end
 
   def set_school_group
-    @school_group = SchoolGroup.find(params[:id])
+    @school_group = campus_scope(SchoolGroup).find(params[:id])
   end
 
   def school_group_params
-    params.require(:school_group).permit(:name, :identifier)
+    campus_attributes(params.require(:school_group).permit(:name, :identifier, :polo_id))
   end
 end

@@ -10,7 +10,7 @@ context 'Find users by your search scope' do
       user: @users.first,
       entity: User
     )
-    sign_in @users.first
+    sign_in_via_form @users.first
   end
 
   feature 'search user' do

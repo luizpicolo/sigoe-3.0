@@ -1,9 +1,7 @@
-import { vi } from 'vitest'
+import { beforeEach, vi } from 'vitest'
 
-Object.defineProperty(window, 'localStorage', {
-  value: {
-    getItem: vi.fn(() => 'test-token'),
-    setItem: vi.fn(),
-    removeItem: vi.fn()
-  }
+beforeEach(() => {
+  vi.restoreAllMocks()
+  localStorage.clear()
+  localStorage.setItem('jwt', 'test-token')
 })

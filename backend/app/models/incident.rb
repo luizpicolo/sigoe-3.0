@@ -34,6 +34,20 @@ class Incident < ApplicationRecord
     attributes date_incident: 'date_incident'
   end
 
+  # Visibility is identical for lists, reports, dashboards and direct access.
+  def self.visible_to(user)
+    return none unless user
+    return all if user.super_admin?
+    return none if user.polo_id.nil?
+
+    scope = joins(:course).where(courses: { polo_id: user.polo_id })
+    if !user.admin? && user.permissions.exists?(entity: 'Incident', can_read_restricted: true)
+      scope.where(user_id: user.id)
+    else
+      scope.where(visibility: 'public').or(scope.where(user_id: user.id))
+    end
+  end
+
   def student_name
     student.present? ? student.name : ' ---- '
   end
@@ -53,8 +67,8 @@ class Incident < ApplicationRecord
   def self.by_is_resolved(params_return = {})
     result = joins(:course).where(params_return).group(:is_resolved).order(Arel.sql('COUNT(*) DESC')).count
     result['Não'] = result.delete 'no_'
+    result['Sem Categoria'] = result.delete nil
     result['Sim'] = result.delete 'yes_'
-    result['Não'] = result.delete nil
     result.compact
   end
 

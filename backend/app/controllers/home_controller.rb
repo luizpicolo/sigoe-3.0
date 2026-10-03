@@ -6,7 +6,7 @@ class HomeController < ApplicationController
   add_breadcrumb 'Home', :root_path
 
   def index
-    @params_return = params_return
+    @incidents = can?(:read, Incident) ? Incident.visible_to(current_user) : Incident.none
   end
 
   private

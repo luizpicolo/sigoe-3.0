@@ -17,7 +17,7 @@ RSpec.describe CoursesController, type: :controller do
     context 'params with empty value' do
       it 'renders page with error message' do
         add_permission @entity, @user, create: true
-        sign_in @user
+        sign_in @user, scope: :user
         post :create, params: { "#{@entity.downcase}": { name: '' } }
         expect(response).to render_template(:new)
         expect(flash[:error]).to_not be_nil
@@ -30,7 +30,7 @@ RSpec.describe CoursesController, type: :controller do
     context 'params with empty value' do
       it 'renders page with error message' do
         add_permission @entity, @user, update: true
-        sign_in @user
+        sign_in @user, scope: :user
         put :update, params: { id: @model.id, "#{@entity.downcase}": { name: '' } }
         expect(response).to render_template(:edit)
         expect(flash[:error]).to_not be_nil
@@ -45,7 +45,7 @@ RSpec.describe CoursesController, type: :controller do
         expect_any_instance_of(Course).to receive(:destroy).and_return(false)
 
         add_permission @entity, @user, destroy: true
-        sign_in @user
+        sign_in @user, scope: :user
         delete :destroy, params: { id: @model.id }
         expect(response).to render_template(:new)
         expect(flash[:error]).to_not be_nil

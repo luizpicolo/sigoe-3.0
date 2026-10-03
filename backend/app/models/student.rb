@@ -62,8 +62,8 @@ class Student < ApplicationRecord
         .order('name asc').collect { |p| [p.name, p.id] }
   end
 
-  def self.import(attributes, course)
-    student = find_by(ra: attributes[2]) || new
+  def self.import(attributes, course, scope = all)
+    student = scope.find_by(ra: attributes[2]) || new
     student.assign_attributes(set_attributes(student, course, attributes))
     student.save(validate: false)
   end

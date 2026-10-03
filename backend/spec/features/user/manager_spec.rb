@@ -10,7 +10,7 @@ context 'Manager (crud) entity User' do
       user: @user,
       entity: User
     )
-    sign_in @user
+    sign_in_via_form @user
   end
 
   feature 'create' do

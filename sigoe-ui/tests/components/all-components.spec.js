@@ -12,17 +12,17 @@ const globalOptions = {
 }
 
 describe('Componentes Vue', () => {
-  it.each(Object.entries(componentModules))('exporta o componente %s', ([, module]) => {
+  it.each(Object.entries(componentModules))('exporta o componente %s', (_, module) => {
     expect(module?.default).toBeDefined()
   })
 
-  it.each(Object.entries(componentModules))('monta o componente %s', ([path, module]) => {
+  it.each(Object.entries(componentModules))('monta o componente %s', (path, module) => {
     const component = module?.default
     expect(component).toBeDefined()
 
     const wrapper = shallowMount(component, {
       global: globalOptions,
-      props: {},
+      props: { incident: {}, incidentId: 1, stateUser: { user: {} } },
     })
 
     expect(wrapper.exists()).toBe(true)

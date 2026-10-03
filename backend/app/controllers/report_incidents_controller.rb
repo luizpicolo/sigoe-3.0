@@ -3,7 +3,7 @@
 class ReportIncidentsController < ApplicationController
   include ParamsSearch
 
-  load_and_authorize_resource Incident
+  before_action -> { authorize! :read, Incident }
   add_breadcrumb 'Home', :root_path
 
   skip_before_action :verify_authenticity_token
@@ -17,9 +17,7 @@ class ReportIncidentsController < ApplicationController
   end
 
   def create
-    p set_conditional
-    incidents = Incident.joins(:student)
-        .where(params_return)
+    incidents = Incident.visible_to(current_user).includes(:student, :course, :type_incident)
         .search(set_conditional)
         .search(set_date_range)
         .order(date_incident: :desc)

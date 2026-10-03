@@ -12,8 +12,7 @@ class StudentsController < ApplicationController
     add_breadcrumb 'Administrador'
     add_breadcrumb 'Estudantes'
 
-    @students = Student.joins(:course)
-        .where(params_return)
+    @students = campus_scope(Student).includes(:course, :school_group)
         .order("#{set_order}": :desc)
         .search(params[:search])
         .page(params[:page]).per(set_amount_return)
@@ -69,11 +68,11 @@ class StudentsController < ApplicationController
   end
 
   def import_xls
-    course = Course.find(params[:course])
+    course = campus_scope(Course).find(params[:course])
     book = Spreadsheet.open params[:xls].tempfile.path
     students_attributes = book.worksheet 0
     students_attributes.each 1 do |attributes|
-      Student.import(attributes, course)
+      Student.import(attributes, course, campus_scope(Student))
     end
     redirect_to students_path
   end
@@ -81,11 +80,11 @@ class StudentsController < ApplicationController
   private
 
   def set_student
-    @student = Student.find(params[:id])
+    @student = campus_scope(Student).find(params[:id])
   end
 
   def check_password(student_params)
-    if student_params[:password].empty?
+    if student_params[:password].blank?
       student_params.delete(:password)
       student_params.delete(:password_confirmation)
     end
@@ -101,8 +100,9 @@ class StudentsController < ApplicationController
   end
 
   def student_params
-    params.require(:student).permit(
+    attributes = params.require(:student).permit(
       :name, :photo, :course_id, :responsible, :responsible_contact, :contact, :password, :password_confirmation, :ra, :cpf, :course_situation, :enrollment, :school_group_id
     )
+    validate_campus_links!(attributes, course_id: Course, school_group_id: SchoolGroup)
   end
 end

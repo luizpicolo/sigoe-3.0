@@ -66,6 +66,12 @@ describe('permissões', () => {
     expect(can('occurrences', 'attach_pdf')).toBe(true)
   })
 
+  it('permite abrir ocorrências com leitura restrita, sem conceder edição', () => {
+    permissionState.permissions = { occurrences: { can_read_restricted: true } }
+    expect(can('occurrences', 'read')).toBe(true)
+    expect(can('occurrences', 'update')).toBe(false)
+  })
+
   it('permite todas as ações para super administrador', () => {
     permissionState.super_admin = true
     expect(can('qualquer-entidade', 'qualquer-acao')).toBe(true)

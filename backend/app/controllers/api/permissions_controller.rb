@@ -18,14 +18,13 @@ class Api::PermissionsController < ApplicationController
   end
 
   def show
-    p params[:id]
     authorize_permission_management!
-    render json: permission_payload(User.find(params[:id]))
+    render json: permission_payload(scoped_user(params[:id], write: true))
   end
 
   def update
     authorize_permission_management!
-    user = User.find(params[:id])
+    user = scoped_user(params[:id], write: true)
     requested_permissions = params.require(:permissions)
 
     unless requested_permissions.is_a?(Array)
@@ -51,9 +50,7 @@ class Api::PermissionsController < ApplicationController
   private
 
   def authorize_permission_management!
-    return if current_user.admin?
-
-    render json: { error: 'Apenas administradores podem gerenciar permissões.' }, status: :forbidden
+    raise CanCan::AccessDenied unless current_user.admin? || current_user.super_admin?
   end
 
   def permission_payload(user)

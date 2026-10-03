@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.describe 'Api::Users', type: :request do
   let!(:admin) { create(:user, admin: true) }
-  let!(:user) { create(:user, name: 'Usuário Original') }
+  let!(:user) { create(:user, polo: admin.polo, name: 'Usuário Original') }
 
   describe 'sem autenticação' do
     it 'retorna não autorizado ao listar usuários' do
@@ -13,7 +13,7 @@ RSpec.describe 'Api::Users', type: :request do
   end
 
   describe 'com autenticação' do
-    before { sign_in admin }
+    before { sign_in admin, scope: :user }
 
     describe 'GET /api/users' do
       it 'lista os usuários' do

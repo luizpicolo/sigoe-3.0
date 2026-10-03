@@ -57,6 +57,7 @@ export const can = (entity, action = 'read') => {
 
   const entityPermissions = permissionState.permissions?.[entity]
   if (!entityPermissions) return false
+  if (entity === 'occurrences' && action === 'read' && entityPermissions.can_read_restricted === true) return true
 
   return entityPermissions[action] === true || entityPermissions[`can_${action}`] === true
 }
