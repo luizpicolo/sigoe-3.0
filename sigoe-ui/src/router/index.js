@@ -1,22 +1,55 @@
 import { createRouter, createWebHistory } from "vue-router"
 import { isTokenValid } from "@/services/authentication"
 import { can, loadCurrentPermissions, permissionState } from "@/services/permissions"
-import Home from "@/views/home.vue"; import Login from "@/views/login.vue"; import Forbidden from "@/views/forbidden.vue"; import UserList from "@/views/users/list.vue"; import UserView from "@/views/users/show.vue"; import UserForm from "@/views/users/form.vue"; import UserPermissions from "@/views/users/permissions.vue"; import StudentList from "@/views/students/list.vue"; import StudentView from "@/views/students/show.vue"; import StudentForm from "@/views/students/form.vue"; import CourseList from "@/views/courses/list.vue"; import CourseForm from "@/views/courses/form.vue"; import SchoolGroupsList from "@/views/school_groups/list.vue"; import SchoolGroupForm from "@/views/school_groups/form.vue"; import IncidentsList from "@/views/incidents/list.vue"; import IncidentsForm from "@/views/incidents/form.vue"; import IncidentsView from "@/views/incidents/show.vue"; import ChangePassword from "@/views/users/change-password.vue"
-import MobileDashboard from "@/views/mobile/Dashboard.vue"
-import MobileIncidentList from "@/views/mobile/incidents/Index.vue"
-import MobileIncidentForm from "@/views/mobile/incidents/Form.vue"
-import MobileIncidentShow from "@/views/mobile/incidents/Show.vue"
-import MobileCourseList from "@/views/mobile/courses/Index.vue"
-import MobileCourseForm from "@/views/mobile/courses/Form.vue"
-import MobileSchoolGroupList from "@/views/mobile/school-groups/Index.vue"
-import MobileSchoolGroupForm from "@/views/mobile/school-groups/Form.vue"
-import MobileStudentList from "@/views/mobile/students/Index.vue"
-import MobileStudentForm from "@/views/mobile/students/Form.vue"
-import MobileStudentShow from "@/views/mobile/students/Show.vue"
-import MobileUserList from "@/views/mobile/users/Index.vue"
-import MobileUserForm from "@/views/mobile/users/Form.vue"
-import MobileUserShow from "@/views/mobile/users/Show.vue"
-import MobileUserPermissions from "@/views/mobile/users/Permissions.vue"
+const Home = () => import("@/views/home.vue")
+ const Login = () => import("@/views/login.vue")
+ const Forbidden = () => import("@/views/forbidden.vue")
+ const UserList = () => import("@/views/users/list.vue")
+ const UserView = () => import("@/views/users/show.vue")
+ const UserForm = () => import("@/views/users/form.vue")
+ const UserPermissions = () => import("@/views/users/permissions.vue")
+ const StudentList = () => import("@/views/students/list.vue")
+ const StudentView = () => import("@/views/students/show.vue")
+ const StudentForm = () => import("@/views/students/form.vue")
+ const CourseList = () => import("@/views/courses/list.vue")
+ const CourseForm = () => import("@/views/courses/form.vue")
+ const SchoolGroupsList = () => import("@/views/school_groups/list.vue")
+ const SchoolGroupForm = () => import("@/views/school_groups/form.vue")
+ const IncidentsList = () => import("@/views/incidents/list.vue")
+ const IncidentsForm = () => import("@/views/incidents/form.vue")
+ const IncidentsView = () => import("@/views/incidents/show.vue")
+ const ChangePassword = () => import("@/views/users/change-password.vue")
+
+const MobileDashboard = () => import("@/views/mobile/Dashboard.vue")
+
+const MobileIncidentList = () => import("@/views/mobile/incidents/Index.vue")
+
+const MobileIncidentForm = () => import("@/views/mobile/incidents/Form.vue")
+
+const MobileIncidentShow = () => import("@/views/mobile/incidents/Show.vue")
+
+const MobileCourseList = () => import("@/views/mobile/courses/Index.vue")
+
+const MobileCourseForm = () => import("@/views/mobile/courses/Form.vue")
+
+const MobileSchoolGroupList = () => import("@/views/mobile/school-groups/Index.vue")
+
+const MobileSchoolGroupForm = () => import("@/views/mobile/school-groups/Form.vue")
+
+const MobileStudentList = () => import("@/views/mobile/students/Index.vue")
+
+const MobileStudentForm = () => import("@/views/mobile/students/Form.vue")
+
+const MobileStudentShow = () => import("@/views/mobile/students/Show.vue")
+
+const MobileUserList = () => import("@/views/mobile/users/Index.vue")
+
+const MobileUserForm = () => import("@/views/mobile/users/Form.vue")
+
+const MobileUserShow = () => import("@/views/mobile/users/Show.vue")
+
+const MobileUserPermissions = () => import("@/views/mobile/users/Permissions.vue")
+
 const routes = [
 {path:"/mobile/dashboard",component:MobileDashboard,meta:{auth:true,mobile:true,mobileTitle:"Dashboard"}},
 {path:"/mobile/incidents",component:MobileIncidentList,meta:{auth:true,mobile:true,mobileTitle:"Ocorrências",permission:{entity:"occurrences",action:"read"}}},

@@ -27,7 +27,7 @@ Rails.application.routes.draw do
     resources :school_groups, only: [:index, :show, :create, :update, :destroy]
     resources :incidents, only: [:index, :show, :create, :update, :destroy] do
       collection { get :options }
-      resources :attachments, only: [:create, :destroy], controller: 'incident_attachments'
+      resources :attachments, only: [:show, :create, :destroy], controller: 'incident_attachments'
     end
     get 'dashboard', to: 'dashboard#show'
   end

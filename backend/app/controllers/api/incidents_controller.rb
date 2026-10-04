@@ -5,13 +5,14 @@ class Api::IncidentsController < ApplicationController
 
   before_action :authenticate_user!
   before_action :set_incident, only: %i[show update destroy]
-  before_action :authorize_private_incident!, only: %i[show update destroy]
 
   def index
     authorize! :read, Incident
 
-    incidents = Incident.joins(:course).where(params_return).order("#{set_order}": :desc).search(params[:search])
-    incidents = incidents.where(user_id: current_user.id) if restricted_read_only?
+    incidents = Incident.visible_to(current_user)
+                        .preload(:student, :type_incident, :sector, :user, :assistant,
+                                 :student_duties, :prohibition_and_responsibilities, :attachments, course: :polo)
+                        .order("#{set_order}": :desc).search(params[:search])
     incidents = incidents.page(params[:page]).per(set_amount_return)
 
     render json: { incidents: incidents.map { |incident| incident_json(incident) }, total: incidents.total_count }
@@ -20,7 +21,7 @@ class Api::IncidentsController < ApplicationController
   def options
     authorize! :create, Incident
 
-    render json: { assistants: User.where(set_polo).order(:name).as_json(only: %i[id name email]), sectors: Sector.where(set_polo).order(:name).as_json(only: %i[id name email]), type_incidents: Incident::TypeIncident.order(:name).as_json(only: %i[id name]), student_duties: Incident::StudentDuty.where(status: true).order(:id).as_json(only: %i[id item]), prohibition_and_responsibilities: Incident::ProhibitionAndResponsibility.where(status: true).order(:id).as_json(only: %i[id item]), sanctions: can?(:sanction, Incident) ? Incident.sanctions.keys.map { |key| { value: key, label: I18n.t("enums.incident.sanction.#{key}", default: key.humanize) } } : [] }
+    render json: { assistants: campus_scope(User).order(:name).as_json(only: %i[id name email]), sectors: campus_scope(Sector).order(:name).as_json(only: %i[id name email]), type_incidents: Incident::TypeIncident.order(:name).as_json(only: %i[id name]), student_duties: Incident::StudentDuty.where(status: true).order(:id).as_json(only: %i[id item]), prohibition_and_responsibilities: Incident::ProhibitionAndResponsibility.where(status: true).order(:id).as_json(only: %i[id item]), sanctions: can?(:sanction, Incident) ? Incident.sanctions.keys.map { |key| { value: key, label: I18n.t("enums.incident.sanction.#{key}", default: key.humanize) } } : [] }
   end
 
   def show
@@ -32,11 +33,14 @@ class Api::IncidentsController < ApplicationController
     authorize! :create, Incident
 
     student_ids = incident_params[:student_ids]
+    if student_ids.blank?
+      return render json: { errors: ['Selecione pelo menos um estudante.'] }, status: :unprocessable_entity
+    end
     attributes = incident_params.except(:student_ids, :student_duty_ids, :prohibition_and_responsibility_ids)
 
     incidents = Incident.transaction do
       student_ids.map do |student_id|
-        student = Student.find(student_id)
+        student = campus_scope(Student).find(student_id)
         incident = Incident.new(attributes)
         incident.user = current_user
         incident.student = student
@@ -89,28 +93,13 @@ class Api::IncidentsController < ApplicationController
 
   def send_email_to(sector, incident = nil)
     return if Rails.env.test?
-    Thread.new do
-      InsidentMailer.send_mailer(sector, incident).deliver_now if sector.present?
-    end
+    InsidentMailer.send_mailer(sector, incident).deliver_later if sector.present?
   rescue StandardError => e
     Rails.logger.error("Erro ao enviar e-mail da ocorrência: #{e.message}")
   end
 
   def set_incident
-    @incident = Incident.includes(:student, :course, :type_incident, :user, :assistant, :student_duties, :prohibition_and_responsibilities, :attachments).where(params_return).find(params[:id])
-  end
-
-  def authorize_private_incident!
-    return if @incident.visibility != 'private'
-    return if current_user.super_admin? || @incident.user_id == current_user.id
-
-    raise CanCan::AccessDenied
-  end
-
-  def restricted_read_only?
-    return false if current_user.admin? || current_user.super_admin?
-
-    current_user.permissions.exists?(entity: 'Incident', can_read_restricted: true)
+    @incident = Incident.visible_to(current_user).includes(:student, :course, :type_incident, :user, :assistant, :student_duties, :prohibition_and_responsibilities, :attachments).find(params[:id])
   end
 
   def params_return
@@ -121,7 +110,8 @@ class Api::IncidentsController < ApplicationController
   end
 
   def incident_params
-    permitted = params.require(:incident).permit(:type_incident_id, :student_id, :date_incident, :sector_id, :assistant_id, :time_incident, :institution, :description, :soluction, :is_resolved, :visibility, :type_student, :sanction, student_ids: [], prohibition_and_responsibility_ids: [], student_duty_ids: [])
+    permitted = params.require(:incident).permit(:type_incident_id, :date_incident, :sector_id, :assistant_id, :time_incident, :institution, :description, :soluction, :is_resolved, :visibility, :type_student, :sanction, student_ids: [], prohibition_and_responsibility_ids: [], student_duty_ids: [])
+    validate_campus_links!(permitted, assistant_id: User, sector_id: Sector)
     return permitted if can?(:sanction, Incident)
 
     permitted.except(:soluction, :is_resolved, :sanction, :student_duty_ids, :prohibition_and_responsibility_ids)
@@ -135,7 +125,7 @@ class Api::IncidentsController < ApplicationController
     {
       id: attachment.id,
       filename: attachment.file.file.original_filename,
-      url: attachment.file.url,
+      url: api_incident_attachment_path(attachment.incident_id, attachment.id),
       created_at: attachment.created_at
     }
   end

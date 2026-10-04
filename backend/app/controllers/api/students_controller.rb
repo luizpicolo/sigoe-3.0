@@ -9,8 +9,7 @@ class Api::StudentsController < ApplicationController
   def index
     authorize! :read, Student
 
-    students = Student.joins(:course)
-                      .where(params_return)
+    students = campus_scope(Student).includes(course: :polo, school_group: :polo)
                       .where(course_situation: 5)
                       .order("#{set_order}": :desc)
                       .search(params[:search])
@@ -60,7 +59,7 @@ class Api::StudentsController < ApplicationController
 
   def options
     authorize! :read, Student
-    courses = Course.where(set_polo).order(:name)
+    courses = campus_scope(Course).order(:name)
     school_groups = SchoolGroup.where(polo_id: courses.select(:polo_id)).order(:identifier, :name)
 
     render json: {
@@ -73,7 +72,7 @@ class Api::StudentsController < ApplicationController
   private
 
   def set_student
-    @student = Student.includes(course: :polo, school_group: :polo).where(params_return).find(params[:id])
+    @student = campus_scope(Student).includes(course: :polo, school_group: :polo).find(params[:id])
   end
 
   def student_json(student, detailed: false)
@@ -102,7 +101,8 @@ class Api::StudentsController < ApplicationController
   end
 
   def student_params
-    params.require(:student).permit(:name, :cpf, :birth_date, :responsible, :responsible_contact, :contact, :password, :password_confirmation, :ra, :enrollment, :course_situation, :course_id, :school_group_id)
+    attributes = params.require(:student).permit(:name, :cpf, :birth_date, :responsible, :responsible_contact, :contact, :password, :password_confirmation, :ra, :enrollment, :course_situation, :course_id, :school_group_id)
+    validate_campus_links!(attributes, course_id: Course, school_group_id: SchoolGroup)
   end
 
   def params_return

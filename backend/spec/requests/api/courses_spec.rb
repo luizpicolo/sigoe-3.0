@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.describe 'Api::Courses', type: :request do
   let!(:admin) { create(:user, admin: true) }
-  let!(:course) { create(:course, name: 'Curso Original', initial: 'CO') }
+  let!(:course) { create(:course, polo: admin.polo, name: 'Curso Original', initial: 'CO') }
 
   describe 'sem autenticação' do
     it 'retorna não autorizado' do
@@ -12,7 +12,7 @@ RSpec.describe 'Api::Courses', type: :request do
   end
 
   describe 'com autenticação' do
-    before { sign_in admin }
+    before { sign_in admin, scope: :user }
 
     it 'lista cursos' do
       get '/api/courses'

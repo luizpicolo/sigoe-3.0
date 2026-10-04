@@ -42,6 +42,10 @@ class User < ApplicationRecord
          :recoverable, :rememberable, :validatable,
          :jwt_authenticatable, jwt_revocation_strategy: JwtDenylist
 
+  def active_for_authentication?
+    super && status?
+  end
+
   # Validações
   validates :username, presence: true, uniqueness: true
 

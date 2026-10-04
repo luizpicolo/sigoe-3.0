@@ -2,6 +2,11 @@
 
 # This file is copied to spec/ when you run 'rails generate rspec:install'
 ENV['RAILS_ENV'] ||= 'test'
+require 'simplecov'
+SimpleCov.start do
+  add_filter 'app/uploaders'
+end
+
 require File.expand_path('../config/environment', __dir__)
 # Prevent database truncation if the environment is production
 abort('The Rails environment is running in production mode!') if Rails.env.production?
@@ -9,13 +14,8 @@ require 'spec_helper'
 require 'rspec/rails'
 require 'factory_bot_rails'
 require 'email_spec'
-require 'support/incident_helpers'
 
 # externals
-require 'simplecov'
-SimpleCov.start do
-  add_filter 'app/uploaders'
-end
 
 # Add additional requires below this line. Rails is not loaded until this point!
 
@@ -32,6 +32,10 @@ end
 # directory. Alternatively, in the individual `*_spec.rb` files, manually
 # require only the support files necessary.
 #
+Dir[Rails.root.join('spec/support/**/*.rb'),
+    Rails.root.join('spec/shared_examples/**/*.rb')].sort.each do |f|
+  require f
+end
 
 # Checks for pending migration and applies them before tests are run.
 # If you are not using ActiveRecord, you can remove this line.
@@ -39,11 +43,10 @@ ActiveRecord::Migration.maintain_test_schema!
 
 RSpec.configure do |config|
   config.include FactoryBot::Syntax::Methods
-  config.include Devise::Test::IntegrationHelpers, type: :request
   config.include IncidentHelpers
-
+  config.include ApiAuthenticationHelpers, type: :request
   # Remove this line if you're not using ActiveRecord or ActiveRecord fixtures
-  config.fixture_paths = [Rails.root.join('spec/fixtures')]
+  config.fixture_paths = ["#{::Rails.root}/spec/fixtures"]
 
   # If you're not using ActiveRecord, or you'd prefer not to run each of your
   # examples within a transaction, remove the following line or assign false
@@ -72,7 +75,7 @@ RSpec.configure do |config|
 
   # Database Clean
   config.before(:suite) do
-    DatabaseRewinder.strategy = :truncation
+    DatabaseRewinder.clean_all
   end
 
   config.before(:each) do

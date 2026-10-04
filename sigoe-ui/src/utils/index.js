@@ -1,10 +1,11 @@
-export const formatDate = (date) => {
-  if (!date) return '';
-  try {
-    return new Date(date).toLocaleDateString('pt-BR', { dateStyle: 'short' });
-  } catch {
-    return '';
-  }
+export const formatDate = date => {
+  if (!date) return ''
+  // A calendar date has no timezone: avoid shifting it to the previous day.
+  const value = /^\d{4}-\d{2}-\d{2}$/.test(date)
+    ? new Date(`${date}T12:00:00`)
+    : new Date(date)
+  if (Number.isNaN(value.getTime())) return ''
+  return value.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: '2-digit' })
 }
 
 export const formatTime = (time) => {

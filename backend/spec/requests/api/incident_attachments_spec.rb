@@ -2,9 +2,9 @@ require 'rails_helper'
 
 RSpec.describe 'Api::IncidentAttachments', type: :request do
   let!(:admin) { create(:user, admin: true) }
-  let!(:incident) { create(:incident) }
+  let!(:incident) { create(:incident, course: create(:course, polo: admin.polo)) }
 
-  before { sign_in admin }
+  before { sign_in admin, scope: :user }
 
   describe 'POST /api/incidents/:incident_id/attachments' do
     it 'envia um PDF para a ocorrência' do
@@ -28,8 +28,8 @@ RSpec.describe 'Api::IncidentAttachments', type: :request do
 
 
     it 'exige a permissão de envio de PDF para usuários não administradores' do
-      user = create(:user)
-      sign_in user
+      user = create(:user, polo: admin.polo)
+      sign_in user, scope: :user
 
       post "/api/incidents/#{incident.id}/attachments",
            params: {
@@ -45,9 +45,9 @@ RSpec.describe 'Api::IncidentAttachments', type: :request do
     end
 
     it 'permite o envio quando o usuário possui a permissão de PDF em ocorrências' do
-      user = create(:user)
+      user = create(:user, polo: admin.polo)
       create(:permission, user: user, entity: 'Incident', can_attach_pdf: true)
-      sign_in user
+      sign_in user, scope: :user
 
       post "/api/incidents/#{incident.id}/attachments",
            params: {

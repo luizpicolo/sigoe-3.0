@@ -8,12 +8,14 @@ class Api::DashboardController < ApplicationController
   def show
     authorize! :read, Incident
 
+    incidents = Incident.visible_to(current_user)
+
     render json: {
-      by_years: Incident.by_years(params_return),
-      by_courses: Incident.by_courses(params_return),
-      by_type_incident: Incident.by_type_incident(params_return),
-      by_sanction: Incident.by_sanction(params_return),
-      by_is_resolved: Incident.by_is_resolved(params_return)
+      by_years: incidents.by_years({}),
+      by_courses: incidents.by_courses({}),
+      by_type_incident: incidents.by_type_incident({}),
+      by_sanction: incidents.by_sanction({}),
+      by_is_resolved: incidents.by_is_resolved({})
     }
   end
 

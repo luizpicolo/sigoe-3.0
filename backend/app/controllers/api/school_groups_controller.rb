@@ -8,7 +8,7 @@ class Api::SchoolGroupsController < ApplicationController
 
   def index
     authorize! :read, SchoolGroup
-    groups = SchoolGroup.where(set_polo)
+    groups = campus_scope(SchoolGroup)
                          .order("#{set_order}": :desc)
                          .search(params[:search])
                          .page(params[:page])
@@ -51,8 +51,8 @@ class Api::SchoolGroupsController < ApplicationController
 
   private
 
-  def set_school_group = @school_group = SchoolGroup.find(params[:id])
-  def group_params = params.require(:school_group).permit(:name, :identifier, :polo_id)
+  def set_school_group = @school_group = campus_scope(SchoolGroup).find(params[:id])
+  def group_params = campus_attributes(params.require(:school_group).permit(:name, :identifier, :polo_id))
   def group_json(group)
     group.as_json(only: %i[id name identifier polo_id], include: { polo: { only: %i[id name] } })
   end

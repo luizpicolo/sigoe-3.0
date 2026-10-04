@@ -5,9 +5,16 @@ class Api::IncidentAttachmentsController < ApplicationController
 
   before_action :authenticate_user!
   before_action :set_incident
-  before_action :authorize_private_incident!
   before_action :authorize_incident_attachment!, only: :create
   before_action :authorize_incident_update!, only: :destroy
+
+  def show
+    authorize! :read, @incident
+    attachment = @incident.attachments.find(params[:id])
+    response.headers['Cache-Control'] = 'private, no-store'
+    send_file attachment.file.path, filename: attachment.file.file.original_filename,
+              type: 'application/pdf', disposition: 'attachment'
+  end
 
   def create
     attachment = @incident.attachments.build(attachment_params)
@@ -28,7 +35,7 @@ class Api::IncidentAttachmentsController < ApplicationController
   private
 
   def set_incident
-    @incident = Incident.joins(:course).includes(:attachments).where(params_return).find(params[:incident_id])
+    @incident = Incident.visible_to(current_user).includes(:attachments).find(params[:incident_id])
   end
 
   def authorize_incident_attachment!
@@ -41,20 +48,6 @@ class Api::IncidentAttachmentsController < ApplicationController
     authorize! :update, @incident
   end
 
-  def authorize_private_incident!
-    return if @incident.visibility != 'private'
-    return if current_user.super_admin? || @incident.user_id == current_user.id
-
-    raise CanCan::AccessDenied
-  end
-
-  def params_return
-    return '' if current_user.super_admin?
-    return set_polo if set_polo.empty?
-
-    { courses: set_polo }
-  end
-
   def attachment_params
     params.require(:attachment).permit(:file)
   end
@@ -63,7 +56,7 @@ class Api::IncidentAttachmentsController < ApplicationController
     {
       id: attachment.id,
       filename: attachment.file.file.original_filename,
-      url: attachment.file.url,
+      url: api_incident_attachment_path(attachment.incident_id, attachment.id),
       created_at: attachment.created_at
     }
   end
