@@ -30,7 +30,7 @@ class Student < ApplicationRecord
   mount_uploader :photo, StudentUploader
   include SearchCop
 
-  enum course_situation: { 'Egresso' => 0, 'Falecido' => 1, 'Trancado' => 2,
+  enum :course_situation, { 'Egresso' => 0, 'Falecido' => 1, 'Trancado' => 2,
                            'Transferido Externamente' => 3, 'Transferido Internamente' => 4, 'Em curso' => 5, 'Evadido' => 6, 'Desligado' => 7, 'Regime Domiciliar' => 8, 'Integralizado em fase escolar' => 9, "Conclu\u00EDdo" => 10, 'Enriquecimento Curricular' => 11, "Em mobilidade acad\u00EAmica" => 12, 'Reprovado' => 13, 'Aluno Especial' => 14 }
 
   delegate :name, to: :course, prefix: true
