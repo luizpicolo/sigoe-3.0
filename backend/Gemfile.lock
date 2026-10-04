@@ -204,7 +204,7 @@ GEM
       path_expander (~> 2.0)
       prism (~> 1.7)
       sexp_processor (~> 4.8)
-    friendly_id (5.5.1)
+    friendly_id (5.7.0)
       activerecord (>= 4.0.0)
     fuubar (2.5.1)
       rspec-core (~> 3.0)
@@ -552,7 +552,7 @@ DEPENDENCIES
   factory_bot_rails
   faker
   figaro
-  friendly_id (~> 5.5.0)
+  friendly_id (~> 5.7.0)
   fuubar
   groupdate
   httparty
