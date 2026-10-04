@@ -85,6 +85,11 @@ onMounted(() => loadCurrentPermissions())
               Ocorrências
             </router-link>
           </li>
+          <li>
+            <router-link to="/ocorrencias/relatorio" class="block px-2 py-1 text-sm hover:bg-gray-100 rounded" :class="{ 'bg-green-50 text-green-700': activePage === 'relatorio', 'text-gray-700': activePage !== 'relatorio' }">
+              Relatório ocorrências
+            </router-link>
+          </li>
         </ul>
       </div>
     </nav>

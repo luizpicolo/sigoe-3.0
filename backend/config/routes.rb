@@ -30,5 +30,11 @@ Rails.application.routes.draw do
       resources :attachments, only: [:show, :create, :destroy], controller: 'incident_attachments'
     end
     get 'dashboard', to: 'dashboard#show'
+    resources :report_incidents, only: [] do
+      collection do
+        get :options
+        get :data
+      end
+    end
   end
 end
