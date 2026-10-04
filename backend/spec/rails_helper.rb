@@ -4,7 +4,7 @@
 ENV['RAILS_ENV'] ||= 'test'
 require 'simplecov'
 SimpleCov.start do
-  add_filter 'app/uploaders'
+  skip 'app/uploaders'
 end
 
 require File.expand_path('../config/environment', __dir__)
