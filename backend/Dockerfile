@@ -8,11 +8,6 @@ ENV RAILS_ENV=production \
     BUNDLE_PATH=/usr/local/bundle \
     BUNDLE_WITHOUT="development:test"
 
-
-# ==================================================
-# BUILD
-# ==================================================
-
 FROM base AS build
 
 RUN apt-get update -qq && \
@@ -27,23 +22,14 @@ RUN apt-get update -qq && \
         shared-mime-info \
     && rm -rf /var/lib/apt/lists/*
 
-
-# Ruby dependencies
 COPY Gemfile Gemfile.lock ./
 
 RUN --mount=type=cache,target=/usr/local/bundle/cache \
     bundle install
 
-
-# Application
 COPY . .
 
 COPY config/database.yml.example config/database.yml
-
-
-# ==================================================
-# PRODUCTION
-# ==================================================
 
 FROM base AS production
 
