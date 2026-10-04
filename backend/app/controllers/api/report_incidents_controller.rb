@@ -7,10 +7,10 @@ class Api::ReportIncidentsController < ApplicationController
     authorize! :read, Incident
 
     render json: {
-      students: Student.joins(:course).where(params_return).where(course_situation: 5)
+      students: campus_scope(Student).where(course_situation: 5)
         .order(:name).as_json(only: %i[id name]),
-      courses: Course.where(params_return).order(:name).as_json(only: %i[id name]),
-      school_groups: SchoolGroup.where(params_return).order(:name).as_json(only: %i[id name]),
+      courses: campus_scope(Course).order(:name).as_json(only: %i[id name]),
+      school_groups: campus_scope(SchoolGroup).order(:name).as_json(only: %i[id name]),
       type_incidents: Incident::TypeIncident.order(:name).as_json(only: %i[id name])
     }
   end
@@ -39,10 +39,11 @@ class Api::ReportIncidentsController < ApplicationController
   private
 
   def filtered_incidents
-    scope = Incident.joins(:student, :course)
-    scope = scope.where(user_id: current_user.id) if current_user.permissions.exists?(entity: 'Incident', can_read_restricted: true)
-    scope = scope.where("incidents.visibility = :public OR (incidents.visibility = :private AND incidents.user_id = :user_id)", public: 'public', private: 'private', user_id: current_user.id)
-    scope.where(params_return).search(search_params).where(date_incident: date_start..date_final).order(date_incident: :desc)
+    Incident.visible_to(current_user)
+      .joins(:student, :course)
+      .search(search_params)
+      .where(date_incident: date_start..date_final)
+      .order(date_incident: :desc)
   end
 
   def date_start
