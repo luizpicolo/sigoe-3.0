@@ -41,7 +41,7 @@ RSpec.describe 'Api::SchoolGroups', type: :request do
 
     it 'retorna erro ao criar turma inválida' do
       post '/api/school_groups', params: { school_group: { name: '' } }
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
       expect(JSON.parse(response.body)).to include('errors')
     end
 

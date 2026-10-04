@@ -45,7 +45,7 @@ class Api::UsersController < ApplicationController
     else
       render json: {
         errors: user.errors.full_messages
-      }, status: :unprocessable_entity
+      }, status: :unprocessable_content
     end
   end
 
@@ -67,7 +67,7 @@ class Api::UsersController < ApplicationController
   rescue ActiveRecord::RecordInvalid => e
     render json: {
       errors: e.record.errors.full_messages
-    }, status: :unprocessable_entity
+    }, status: :unprocessable_content
   end
 
   def change_password
@@ -78,7 +78,7 @@ class Api::UsersController < ApplicationController
     unless current_user.valid_password?(current_password)
       render json: {
         error: 'A senha atual está incorreta.'
-      }, status: :unprocessable_entity
+      }, status: :unprocessable_content
 
       return
     end
@@ -86,7 +86,7 @@ class Api::UsersController < ApplicationController
     unless new_password == password_confirmation
       render json: {
         error: 'A confirmação da senha não corresponde.'
-      }, status: :unprocessable_entity
+      }, status: :unprocessable_content
 
       return
     end
@@ -101,7 +101,7 @@ class Api::UsersController < ApplicationController
     else
       render json: {
         errors: current_user.errors.full_messages
-      }, status: :unprocessable_entity
+      }, status: :unprocessable_content
     end
   end
 
@@ -113,7 +113,7 @@ class Api::UsersController < ApplicationController
     if user.id == current_user.id
       return render json: {
         error: 'Não é possível excluir o próprio usuário'
-      }, status: :unprocessable_entity
+      }, status: :unprocessable_content
     end
 
     user.destroy!

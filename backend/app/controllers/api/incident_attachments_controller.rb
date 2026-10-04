@@ -22,7 +22,7 @@ class Api::IncidentAttachmentsController < ApplicationController
     if attachment.save
       render json: { attachment: attachment_json(attachment) }, status: :created
     else
-      render json: { errors: attachment.errors.full_messages }, status: :unprocessable_entity
+      render json: { errors: attachment.errors.full_messages }, status: :unprocessable_content
     end
   end
 

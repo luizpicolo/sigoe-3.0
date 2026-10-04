@@ -41,7 +41,7 @@ RSpec.describe 'Api::Students', type: :request do
 
     it 'retorna erro ao criar estudante inválido' do
       post '/api/students', params: { student: { name: '' } }
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
       expect(JSON.parse(response.body)).to include('errors')
     end
 

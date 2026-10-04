@@ -28,7 +28,7 @@ class Api::CoursesController < ApplicationController
     if course.save
       render json: { course: course_json(course) }, status: :created
     else
-      render json: { errors: course.errors.full_messages }, status: :unprocessable_entity
+      render json: { errors: course.errors.full_messages }, status: :unprocessable_content
     end
   end
 
@@ -37,7 +37,7 @@ class Api::CoursesController < ApplicationController
     if @course.update(course_params)
       render json: { course: course_json(@course) }
     else
-      render json: { errors: @course.errors.full_messages }, status: :unprocessable_entity
+      render json: { errors: @course.errors.full_messages }, status: :unprocessable_content
     end
   end
 
@@ -46,7 +46,7 @@ class Api::CoursesController < ApplicationController
     @course.destroy!
     head :no_content
   rescue ActiveRecord::RecordNotDestroyed => e
-    render json: { errors: [e.message] }, status: :unprocessable_entity
+    render json: { errors: [e.message] }, status: :unprocessable_content
   end
 
   private

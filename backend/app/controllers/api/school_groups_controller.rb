@@ -28,7 +28,7 @@ class Api::SchoolGroupsController < ApplicationController
     if group.save
       render json: { school_group: group_json(group) }, status: :created
     else
-      render json: { errors: group.errors.full_messages }, status: :unprocessable_entity
+      render json: { errors: group.errors.full_messages }, status: :unprocessable_content
     end
   end
 
@@ -37,7 +37,7 @@ class Api::SchoolGroupsController < ApplicationController
     if @school_group.update(group_params)
       render json: { school_group: group_json(@school_group) }
     else
-      render json: { errors: @school_group.errors.full_messages }, status: :unprocessable_entity
+      render json: { errors: @school_group.errors.full_messages }, status: :unprocessable_content
     end
   end
 
@@ -46,7 +46,7 @@ class Api::SchoolGroupsController < ApplicationController
     @school_group.destroy!
     head :no_content
   rescue ActiveRecord::RecordNotDestroyed => e
-    render json: { errors: [e.message] }, status: :unprocessable_entity
+    render json: { errors: [e.message] }, status: :unprocessable_content
   end
 
   private

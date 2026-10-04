@@ -34,7 +34,7 @@ class Api::IncidentsController < ApplicationController
 
     student_ids = incident_params[:student_ids]
     if student_ids.blank?
-      return render json: { errors: ['Selecione pelo menos um estudante.'] }, status: :unprocessable_entity
+      return render json: { errors: ['Selecione pelo menos um estudante.'] }, status: :unprocessable_content
     end
     attributes = incident_params.except(:student_ids, :student_duty_ids, :prohibition_and_responsibility_ids)
 
@@ -61,7 +61,7 @@ class Api::IncidentsController < ApplicationController
 
     render json: { incidents: incidents.map { |incident| incident_json(incident) } }, status: :created
   rescue ActiveRecord::RecordInvalid, ActiveRecord::RecordNotFound => e
-    render json: { errors: [e.message] }, status: :unprocessable_entity
+    render json: { errors: [e.message] }, status: :unprocessable_content
   end
 
   def update
@@ -80,7 +80,7 @@ class Api::IncidentsController < ApplicationController
 
     render json: { incident: incident_json(@incident) }
   rescue ActiveRecord::RecordInvalid => e
-    render json: { errors: e.record.errors.full_messages }, status: :unprocessable_entity
+    render json: { errors: e.record.errors.full_messages }, status: :unprocessable_content
   end
 
   def destroy

@@ -205,19 +205,19 @@ RSpec.describe 'Campus and privacy boundaries', type: :request do
       expect do
         post '/api/incidents', params: { incident: payload.merge(student_ids: [student.id, other_student.id]) }
       end.not_to change(Incident, :count)
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
     end
 
     it 'rejects an assistant from another campus' do
       expect do
         post '/api/incidents', params: { incident: payload.merge(assistant_id: outsider.id) }
       end.not_to change(Incident, :count)
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
     end
 
     it 'rejects an empty selection instead of returning a server error' do
       post '/api/incidents', params: { incident: payload.except(:student_ids) }
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
     end
   end
 end

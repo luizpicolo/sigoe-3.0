@@ -28,7 +28,7 @@ class Api::PermissionsController < ApplicationController
     requested_permissions = params.require(:permissions)
 
     unless requested_permissions.is_a?(Array)
-      return render json: { error: 'permissions deve ser um array' }, status: :unprocessable_entity
+      return render json: { error: 'permissions deve ser um array' }, status: :unprocessable_content
     end
 
     normalized = normalize_permissions(requested_permissions)
@@ -42,9 +42,9 @@ class Api::PermissionsController < ApplicationController
 
     render json: permission_payload(user)
   rescue ActionController::ParameterMissing => e
-    render json: { error: e.message }, status: :unprocessable_entity
+    render json: { error: e.message }, status: :unprocessable_content
   rescue ActiveRecord::RecordInvalid => e
-    render json: { errors: e.record.errors.full_messages }, status: :unprocessable_entity
+    render json: { errors: e.record.errors.full_messages }, status: :unprocessable_content
   end
 
   private
@@ -91,12 +91,12 @@ class Api::PermissionsController < ApplicationController
       config = ENTITIES[entity_key]
 
       unless config
-        render json: { error: "Entidade inválida: #{entity_key}" }, status: :unprocessable_entity
+        render json: { error: "Entidade inválida: #{entity_key}" }, status: :unprocessable_content
         return
       end
 
       if seen[entity_key]
-        render json: { error: "Entidade duplicada: #{entity_key}" }, status: :unprocessable_entity
+        render json: { error: "Entidade duplicada: #{entity_key}" }, status: :unprocessable_content
         return
       end
 

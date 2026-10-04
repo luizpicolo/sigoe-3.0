@@ -34,7 +34,7 @@ class Api::StudentsController < ApplicationController
     if student.save
       render json: { student: student_json(student, detailed: true) }, status: :created
     else
-      render json: { errors: student.errors.full_messages }, status: :unprocessable_entity
+      render json: { errors: student.errors.full_messages }, status: :unprocessable_content
     end
   end
 
@@ -45,7 +45,7 @@ class Api::StudentsController < ApplicationController
     if @student.update(attributes)
       render json: { student: student_json(@student, detailed: true) }
     else
-      render json: { errors: @student.errors.full_messages }, status: :unprocessable_entity
+      render json: { errors: @student.errors.full_messages }, status: :unprocessable_content
     end
   end
 
@@ -54,7 +54,7 @@ class Api::StudentsController < ApplicationController
     @student.destroy!
     head :no_content
   rescue ActiveRecord::RecordNotDestroyed => e
-    render json: { errors: [e.message] }, status: :unprocessable_entity
+    render json: { errors: [e.message] }, status: :unprocessable_content
   end
 
   def options

@@ -46,7 +46,7 @@ RSpec.describe 'Api::Users', type: :request do
       it 'retorna erros de validação' do
         put "/api/users/#{user.id}", params: { user: { email: '' } }
 
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         expect(JSON.parse(response.body)).to include('errors')
       end
     end
@@ -63,7 +63,7 @@ RSpec.describe 'Api::Users', type: :request do
       it 'impede que o usuário autenticado seja excluído' do
         delete "/api/users/#{admin.id}"
 
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         expect(JSON.parse(response.body)['error']).to eq('Não é possível excluir o próprio usuário')
       end
     end
