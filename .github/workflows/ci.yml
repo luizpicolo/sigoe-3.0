@@ -35,7 +35,7 @@ jobs:
       - run: sudo apt-get update && sudo apt-get install -y libpq-dev shared-mime-info graphviz imagemagick
       - uses: ruby/setup-ruby@v1
         with:
-          ruby-version: '3.4.10'
+          ruby-version: '4.0.7'
           bundler-cache: true
           working-directory: backend
       - run: cp config/database.yml.example config/database.yml
