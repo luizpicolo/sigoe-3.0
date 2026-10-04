@@ -13,10 +13,11 @@ RSpec.describe 'API-only routing', type: :request do
     expect(application_paths).to all(start_with('/api/'))
   end
 
-  it 'does not expose the removed incident report endpoints' do
-    expect do
-      Rails.application.routes.recognize_path('/api/report_incidents/data', method: :get)
-    end.to raise_error(ActionController::RoutingError)
+  it 'exposes incident report data through the API' do
+    route = Rails.application.routes.recognize_path('/api/report_incidents/data', method: :get)
+
+    expect(route[:controller]).to eq('api/report_incidents')
+    expect(route[:action]).to eq('data')
   end
 
   it 'uses the API controller stack' do

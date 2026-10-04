@@ -43,6 +43,10 @@ onMounted(async () => {
                 <i class="fa-solid fa-plus text-lg"></i>
                 <span>Nova ocorrência</span>
               </RouterLink>
+              <RouterLink v-if="can('occurrences','read')" to="/ocorrencias/relatorio" class="flex flex-col items-center gap-2 rounded-xl bg-gray-100 p-4 text-center text-sm">
+                <i class="fa-solid fa-chart-column text-lg"></i>
+                <span>Relatórios</span>
+              </RouterLink>
             </div>
           </div>
 
