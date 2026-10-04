@@ -18,6 +18,7 @@ const Home = () => import("@/views/home.vue")
  const IncidentsList = () => import("@/views/incidents/list.vue")
  const IncidentsForm = () => import("@/views/incidents/form.vue")
  const IncidentsView = () => import("@/views/incidents/show.vue")
+ const IncidentsReport = () => import("@/views/incidents/report.vue")
  const ChangePassword = () => import("@/views/users/change-password.vue")
 
 const MobileDashboard = () => import("@/views/mobile/Dashboard.vue")
@@ -76,7 +77,7 @@ const routes = [
 {path:"/administrador/estudantes/listar",component:StudentList,meta:{auth:true,permission:{entity:"students",action:"read"}}},{path:"/administrador/estudantes/novo",component:StudentForm,meta:{auth:true,permission:{entity:"students",action:"create"}}},{path:"/administrador/estudantes/visualizar/:id",component:StudentView,meta:{auth:true,permission:{entity:"students",action:"read"}}},{path:"/administrador/estudantes/editar/:id",component:StudentForm,meta:{auth:true,permission:{entity:"students",action:"update"}}},
 {path:"/administrador/cursos/listar",component:CourseList,meta:{auth:true,permission:{entity:"courses",action:"read"}}},{path:"/administrador/cursos/novo",component:CourseForm,meta:{auth:true,permission:{entity:"courses",action:"create"}}},{path:"/administrador/cursos/editar/:id",component:CourseForm,meta:{auth:true,permission:{entity:"courses",action:"update"}}},
 {path:"/administrador/turmas/listar",component:SchoolGroupsList,meta:{auth:true,permission:{entity:"classes",action:"read"}}},{path:"/administrador/turmas/novo",component:SchoolGroupForm,meta:{auth:true,permission:{entity:"classes",action:"create"}}},{path:"/administrador/turmas/editar/:id",component:SchoolGroupForm,meta:{auth:true,permission:{entity:"classes",action:"update"}}},
-{path:"/ocorrencias/ocorrencias/listar",component:IncidentsList,meta:{auth:true,permission:{entity:"occurrences",action:"read"}}},{path:"/ocorrencias/ocorrencias/novo",component:IncidentsForm,meta:{auth:true,permission:{entity:"occurrences",action:"create"}}},{path:"/ocorrencias/ocorrencias/visualizar/:id",component:IncidentsView,meta:{auth:true,permission:{entity:"occurrences",action:"read"}}},{path:"/ocorrencias/ocorrencias/editar/:id",component:IncidentsForm,meta:{auth:true,permission:{entity:"occurrences",action:"update"}}}]
+{path:"/ocorrencias/ocorrencias/listar",component:IncidentsList,meta:{auth:true,permission:{entity:"occurrences",action:"read"}}},{path:"/ocorrencias/ocorrencias/novo",component:IncidentsForm,meta:{auth:true,permission:{entity:"occurrences",action:"create"}}},{path:"/ocorrencias/ocorrencias/visualizar/:id",component:IncidentsView,meta:{auth:true,permission:{entity:"occurrences",action:"read"}}},{path:"/ocorrencias/ocorrencias/editar/:id",component:IncidentsForm,meta:{auth:true,permission:{entity:"occurrences",action:"update"}}},{path:"/ocorrencias/relatorio",component:IncidentsReport,meta:{auth:true,permission:{entity:"occurrences",action:"read"}}}]
 const router=createRouter({history:createWebHistory(),routes})
 router.beforeEach(async(to,_from,next)=>{if(!to.meta.auth){next();return}if(!(await isTokenValid())){next({path:"/"});return}await loadCurrentPermissions();const p=to.meta.permission;if(p&&(p.adminOnly&&!permissionState.admin||!can(p.entity,p.action))){next({path:"/sem-permissao"});return}next()})
 export default router

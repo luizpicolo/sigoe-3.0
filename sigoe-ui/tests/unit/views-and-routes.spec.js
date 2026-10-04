@@ -16,6 +16,13 @@ describe('Application router', () => {
     expect(router.getRoutes().length).toBeGreaterThan(0)
   })
 
+  it('keeps the incident report route available from the sidebar', () => {
+    const reportRoute = router.getRoutes().find(route => route.path === '/ocorrencias/relatorio')
+
+    expect(reportRoute).toBeDefined()
+    expect(reportRoute.meta.permission).toEqual({ entity: 'occurrences', action: 'read' })
+  })
+
   it.each(router.getRoutes())('defines a valid route: $path', (route) => {
     expect(typeof route.path).toBe('string')
     expect(route.path.length).toBeGreaterThan(0)
