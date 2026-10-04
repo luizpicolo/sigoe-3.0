@@ -15,8 +15,8 @@ O sistema permite:
 - registro de ocorrências escolares;
 - organização por institutos, polos, grupos escolares e setores;
 - controle de permissões e acesso por perfil;
-- geração de relatórios e painel administrativo;
-- consulta e acompanhamento de dados por meio de interfaces web.
+- painel de acompanhamento;
+- consulta e gestão dos dados pela interface Vue.js.
 
 ## Stack tecnológica
 
@@ -25,15 +25,14 @@ O sistema permite:
 - PostgreSQL
 - Vue.js 3
 - Vite
-- ActiveAdmin
 - Devise / JWT
 
 ## Estrutura do repositório
 
 ```text
 .
-├── backend/        # aplicação Rails
-├── sigoe-ui/       # frontend em Vue.js
+├── backend/        # API Rails, sem interface web própria
+├── sigoe-ui/       # única interface web, em Vue.js
 └── README.md       # documentação do projeto
 ```
 
@@ -71,7 +70,7 @@ Inicie o servidor Rails:
 bundle exec rails server
 ```
 
-A aplicação estará disponível em:
+A API estará disponível em:
 
 ```text
 http://localhost:3000

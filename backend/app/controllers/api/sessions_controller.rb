@@ -1,6 +1,4 @@
 class Api::SessionsController < Devise::SessionsController
-  layout false
-  skip_before_action :verify_authenticity_token
   respond_to :json
   skip_before_action :verify_signed_out_user, only: :destroy
   before_action :authenticate_user!, only: :destroy
@@ -14,7 +12,6 @@ class Api::SessionsController < Devise::SessionsController
       return
     end
 
-    sign_in(:user, user)
     token, = Warden::JWTAuth::UserEncoder.new.call(user, :user, nil)
 
     response.set_header('Authorization', "Bearer #{token}")

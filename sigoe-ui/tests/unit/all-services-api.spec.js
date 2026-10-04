@@ -4,7 +4,6 @@ import * as courses from '@/services/courses'
 import * as dashboard from '@/services/dashboard'
 import * as incidents from '@/services/incidents'
 import * as permissions from '@/services/permissions'
-import * as reports from '@/services/reports/incidents'
 import * as schoolGroups from '@/services/school_groups'
 import * as students from '@/services/students'
 import * as users from '@/services/users'
@@ -15,7 +14,6 @@ const modules = [
   ['dashboard', dashboard],
   ['incidents', incidents],
   ['permissions', permissions],
-  ['reports', reports],
   ['school_groups', schoolGroups],
   ['students', students],
   ['users', users],

@@ -10,7 +10,7 @@ RSpec.describe InsidentMailer, type: :mailer do
     it 'Renders the headers' do
       expect(mail.subject).to eq('Nova ocorrência cadastrada')
       expect(mail.to).to eq([coordenation])
-      expect(mail.from).to eq(['luizpicolo@gmail.com'])
+      expect(mail.from).to eq(['sistemas.na@ifms.edu.br'])
     end
   end
 end

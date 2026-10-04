@@ -89,14 +89,6 @@ RSpec.describe 'Campus and privacy boundaries', type: :request do
       expect(response).to have_http_status(:ok)
     end
 
-    it 'also rejects escalation and cross-campus changes on the legacy endpoint' do
-      patch "/users/#{actor.id}", params: { user: { admin: true } }
-      expect(response).to have_http_status(:redirect)
-      expect(actor.reload).not_to be_admin
-      patch "/users/#{outsider.id}", params: { user: { name: 'Tampered' } }
-      expect(response).to have_http_status(:not_found)
-      expect(outsider.reload.name).not_to eq('Tampered')
-    end
   end
 
   describe 'incident visibility' do
@@ -128,10 +120,7 @@ RSpec.describe 'Campus and privacy boundaries', type: :request do
       expect(response).to have_http_status(:not_found)
     end
 
-    it 'excludes private and foreign records from reports and dashboard totals' do
-      get '/api/report_incidents/data', params: { date_start: Date.current.to_s, date_final: Date.current.to_s }
-      expect(response).to have_http_status(:ok)
-      expect(response.parsed_body.map { |item| item['description'] }).to contain_exactly(own_private.description, public_incident.description)
+    it 'excludes private and foreign records from dashboard totals' do
       get '/api/dashboard'
       expect(response).to have_http_status(:ok)
       expect(response.parsed_body['by_years'].values.sum).to eq(2)
@@ -144,11 +133,6 @@ RSpec.describe 'Campus and privacy boundaries', type: :request do
       actor.update!(super_admin: true)
       get "/api/incidents/#{other_private.id}"
       expect(response).to have_http_status(:ok)
-    end
-
-    it 'protects the legacy detail endpoint' do
-      get "/incidents/#{other_private.id}"
-      expect(response).to have_http_status(:not_found)
     end
 
     it 'honors the requested page size' do

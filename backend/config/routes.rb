@@ -1,12 +1,13 @@
 # frozen_string_literal: true
 
 Rails.application.routes.draw do
-  devise_for :admin_users, ActiveAdmin::Devise.config
-  ActiveAdmin.routes(self)
-  root 'home#index'
+  devise_for :users, skip: :all
+  devise_scope :user do
+    post '/api/auth/login', to: 'api/sessions#create', as: :user_session
+    delete '/api/auth/logout', to: 'api/sessions#destroy', as: :destroy_user_session
+  end
 
   namespace :api, defaults: { format: :json } do
-    devise_for :user, path: 'auth', path_names: { sign_in: 'login', sign_out: 'logout', registration: 'register', sign_up: 'signup' }, controllers: { sessions: 'api/sessions', registrations: 'api/registrations' }
     resources :users, only: [:index, :show, :create, :update, :destroy] do
       collection { get :validation }
       collection { get :options }
@@ -29,30 +30,5 @@ Rails.application.routes.draw do
       resources :attachments, only: [:show, :create, :destroy], controller: 'incident_attachments'
     end
     get 'dashboard', to: 'dashboard#show'
-    resources :report_incidents, only: [] do
-      collection do
-        get :options
-        get :data
-      end
-    end
-    post 'report_incidents', to: 'report_incidents#create', defaults: { format: :pdf }
   end
-
-  devise_for :user, path: 'auth', path_names: { sign_in: 'login', sign_out: 'logout', registration: 'register', sign_up: 'signup' }, controllers: { sessions: 'sessions' }
-  resources :users, except: [:show] do
-    get :change_password
-    resources :permissions, except: [:show]
-  end
-  resources :students, except: [:show] do
-    get :import_xls, to: 'students#send_xls', on: :collection
-    post :import_xls, to: 'students#import_xls', on: :collection
-  end
-  resources :courses, except: [:show]
-  resources :incidents do
-    get :sign, to: 'incidents#confirmation'
-    post :sign, to: 'incidents#sign'
-    get :export_to_academic_system, to: 'incidents#export_to_academic_system'
-  end
-  resources :report_incidents, only: %i[new create]
-  resources :school_groups, except: [:show]
 end

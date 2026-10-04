@@ -36,4 +36,4 @@ Recomenda-se configurar os checks `backend` e `frontend` como obrigatórios na p
 
 Listagens de ocorrências pré-carregam suas associações para evitar consultas por registro. O tamanho de página aceita `amount` e o parâmetro legado `return`, limitado a 100. Telas Vue são carregadas sob demanda. A formatação de datas sem horário preserva o dia independentemente do fuso. O envio de e-mail usa Active Job; em produção, um adaptador de fila persistente ainda deve ser configurado para garantir entrega após reinícios.
 
-A atualização de Vitest/cobertura e jsPDF elimina os alertas encontrados no frontend durante esta revisão. O conjunto JavaScript legado do backend ainda possui alertas de dependências transitivas; a migração de Webpacker e de suas dependências requer trabalho separado, sem atualizações forçadas incompatíveis.
+A atualização de Vitest/cobertura elimina os alertas encontrados no frontend durante esta revisão. O jsPDF e o conjunto JavaScript legado do backend foram removidos junto com a geração de relatórios em PDF e a interface Rails.

@@ -6,7 +6,7 @@ class InsidentMailer < ApplicationMailer
     @insident = insident
     mail(
       to: coordenation,
-      from: 'luizpicolo@gmail.com',
+      from: ENV.fetch('SMTP_FROM', 'sistemas.na@ifms.edu.br'),
       subject: 'Nova ocorrência cadastrada'
     )
   end

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-Rails.env.on(:any) do
+Rails.application.configure do
   # Disabel Generate assets and helpes
   config.generators.assets = false
   config.generators.helper = false
