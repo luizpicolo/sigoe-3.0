@@ -30,7 +30,7 @@ export const formatTime = (time) => {
 export const avatar = (path) => {
   if (!path) return '';
   try {
-    return `${BASE_URL}}/${path}`;
+    return `${BASE_URL}/${path}`;
   } catch {
     return ''
   }
