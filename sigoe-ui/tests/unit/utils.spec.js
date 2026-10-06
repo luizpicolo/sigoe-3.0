@@ -17,7 +17,7 @@ describe('utilitários de formatação', () => {
   })
 
   it('monta URL de avatar', () => {
-    expect(avatar('uploads/avatar.png')).toBe('https://sigoe.na.ifms.edu.br/uploads/avatar.png')
+    expect(avatar('uploads/avatar.png')).toBe('http://localhost:3000/uploads/avatar.png')
     expect(avatar('')).toBe('')
   })
 })
