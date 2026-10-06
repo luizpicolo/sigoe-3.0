@@ -1,3 +1,5 @@
+const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
+
 export const formatDate = date => {
   if (!date) return ''
   // A calendar date has no timezone: avoid shifting it to the previous day.
@@ -28,7 +30,7 @@ export const formatTime = (time) => {
 export const avatar = (path) => {
   if (!path) return '';
   try {
-    return `https://sigoe.na.ifms.edu.br/${path}`;
+    return `${BASE_URL}}/${path}`;
   } catch {
     return ''
   }
