@@ -98,7 +98,7 @@ const handleSubmit = async () => {
           </p>
 
           <p>
-            SIGOE - 3.0.0
+            SIGOE - 3.0.1
           </p>
         </div>
       </div>
