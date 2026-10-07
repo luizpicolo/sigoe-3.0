@@ -17,28 +17,28 @@
     "test:coverage": "vitest run tests --coverage"
   },
   "dependencies": {
-    "@fortawesome/fontawesome-free": "^6.7.2",
-    "@fortawesome/fontawesome-svg-core": "^6.7.2",
-    "@fortawesome/free-solid-svg-icons": "^6.7.2",
-    "@fortawesome/vue-fontawesome": "^3.0.8",
+    "@fortawesome/fontawesome-free": "^7.3.1",
+    "@fortawesome/fontawesome-svg-core": "^7.3.1",
+    "@fortawesome/free-solid-svg-icons": "^7.3.1",
+    "@fortawesome/vue-fontawesome": "^3.3.3",
     "@hennge/vue3-pagination": "^1.0.17",
-    "@tailwindcss/vite": "^4.1.4",
-    "axios": "^1.9.0",
-    "dotenv": "^16.5.0",
-    "sweetalert2": "^11.22.2",
-    "vue": "^3.5.13",
-    "vue-router": "^4.5.1"
+    "@tailwindcss/vite": "^4.3.3",
+    "axios": "^1.20.0",
+    "dotenv": "^18.0.6",
+    "sweetalert2": "^11.26.25",
+    "vue": "^3.5.43",
+    "vue-router": "^5.4.0"
   },
   "devDependencies": {
-    "@vitejs/plugin-vue": "^5.2.3",
-    "@vitest/coverage-v8": "^4.1.11",
-    "@vue/test-utils": "^2.4.6",
-    "jsdom": "^26.1.0",
-    "postcss": "^8.5.3",
+    "@vitejs/plugin-vue": "^6.0.9",
+    "@vitest/coverage-v8": "^5.0.3",
+    "@vue/test-utils": "^2.5.1",
+    "jsdom": "^30.1.2",
+    "postcss": "^8.5.29",
     "prettier": "3.9.9",
-    "tailwindcss": "^4.1.4",
-    "vite": "^6.2.4",
-    "vite-plugin-vue-devtools": "^7.7.2",
-    "vitest": "^4.1.11"
+    "tailwindcss": "^4.3.3",
+    "vite": "^8.3.3",
+    "vite-plugin-vue-devtools": "^8.2.1",
+    "vitest": "^5.0.3"
   }
 }
