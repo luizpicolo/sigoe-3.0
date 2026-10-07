@@ -55,7 +55,5 @@ jobs:
         with:
           bun-version: '1'
       - run: bun install --frozen-lockfile
-      - run: bun --bun run test:coverage
-      - run: bun --bun run build
       - run: bun run test:coverage
       - run: bun run build
