@@ -48,9 +48,14 @@ jobs:
         working-directory: sigoe-ui
     steps:
       - uses: actions/checkout@v7
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version: '1'
       - run: bun install --frozen-lockfile
       - run: bun --bun run test:coverage
       - run: bun --bun run build
+      - run: bun run test:coverage
+      - run: bun run build
