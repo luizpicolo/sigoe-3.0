@@ -3,8 +3,8 @@ import { onMounted, computed, ref } from 'vue'
 import Sidebar from '@/components/sidebar.vue'
 import Button from '@/components/ui/button.vue'
 import Breadcrumb from '@/components/breadcrumb.vue'
-import Input from '@/components/ui/input.vue'
 import Header from '@/components/header.vue'
+import ListFilters from '@/components/ListFilters.vue'
 import { list, remove } from '@/services/school_groups'
 import { can, permissionState } from '@/services/permissions'
 import VPagination from '@hennge/vue3-pagination'
@@ -63,7 +63,8 @@ const destroy = async id => {
   if (await confirm('Excluir esta turma?')) {
     try {
       await remove(id)
-      if (await success('Turma excluída com sucesso.')){
+
+      if (await success('Turma excluída com sucesso.')) {
         await loadGroups()
       }
     } catch (e) {
@@ -89,47 +90,23 @@ onMounted(loadGroups)
           Turmas
         </h1>
 
-        <div class="bg-white rounded-md shadow p-4 mb-6">
-          <div class="flex flex-wrap gap-2">
-            <Button :disabled="!can('classes', 'create')" customClass="bg-green-600 hover:bg-green-700 focus:ring-green-500" to="/administrador/turmas/novo">
-              <i class="fa-solid fa-plus pr-2"></i>
-              Nova Turma
-            </Button>
-
-            <div class="flex items-center gap-2 ml-auto">
-              <span class="text-sm">
-                Ordenar por
-              </span>
-
-              <select v-model="order" @change="changeFilters" class="block w-[180px] px-3 py-2 border border-gray-300 bg-white rounded-md shadow-sm sm:text-sm">
-                <option value="id">ID</option>
-                <option value="name">Nome</option>
-              </select>
-            </div>
-
-            <div class="flex items-center gap-2">
-              <span class="text-sm">
-                Total
-              </span>
-
-              <select v-model="amount" @change="changeFilters" class="block w-[80px] px-3 py-2 border border-gray-300 bg-white rounded-md shadow-sm sm:text-sm">
-                <option :value="10">10</option>
-                <option :value="25">25</option>
-                <option :value="50">50</option>
-                <option :value="100">100</option>
-              </select>
-            </div>
-
-            <div class="flex items-center gap-2">
-              <Input v-model="search" type="text" placeholder="Buscar..." class="w-[200px]" />
-
-              <Button @click="searchGroups" customClass="bg-green-600 hover:bg-green-700 focus:ring-green-500">
-                <i class="fa-solid fa-magnifying-glass pr-2"></i>
-                Busca
-              </Button>
-            </div>
-          </div>
-        </div>
+        <ListFilters
+          v-model:search="search"
+          v-model:order="order"
+          v-model:amount="amount"
+          search-placeholder="Buscar turmas..."
+          :order-options="[
+            { label: 'ID', value: 'id' },
+            { label: 'Nome', value: 'name' }
+          ]"
+          :amount-options="[10, 25, 50, 100]"
+          :create-permission="can('classes', 'create')"
+          create-label="Nova Turma"
+          create-route="/administrador/turmas/novo"
+          create-icon="fa-solid fa-plus"
+          @search="searchGroups"
+          @filter-change="changeFilters"
+        />
 
         <div class="bg-white rounded-md shadow overflow-hidden w-full">
           <div v-if="loading" class="p-6 text-center">
@@ -195,7 +172,7 @@ onMounted(loadGroups)
               </tr>
 
               <tr v-if="!groups.length">
-                <td colspan="5" class="px-6 py-4 text-center text-sm text-gray-500">
+                <td :colspan="showCampus ? 5 : 4" class="px-6 py-4 text-center text-sm text-gray-500">
                   Nenhuma turma encontrada.
                 </td>
               </tr>

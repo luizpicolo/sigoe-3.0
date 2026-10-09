@@ -3,12 +3,12 @@ import { onMounted, computed, ref } from 'vue'
 import Sidebar from '@/components/sidebar.vue'
 import Button from '@/components/ui/button.vue'
 import Breadcrumb from '@/components/breadcrumb.vue'
-import Input from '@/components/ui/input.vue'
 import { list } from '@/services/incidents'
 import { can, permissionState } from '@/services/permissions'
 import VPagination from '@hennge/vue3-pagination'
 import '@hennge/vue3-pagination/dist/vue3-pagination.css'
 import Header from '@/components/header.vue'
+import ListFilters from '@/components/listfilters.vue'
 
 const breadcrumbItems = [
   { label: 'Home', href: '/' },
@@ -85,40 +85,23 @@ onMounted(loadIncidents)
         <Breadcrumb :items="breadcrumbItems" />
         <h1 class="text-2xl font-bold mb-6">Ocorrências Escolares</h1>
 
-        <div class="bg-white rounded-md shadow p-4 mb-6">
-          <div class="flex flex-wrap gap-2">
-            <Button :disabled="!can('occurrences', 'create')" customClass="bg-green-600 hover:bg-green-700 focus:ring-green-500" to="/ocorrencias/ocorrencias/novo">
-              <i class="fa-solid fa-user pr-2"></i>
-              Nova Ocorrência
-            </Button>
-
-            <div class="flex items-center gap-2 ml-auto">
-              <span class="text-sm">Ordenar por</span>
-              <select v-model="order" @change="changeFilters" class="block w-[180px] px-3 py-2 border border-gray-300 bg-white rounded-md shadow-sm">
-                <option value="id">ID</option>
-                <option value="date_incident">Data</option>
-              </select>
-            </div>
-
-            <div class="flex items-center gap-2">
-              <span class="text-sm">Total</span>
-              <select v-model="amount" @change="changeFilters" class="block w-[80px] px-3 py-2 border border-gray-300 bg-white rounded-md shadow-sm">
-                <option :value="10">10</option>
-                <option :value="25">25</option>
-                <option :value="50">50</option>
-                <option :value="100">100</option>
-              </select>
-            </div>
-
-            <div class="flex items-center gap-2">
-              <Input v-model="search" type="text" placeholder="Buscar..." class="w-[200px]" />
-              <Button @click="searchIncidents" customClass="bg-green-600 hover:bg-green-700 focus:ring-green-500">
-                <i class="fa-solid fa-magnifying-glass  pr-2"></i>
-                Busca
-              </Button>
-            </div>
-          </div>
-        </div>
+        <ListFilters
+          v-model:search="search"
+          v-model:order="order"
+          v-model:amount="amount"
+          search-placeholder="Buscar ocorrências..."
+          :order-options="[
+            { label: 'ID', value: 'id' },
+            { label: 'Data', value: 'date_incident' }
+          ]"
+          :amount-options="[10, 25, 50, 100]"
+          :create-permission="can('occurrences', 'create')"
+          create-label="Nova Ocorrência"
+          create-route="/ocorrencias/ocorrencias/novo"
+          create-icon="fa-solid fa-user"
+          @search="searchIncidents"
+          @filter-change="changeFilters"
+        />
 
         <div class="bg-white rounded-md shadow overflow-hidden w-full">
           <div v-if="loading" class="p-6 text-center">

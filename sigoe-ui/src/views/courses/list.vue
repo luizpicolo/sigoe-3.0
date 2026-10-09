@@ -4,7 +4,7 @@ import Sidebar from '@/components/sidebar.vue'
 import Button from '@/components/ui/button.vue'
 import Header from '@/components/header.vue'
 import Breadcrumb from '@/components/breadcrumb.vue'
-import Input from '@/components/ui/input.vue'
+import ListFilters from '@/components/ListFilters.vue'
 import VPagination from '@hennge/vue3-pagination'
 import '@hennge/vue3-pagination/dist/vue3-pagination.css'
 
@@ -45,7 +45,7 @@ const loadCourses = async () => {
   }
 }
 
-const updateHandler = (newPage) => {
+const updateHandler = newPage => {
   page.value = newPage
   loadCourses()
 }
@@ -60,11 +60,12 @@ const changeFilters = () => {
   loadCourses()
 }
 
-const destroy = async (id) => {
+const destroy = async id => {
   if (await confirm('Excluir este curso?')) {
     try {
       await remove(id)
-      if (await success('Curso removido com sucesso')){
+
+      if (await success('Curso removido com sucesso')) {
         await loadCourses()
       }
     } catch (e) {
@@ -86,45 +87,27 @@ onMounted(loadCourses)
       <main class="flex-1 min-w-0 p-6">
         <Breadcrumb :items="breadcrumbItems" />
 
-        <h1 class="text-2xl font-bold mb-6">Cursos</h1>
+        <h1 class="text-2xl font-bold mb-6">
+          Cursos
+        </h1>
 
-        <div class="bg-white rounded-md shadow p-4 mb-6">
-          <div class="flex flex-wrap gap-2">
-            <Button :disabled="!can('courses', 'create')" customClass="bg-green-600 hover:bg-green-700 focus:ring-green-500" to="/administrador/cursos/novo">
-              <i class="fa-solid fa-plus pr-2"></i>
-              Novo Curso
-            </Button>
-
-            <div class="flex items-center gap-2 ml-auto">
-              <span class="text-sm">Ordenar por</span>
-
-              <select v-model="order" @change="changeFilters" class="block w-[180px] px-3 py-2 border border-gray-300 bg-white rounded-md shadow-sm sm:text-sm">
-                <option value="id">ID</option>
-                <option value="name">Nome</option>
-              </select>
-            </div>
-
-            <div class="flex items-center gap-2">
-              <span class="text-sm">Total</span>
-
-              <select v-model="amount" @change="changeFilters" class="block w-[80px] px-3 py-2 border border-gray-300 bg-white rounded-md shadow-sm sm:text-sm">
-                <option :value="10">10</option>
-                <option :value="25">25</option>
-                <option :value="50">50</option>
-                <option :value="100">100</option>
-              </select>
-            </div>
-
-            <div class="flex items-center gap-2">
-              <Input v-model="search" type="text" placeholder="Buscar..." class="w-[200px]" />
-
-              <Button @click="searchCourses" customClass="bg-green-600 hover:bg-green-700 focus:ring-green-500">
-                <i class="fa-solid fa-magnifying-glass pr-2"></i>
-                Busca
-              </Button>
-            </div>
-          </div>
-        </div>
+        <ListFilters
+          v-model:search="search"
+          v-model:order="order"
+          v-model:amount="amount"
+          search-placeholder="Buscar cursos..."
+          :order-options="[
+            { label: 'ID', value: 'id' },
+            { label: 'Nome', value: 'name' }
+          ]"
+          :amount-options="[10, 25, 50, 100]"
+          :create-permission="can('courses', 'create')"
+          create-label="Novo Curso"
+          create-route="/administrador/cursos/novo"
+          create-icon="fa-solid fa-plus"
+          @search="searchCourses"
+          @filter-change="changeFilters"
+        />
 
         <div class="bg-white rounded-md shadow overflow-hidden w-full">
           <div v-if="loading" class="p-6 text-center">
@@ -190,7 +173,7 @@ onMounted(loadCourses)
               </tr>
 
               <tr v-if="!courses.length">
-                <td colspan="5" class="px-6 py-4 text-center text-sm text-gray-500">
+                <td :colspan="showCampus ? 5 : 4" class="px-6 py-4 text-center text-sm text-gray-500">
                   Nenhum curso encontrado.
                 </td>
               </tr>
