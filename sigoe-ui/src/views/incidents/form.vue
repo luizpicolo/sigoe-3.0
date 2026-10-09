@@ -331,7 +331,7 @@ onMounted(loadData)
           </Card>
 
           <template v-if="can('occurrences', 'sanction')">
-            <Card title="Capítulo III - Direitos e Deveres">
+            <Card title="Capítulo III - Direitos e Deveres do estudante">
               <label v-for="item in options.student_duties" :key="item.id" class="flex gap-2 mb-2">
                 <input type="checkbox" :value="item.id" v-model="studentDuties" />
 
@@ -341,7 +341,7 @@ onMounted(loadData)
               </label>
             </Card>
 
-            <Card title="Capítulo IV - Proibições">
+            <Card title="Capítulo IV - Proibições e Responsabilidades">
               <label v-for="item in options.prohibition_and_responsibilities" :key="item.id" class="flex gap-2 mb-2">
                 <input type="checkbox" :value="item.id" v-model="prohibitions" />
 
