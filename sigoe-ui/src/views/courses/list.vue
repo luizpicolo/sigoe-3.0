@@ -4,7 +4,7 @@ import Sidebar from '@/components/sidebar.vue'
 import Button from '@/components/ui/button.vue'
 import Header from '@/components/header.vue'
 import Breadcrumb from '@/components/breadcrumb.vue'
-import ListFilters from '@/components/ListFilters.vue'
+import ListFilters from '@/components/listfilters.vue'
 import VPagination from '@hennge/vue3-pagination'
 import '@hennge/vue3-pagination/dist/vue3-pagination.css'
 
