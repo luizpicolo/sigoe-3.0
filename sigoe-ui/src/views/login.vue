@@ -1,4 +1,5 @@
 <script setup>
+import axios from 'axios'
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import Input from '@/components/ui/input.vue'
@@ -6,16 +7,18 @@ import Button from '@/components/ui/button.vue'
 import { isTokenValid } from '@/services/authentication'
 import { error } from '@/utils/sweetPopup2'
 import { getInitialRoute } from '@/utils/device'
-import axios from 'axios'
+import { version } from '@/utils/version'
 
 const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000'
 
 const router = useRouter()
 const username = ref('')
+const VERSION = ref('')
 const password = ref('')
 const isLoading = ref(false)
 
 onMounted(async () => {
+  VERSION.value = await version()
   const isValid = await isTokenValid()
 
   if (isValid) {
@@ -98,7 +101,7 @@ const handleSubmit = async () => {
           </p>
 
           <p>
-            SIGOE - 3.0.1
+            SIGOE - {{ VERSION }}
           </p>
         </div>
       </div>
