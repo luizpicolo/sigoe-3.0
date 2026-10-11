@@ -41,3 +41,9 @@ fs.writeFileSync(file, JSON.stringify(packageJson, null, 2) + "\n");
 
 console.log(`Versão atualizada para ${version}`);
 ' "$PACKAGE_JSON" "$NOVA_VERSAO"
+
+git add VERSION.md 
+git add $PACKAGE_JSON
+git commit -m "Atualizada versão para $NOVA_VERSAO"
+git push origin main
+gh release create v$NOVA_VERSAO --title "v$NOVA_VERSAO" --notes "v$NOVA_VERSAO"
