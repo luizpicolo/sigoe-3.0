@@ -15,7 +15,8 @@ class Api::DashboardController < ApplicationController
       by_courses: incidents.by_courses({}),
       by_type_incident: incidents.by_type_incident({}),
       by_sanction: incidents.by_sanction({}),
-      by_is_resolved: incidents.by_is_resolved({})
+      by_is_resolved: incidents.by_is_resolved({}),
+      by_campus: incidents.by_campus({})
     }
   end
 

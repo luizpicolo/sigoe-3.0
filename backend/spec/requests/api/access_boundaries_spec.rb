@@ -124,6 +124,7 @@ RSpec.describe 'Campus and privacy boundaries', type: :request do
       get '/api/dashboard'
       expect(response).to have_http_status(:ok)
       expect(response.parsed_body['by_years'].values.sum).to eq(2)
+      expect(response.parsed_body['by_campus']).to eq(polo.name => 2)
     end
 
     it 'keeps private records hidden from a local administrator but allows super administrators' do

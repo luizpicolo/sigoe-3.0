@@ -201,6 +201,29 @@ RSpec.describe Incident, type: :model do
     end
   end
 
+  describe '.by_campus' do
+    let(:campo_grande) { FactoryBot.create(:polo, name: 'Campo Grande') }
+    let(:dourados) { FactoryBot.create(:polo, name: 'Dourados') }
+    let(:campo_grande_course) { FactoryBot.create(:course, polo: campo_grande) }
+    let(:dourados_course) { FactoryBot.create(:course, polo: dourados) }
+    let(:campo_grande_user) { FactoryBot.create(:user, polo: campo_grande) }
+    let(:dourados_user) { FactoryBot.create(:user, polo: dourados) }
+
+    before do
+      FactoryBot.create(:incident, user: campo_grande_user, course: campo_grande_course)
+      FactoryBot.create(:incident, user: campo_grande_user, course: campo_grande_course)
+      FactoryBot.create(:incident, user: dourados_user, course: dourados_course)
+    end
+
+    it 'returns incident counts grouped by the campus of the reporting user' do
+      expect(described_class.by_campus({})).to eq('Campo Grande' => 2, 'Dourados' => 1)
+    end
+
+    it 'applies campus filters used by local users' do
+      expect(described_class.by_campus(courses: { polo: campo_grande.id })).to eq('Campo Grande' => 2)
+    end
+  end
+
   describe '#signed_by_student_in' do
     let(:subject) { FactoryBot.create(:incident) }
 
@@ -237,8 +260,7 @@ RSpec.describe Incident, type: :model do
     it 'returns a hash with the counts of each resolved status' do
       result = described_class.by_is_resolved
 
-      # check that the expected keys and values are present in the result
-      expect(result).to include('Sim' => 2, 'Não' => 2, 'Sem Categoria' => 1)
+      expect(result).to include('Dada ciência / Resolvida' => 2, 'Apenas Registradas' => 3)
     end
   end
 

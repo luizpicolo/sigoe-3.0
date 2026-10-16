@@ -58,6 +58,7 @@ onMounted(() => {
 
         <div v-else class="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <Chart title="Ocorrências por ano" :data="dashboard.by_years" />
+          <Chart title="Por Campus" :data="dashboard.by_campus" />
           <Chart title="Ocorrências por turma" :data="dashboard.by_courses" />
           <Chart title="Ocorrências por tipo" :data="dashboard.by_type_incident" />
           <Chart title="Sanções adotadas" :data="dashboard.by_sanction" />

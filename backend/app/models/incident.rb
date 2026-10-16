@@ -60,15 +60,18 @@ class Incident < ApplicationRecord
     joins(:course).where(params_return).group_by_year(:created_at, format: '%Y').count
   end
 
+  def self.by_campus(params_return)
+    joins(:course, user: :polo).where(params_return).group('polos.name').order(Arel.sql('COUNT(*) DESC')).count
+  end
+
   def self.by_courses(params_return)
     joins(:course).where(params_return).group(:'courses.name').order(Arel.sql('COUNT(*) DESC')).count
   end
 
   def self.by_is_resolved(params_return = {})
     result = joins(:course).where(params_return).group(:is_resolved).order(Arel.sql('COUNT(*) DESC')).count
-    result['Não'] = result.delete 'no_'
-    result['Sem Categoria'] = result.delete nil
-    result['Sim'] = result.delete 'yes_'
+    result['Apenas Registradas'] = result.delete('no_').to_i + result.delete(nil).to_i
+    result['Dada ciência / Resolvida'] = result.delete 'yes_'
     result.compact
   end
 
