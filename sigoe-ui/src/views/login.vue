@@ -84,7 +84,7 @@ const handleSubmit = async () => {
             </p>
           </div>
 
-          <form @submit.prevent="handleSubmit" class="space-y-6">
+          <form v-if="!isValid" @submit.prevent="handleSubmit" class="space-y-6">
             <Input id="username" name="username" label="Usuário" v-model="username" required />
 
             <Input id="password" name="password" label="Senha" type="password" v-model="password" required />
@@ -93,6 +93,10 @@ const handleSubmit = async () => {
               {{ isLoading ? 'Entrando...' : 'Entrar' }}
             </Button>
           </form>
+          <div v-else class="text-center">
+            <p>Chateado? Aguarde...</p>
+            <img src="/bored.gif" width="60" class="moving-image" />
+          </div>
         </div>
 
         <div class="text-center text-sm text-gray-600">

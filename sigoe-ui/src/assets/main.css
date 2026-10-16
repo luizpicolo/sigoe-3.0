@@ -29,3 +29,17 @@ button {
     place-items: center;
   }
 }
+
+.moving-image {
+  display: inline;
+  animation: move-back-and-forth 2s ease-in-out infinite alternate;
+}
+
+@keyframes move-back-and-forth {
+  from {
+    transform: translateX(-80px);
+  }
+  to {
+    transform: translateX(80px);
+  }
+}
