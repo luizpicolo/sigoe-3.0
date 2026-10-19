@@ -29,7 +29,7 @@ class Api::ReportIncidentsController < ApplicationController
         student: incident.student_name,
         course: incident.course_name,
         date_incident: incident.date_incident,
-        time_incident: incident.time_incident,
+        time_incident: incident.time_incident&.strftime('%H:%M'),
         type_incident: incident.type_incident.name,
         description: incident.description
       }

@@ -20,7 +20,7 @@ describe('relatório de ocorrência', () => {
       student: { name: 'Maria' },
       course: { name: 'Informática' },
       date_incident: '2026-09-24',
-      time_incident: '10:30',
+      time_incident: '2000-01-01T20:20:00.000-04:00',
       type_incident: { name: 'Indisciplina' },
       description: 'Descrição',
       sanction: 'written_warning',
@@ -43,6 +43,7 @@ describe('relatório de ocorrência', () => {
     await report.generateIncidentReportFromIncident(incident)
 
     expect(window.open).toHaveBeenCalledWith('', '_blank', 'width=900,height=700')
+    expect(window.open.mock.results[0].value.document.write).toHaveBeenCalledWith(expect.stringContaining('20:20'))
     window.open = open
   })
 })

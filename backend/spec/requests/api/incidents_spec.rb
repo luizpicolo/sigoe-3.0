@@ -42,5 +42,26 @@ RSpec.describe 'Api::Incidents', type: :request do
       expect(response).to have_http_status(:ok)
       expect(JSON.parse(response.body)['incidents'].map { |item| item['id'] }).to include(incident.id)
     end
+
+    it 'retorna a hora no formato de relógio local ao visualizar para edição' do
+      incident.update!(time_incident: '20:20')
+
+      get "/api/incidents/#{incident.id}"
+
+      expect(response).to have_http_status(:ok)
+      expect(response.parsed_body.dig('incident', 'time_incident')).to eq('20:20')
+    end
+
+    it 'retorna a hora no formato local no relatório de ocorrências' do
+      incident.update!(time_incident: '20:20', date_incident: Date.current)
+
+      get '/api/report_incidents/data', params: {
+        date_start: Date.current.to_s,
+        date_final: Date.current.to_s
+      }
+
+      expect(response).to have_http_status(:ok)
+      expect(response.parsed_body.first['time_incident']).to eq('20:20')
+    end
   end
 end

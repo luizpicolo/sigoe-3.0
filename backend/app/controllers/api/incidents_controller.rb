@@ -112,13 +112,16 @@ class Api::IncidentsController < ApplicationController
   def incident_params
     permitted = params.require(:incident).permit(:type_incident_id, :date_incident, :sector_id, :assistant_id, :time_incident, :institution, :description, :soluction, :is_resolved, :visibility, :type_student, :sanction, student_ids: [], prohibition_and_responsibility_ids: [], student_duty_ids: [])
     validate_campus_links!(permitted, assistant_id: User, sector_id: Sector)
-    return permitted if can?(:sanction, Incident)
+    return permitted if can?(:sanction, Incident) || current_user.admin? || current_user.super_admin?
 
     permitted.except(:soluction, :is_resolved, :sanction, :student_duty_ids, :prohibition_and_responsibility_ids)
   end
 
   def incident_json(incident)
-    incident.as_json(include: { student: { only: %i[id name ra photo] }, course: { only: %i[id name initial polo_id], include: { polo: { only: %i[id name] } } }, type_incident: { only: %i[id name] }, sector: { only: %i[id name email] }, user: { only: %i[id name] }, assistant: { only: %i[id name email] }, student_duties: { only: %i[id item] }, prohibition_and_responsibilities: { only: %i[id item] } }).merge('attachments' => incident.attachments.map { |attachment| attachment_json(attachment) })
+    incident.as_json(include: { student: { only: %i[id name ra photo] }, course: { only: %i[id name initial polo_id], include: { polo: { only: %i[id name] } } }, type_incident: { only: %i[id name] }, sector: { only: %i[id name email] }, user: { only: %i[id name] }, assistant: { only: %i[id name email] }, student_duties: { only: %i[id item] }, prohibition_and_responsibilities: { only: %i[id item] } }).merge(
+      'time_incident' => incident.time_incident&.strftime('%H:%M'),
+      'attachments' => incident.attachments.map { |attachment| attachment_json(attachment) }
+    )
   end
 
   def attachment_json(attachment)

@@ -220,5 +220,62 @@ RSpec.describe 'Campus and privacy boundaries', type: :request do
       post '/api/incidents', params: { incident: payload.except(:student_ids) }
       expect(response).to have_http_status(:unprocessable_content)
     end
+
+    it 'persists solution, resolution, sanction, duties and prohibitions when sanction permission is granted' do
+      duty = create(:incident_student_duty)
+      prohibition = create(:prohibition_and_responsibility)
+      grant('Incident', can_create: true, can_sanction: true)
+      attributes = {
+        time_incident: '20:20',
+        soluction: 'A solução foi registrada.',
+        is_resolved: 'yes_',
+        sanction: 'written_warning',
+        student_duty_ids: [duty.id],
+        prohibition_and_responsibility_ids: [prohibition.id]
+      }
+
+      post '/api/incidents', params: { incident: payload.merge(attributes) }
+
+      expect(response).to have_http_status(:created)
+      created = Incident.find(response.parsed_body.dig('incidents', 0, 'id'))
+      expect(response.parsed_body.dig('incidents', 0, 'time_incident')).to eq('20:20')
+      expect(created.time_incident.strftime('%H:%M')).to eq('20:20')
+      expect(created).to have_attributes(
+        soluction: 'A solução foi registrada.',
+        is_resolved: 'yes_',
+        sanction: 'written_warning'
+      )
+      expect(created.student_duty_ids).to eq([duty.id])
+      expect(created.prohibition_and_responsibility_ids).to eq([prohibition.id])
+    end
+
+    it 'persists solution, resolution, sanction, duties and prohibitions when updating' do
+      incident = create(:incident, user: actor, assistant: colleague, student: student, course: course)
+      duty = create(:incident_student_duty)
+      prohibition = create(:prohibition_and_responsibility)
+      grant('Incident', can_update: true, can_sanction: true)
+
+      patch "/api/incidents/#{incident.id}", params: {
+        incident: {
+          time_incident: '20:20',
+          soluction: 'A solução atualizada.',
+          is_resolved: 'yes_',
+          sanction: 'suspension',
+          student_duty_ids: [duty.id],
+          prohibition_and_responsibility_ids: [prohibition.id]
+        }
+      }
+
+      expect(response).to have_http_status(:ok)
+      expect(response.parsed_body.dig('incident', 'time_incident')).to eq('20:20')
+      expect(incident.reload.time_incident.strftime('%H:%M')).to eq('20:20')
+      expect(incident.reload).to have_attributes(
+        soluction: 'A solução atualizada.',
+        is_resolved: 'yes_',
+        sanction: 'suspension'
+      )
+      expect(incident.student_duty_ids).to eq([duty.id])
+      expect(incident.prohibition_and_responsibility_ids).to eq([prohibition.id])
+    end
   end
 end

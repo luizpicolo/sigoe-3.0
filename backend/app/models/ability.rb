@@ -14,12 +14,12 @@ class Ability
     user.permissions.each do |permission|
       entity = permission.entity.to_s.safe_constantize
       next unless entity.is_a?(Class) && entity <= ApplicationRecord
-      # Permissões extras para ocorrências
+      # Ações extras mantidas pela permissão legada.
       if permission.can_extras?
-        can [:sanction], entity if permission.can_extras?
         can [:confirmation], entity if permission.can_extras?
         can [:sign], entity if permission.can_extras?
       end
+      can [:sanction], entity if permission.can_sanction? && entity == Incident
       can [:attach_pdf], Incident if permission.can_attach_pdf? && permission.entity == 'Incident'
       can [:create], entity if permission.can_create?
       can [:read], entity if permission.can_read_restricted?

@@ -6,6 +6,7 @@ import StudentSearchableSelect from '@/components/ui/student-searchable-select.v
 import { create, find, options, update } from '@/services/incidents'
 import { can } from '@/services/permissions'
 import { error, success } from '@/utils/sweetPopup2'
+import { toTimeInputValue } from '@/utils'
 
 const route = useRoute(), router = useRouter()
 const editing = computed(() => Boolean(route.params.id))
@@ -25,7 +26,7 @@ onMounted(async () => {
     if (editing.value) {
       const response = await find(id.value); incident.value = response.incident
       const x = incident.value
-      form.value = { ...form.value, type_student:x.type_student || 'non_resident', assistant_id:String(x.assistant_id || x.assistant?.id || ''), sector_id:String(x.sector_id || ''), type_incident_id:String(x.type_incident_id || x.type_incident?.id || ''), visibility:x.visibility || 'public', date_incident:x.date_incident || '', time_incident:x.time_incident || '', description:x.description || '', sanction:x.sanction || '', is_resolved:x.is_resolved || 'no_', soluction:x.soluction || '' }
+      form.value = { ...form.value, type_student:x.type_student || 'non_resident', assistant_id:String(x.assistant_id || x.assistant?.id || ''), sector_id:String(x.sector_id || ''), type_incident_id:String(x.type_incident_id || x.type_incident?.id || ''), visibility:x.visibility || 'public', date_incident:x.date_incident || '', time_incident:toTimeInputValue(x.time_incident), description:x.description || '', sanction:x.sanction || '', is_resolved:x.is_resolved || 'no_', soluction:x.soluction || '' }
       duties.value = (x.student_duties || []).map(i => i.id); prohibitions.value = (x.prohibition_and_responsibilities || []).map(i => i.id)
     }
   } catch (e) { errorMessage.value = e.response?.data?.errors?.join(', ') || 'Não foi possível carregar o formulário.' }

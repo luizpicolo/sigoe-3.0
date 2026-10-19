@@ -16,6 +16,7 @@ const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 import { can } from '@/services/permissions'
 import { create as createIncident, find as findIncident, options as incidentOptions, update as updateIncident } from '@/services/incidents'
 import { success, error } from '@/utils/sweetPopup2'
+import { toTimeInputValue } from '@/utils'
 
 const route = useRoute()
 const router = useRouter()
@@ -98,7 +99,7 @@ const loadIncident = async () => {
   selectedSanction.value = data.sanction || ''
   occurrenceResolved.value = data.is_resolved || 'no_'
   occurrenceDate.value = data.date_incident || ''
-  occurrenceTime.value = data.time_incident || ''
+  occurrenceTime.value = toTimeInputValue(data.time_incident)
   occurrenceDescription.value = data.description || ''
   solutionDescription.value = data.soluction || ''
   studentDuties.value = (data.student_duties || []).map(item => item.id)

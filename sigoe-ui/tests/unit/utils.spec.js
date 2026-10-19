@@ -15,6 +15,8 @@ describe('utilitários de formatação', () => {
 
   it('formata horários', () => {
     expect(formatTime('2025-04-30T14:35:00')).toMatch(/14:35/)
+    expect(formatTime('2000-01-01T20:20:00.000-04:00')).toBe('20:20')
+    expect(formatTime('20:20:00')).toBe('20:20')
     expect(formatTime(null)).toBe('')
   })
 

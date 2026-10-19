@@ -10,22 +10,16 @@ export const formatDate = date => {
   return value.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: '2-digit' })
 }
 
-export const formatTime = (time) => {
+export const toTimeInputValue = (time) => {
   if (!time) return ''
 
-  if (/^\d{2}:\d{2}(:\d{2})?$/.test(time)) {
-    return time.slice(0, 5)
-  }
-
-  try {
-    return new Date(time).toLocaleTimeString('pt-BR', {
-      hour: '2-digit',
-      minute: '2-digit',
-    })
-  } catch {
-    return ''
-  }
+  // API time values represent a wall clock time. Keep their clock portion
+  // instead of parsing the timestamp and shifting it to the browser timezone.
+  const match = String(time).match(/(?:^|T)(\d{2}):(\d{2})/)
+  return match ? `${match[1]}:${match[2]}` : ''
 }
+
+export const formatTime = toTimeInputValue
 
 export const avatar = (path) => {
   if (!path) return '';
