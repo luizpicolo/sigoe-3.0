@@ -151,7 +151,7 @@ onMounted(loadIncidents)
                 </td>
 
                 <td class="px-3 py-4 text-center text-sm">
-                  <i v-if="incident.is_resolved" class="fa-solid fa-check text-green-600"></i>
+                  <i v-if="incident.is_resolved === 'yes_'" class="fa-solid fa-check text-green-600"></i>
                   <i v-else class="fa-solid fa-xmark text-red-600"></i>
                   
                 </td>
