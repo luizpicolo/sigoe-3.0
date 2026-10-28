@@ -5,7 +5,6 @@ import Button from '@/components/ui/button.vue'
 import Breadcrumb from '@/components/breadcrumb.vue'
 import Card from '@/components/ui/card.vue'
 import Select from '@/components/ui/select.vue'
-import SearchableSelect from '@/components/ui/searchable-select.vue'
 import Input from '@/components/ui/input.vue'
 import Header from '@/components/header.vue'
 import { getIncidentReportOptions, generateIncidentReport } from '@/services/reports/incidents'
@@ -221,16 +220,16 @@ onMounted(async () => {
 
           <Card customClass="mb-4" title="Estudante e Curso" icon="user-graduate">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <SearchableSelect v-model="selectedStudent" :options="studentOptions" placeholder="Todos os estudantes"
+              <Select v-model="selectedStudent" :options="studentOptions" placeholder="Todos os estudantes"
                 :disabled="isLoadingOptions" />
-              <SearchableSelect v-model="selectedCourse" :options="courseOptions" placeholder="Todos os cursos"
+              <Select v-model="selectedCourse" :options="courseOptions" placeholder="Todos os cursos"
                 :disabled="isLoadingOptions" />
             </div>
           </Card>
 
           <Card customClass="mb-4" title="Dados da Ocorrência" icon="exclamation-triangle">
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              <SearchableSelect v-model="selectedOccurrenceType" :options="occurrenceOptions"
+              <Select v-model="selectedOccurrenceType" :options="occurrenceOptions"
                 placeholder="Todos os tipos" :disabled="isLoadingOptions" />
 
               <Select v-model="selectedResident"
@@ -239,7 +238,7 @@ onMounted(async () => {
               <Select v-model="selectedResolved"
                 :options="[{ value: '', label: 'Resolvida?' }, { value: 'yes_', label: 'Sim' }, { value: 'no_', label: 'Não' }]" />
 
-              <SearchableSelect v-model="selectedClass" :options="classOptions" placeholder="Todas as turmas"
+              <Select v-model="selectedClass" :options="classOptions" placeholder="Todas as turmas"
                 :disabled="isLoadingOptions" />
             </div>
           </Card>

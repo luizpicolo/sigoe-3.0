@@ -1,5 +1,5 @@
 <script setup>
-import { computed, ref } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 
 const props = defineProps({
   id: String,
@@ -12,6 +12,7 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['update:modelValue'])
+const selectRef = ref(null)
 const isOpen = ref(false)
 const search = ref('')
 const selectedOption = computed(() => props.options.find(option => String(option.value) === String(props.modelValue)))
@@ -37,10 +38,17 @@ const close = () => {
   isOpen.value = false
   search.value = ''
 }
+
+const closeOnOutsideClick = event => {
+  if (selectRef.value && !selectRef.value.contains(event.target)) close()
+}
+
+onMounted(() => document.addEventListener('click', closeOnOutsideClick))
+onBeforeUnmount(() => document.removeEventListener('click', closeOnOutsideClick))
 </script>
 
 <template>
-  <div class="relative">
+  <div ref="selectRef" class="relative">
     <label v-if="label" :for="id" class="mb-2 block text-sm font-medium text-gray-700">{{ label }}</label>
     <button :id="id" type="button" :disabled="disabled" class="flex w-full items-center justify-between rounded-md border-2 border-gray-300 bg-white px-3 py-2 text-left text-sm focus:border-green-500 focus:outline-none focus:ring-2 focus:ring-green-200 disabled:cursor-not-allowed disabled:bg-gray-100" @click="toggle">
       <span :class="selectedOption ? 'text-gray-900' : 'text-gray-500'">{{ selectedOption?.label || placeholder }}</span>

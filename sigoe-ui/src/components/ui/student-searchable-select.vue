@@ -1,5 +1,5 @@
 <script setup>
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { list as listStudents } from '@/services/students'
 
 const props = defineProps({
@@ -12,6 +12,7 @@ const students = ref([])
 const search = ref('')
 const loading = ref(false)
 const opened = ref(false)
+const componentRef = ref(null)
 let searchTimer
 
 const selectedStudents = computed(() => props.modelValue || [])
@@ -30,15 +31,17 @@ const searchStudents = async () => {
 
 const toggleStudent = student => {
   const exists = selectedIds.value.includes(student.id)
-  const nextStudents = exists
-    ? selectedStudents.value.filter(item => item.id !== student.id)
-    : [...selectedStudents.value, student]
+  const nextStudents = exists ? selectedStudents.value.filter(item => item.id !== student.id) : [...selectedStudents.value, student]
   emit('update:modelValue', nextStudents)
   if (!exists) search.value = ''
 }
 
 const removeStudent = studentId => {
   emit('update:modelValue', selectedStudents.value.filter(student => student.id !== studentId))
+}
+
+const closeOnOutsideClick = event => {
+  if (componentRef.value && !componentRef.value.contains(event.target)) opened.value = false
 }
 
 watch(search, () => {
@@ -52,11 +55,19 @@ watch(opened, value => {
   if (value) searchStudents()
 })
 
-onMounted(searchStudents)
+onMounted(() => {
+  searchStudents()
+  document.addEventListener('click', closeOnOutsideClick)
+})
+
+onUnmounted(() => {
+  document.removeEventListener('click', closeOnOutsideClick)
+  clearTimeout(searchTimer)
+})
 </script>
 
 <template>
-  <div class="relative">
+  <div ref="componentRef" class="relative">
     <label class="block text-sm font-medium mb-1">Pesquisar estudante</label>
     <button type="button" class="block w-full px-3 py-2 rounded-md border-2 border-gray-300 bg-white text-left" :disabled="disabled" @click="opened = !opened">
       {{ selectedStudents.length ? `${selectedStudents.length} estudante(s) selecionado(s)` : 'Nome, R.A. ou matrícula' }}

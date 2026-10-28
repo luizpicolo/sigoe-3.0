@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { shallowMount } from '@vue/test-utils'
+import { createMemoryHistory, createRouter, routerKey } from 'vue-router'
 
 const componentModules = import.meta.glob('../../src/components/**/*.vue', { eager: true })
 
@@ -11,6 +12,20 @@ const globalOptions = {
   },
 }
 
+const router = createRouter({ history: createMemoryHistory(), routes: [] })
+
+const propsFor = path => ({
+  incident: {},
+  incidentId: 1,
+  stateUser: { user: {} },
+  ...(path.endsWith('/breadcrumb.vue') ? { items: [] } : {}),
+  ...(path.endsWith('/header.vue') ? {} : {}),
+  ...(path.endsWith('/academic-export-form.vue') ? { action: '/export' } : {}),
+  ...(path.endsWith('/sidebar.vue') ? { activePage: '' } : {}),
+  ...(path.endsWith('/ui/alert.vue') ? { message: '' } : {}),
+  ...(path.endsWith('/ui/chart.vue') ? { title: '' } : {})
+})
+
 describe('Componentes Vue', () => {
   it.each(Object.entries(componentModules))('exporta o componente %s', (_, module) => {
     expect(module?.default).toBeDefined()
@@ -21,8 +36,8 @@ describe('Componentes Vue', () => {
     expect(component).toBeDefined()
 
     const wrapper = shallowMount(component, {
-      global: globalOptions,
-      props: { incident: {}, incidentId: 1, stateUser: { user: {} } },
+      global: { ...globalOptions, provide: { [routerKey]: router } },
+      props: propsFor(path),
     })
 
     expect(wrapper.exists()).toBe(true)

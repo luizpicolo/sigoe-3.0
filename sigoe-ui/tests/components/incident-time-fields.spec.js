@@ -52,7 +52,10 @@ const stubs = {
   Sidebar: true,
   Breadcrumb: true,
   Card: { template: '<section><slot /></section>' },
-  Select: { template: '<select />' },
+  Select: {
+    props: ['options', 'modelValue'],
+    template: '<div />'
+  },
   Button: { template: '<button><slot /></button>' },
   StudentSearchableSelect: true,
   MobileLayout: { template: '<main><slot /></main>' }
