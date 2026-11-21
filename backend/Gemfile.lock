@@ -314,7 +314,7 @@ GEM
       byebug (~> 13.0)
       pry (>= 0.13, < 0.17)
     public_suffix (7.0.5)
-    puma (8.0.2)
+    puma (8.1.2)
       nio4r (~> 2.0)
     racc (1.8.1)
     rack (3.2.8)
@@ -557,7 +557,7 @@ DEPENDENCIES
   nokogiri (>= 1.13.4)
   pg
   pry-byebug
-  puma (~> 8.0)
+  puma (~> 8.1)
   rack (>= 3.2.7)
   rack-cors
   rails (~> 8.1.0)
