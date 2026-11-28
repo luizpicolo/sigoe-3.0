@@ -106,10 +106,14 @@ class Api::IncidentsController < ApplicationController
 
   def send_whatsapp_to(incident = nil)
     uri = URI.parse("#{BAILEYS_URL}/messages")
+    phone = incident&.student&.contact.to_s.gsub(/\D/, '')
+    return if phone.blank?
+
+    phone = "55#{phone}" unless phone.start_with?('55')
 
     header = { 'Content-Type' => 'application/json' }
     user = {
-      to: incident&.student&.contact,
+      to: phone,
       nome: incident&.student&.responsible,
       data: incident&.date_incident,
       filho: incident&.student.name,
