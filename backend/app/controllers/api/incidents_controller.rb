@@ -105,15 +105,15 @@ class Api::IncidentsController < ApplicationController
   end
 
   def send_whatsapp_to(incident = nil)
-    uri = URI.parse("http://bailey:5051/messages")
+    uri = URI.parse("#{BAILEYS_URL}/messages")
 
     header = { 'Content-Type' => 'application/json' }
     user = {
-      to: "556799088371",
-      nome: "nome do responsavel",
-      data: "13/12/2026",
-      filho: "nome do Estudante",
-      descricao: 'Há uma nova ocorrência.',
+      to: incident&.student&.contact,
+      nome: incident&.student&.responsible,
+      data: incident&.date_incident,
+      filho: incident&.student.name,
+      descricao: incident&.description,
       link: "https://ocorrencias/12"
     }
 
