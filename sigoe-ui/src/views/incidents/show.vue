@@ -11,7 +11,7 @@ import AcademicExportForm from '@/components/incidents/academic-export-form.vue'
 import IncidentAttachments from '@/components/incidents/incident-attachments.vue'
 import { formatDate, formatTime } from '@/utils'
 import { can } from '@/services/permissions'
-import { find, remove } from '@/services/incidents'
+import { find, remove, sendWhatsapp } from '@/services/incidents'
 import { generateIncidentReportFromIncident } from '@/services/reports/incidents'
 
 const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
@@ -24,6 +24,8 @@ const incident = ref(null)
 const showAcademicExportForm = ref(false)
 const academicExportAction = ref('')
 const isPrintingReport = ref(false)
+const isSendingWhatsapp = ref(false)
+const whatsappSent = ref(false)
 
 const sanctionLabels = {
   verbal_warning: 'Advertência Verbal',
@@ -72,6 +74,25 @@ const printIncidentReport = async () => {
     error(exception.message || 'Não foi possível gerar o relatório da ocorrência.')
   } finally {
     isPrintingReport.value = false
+  }
+}
+
+const sendIncidentToResponsible = async () => {
+  if (!incident.value || isSendingWhatsapp.value || whatsappSent.value) return
+  if (!incident.value.student?.contact) {
+    error('Não há contato do responsável cadastrado para este estudante.')
+    return
+  }
+
+  isSendingWhatsapp.value = true
+  try {
+    await sendWhatsapp(incidentId)
+    whatsappSent.value = true
+    await success('Ocorrência enviada ao responsável pelo WhatsApp.')
+  } catch (exception) {
+    error(exception.response?.data?.errors?.join(', ') || 'Não foi possível enviar a ocorrência pelo WhatsApp.')
+  } finally {
+    isSendingWhatsapp.value = false
   }
 }
 
@@ -179,6 +200,11 @@ onMounted(loadIncident)
               <Button :disabled="!can('occurrences', 'can_export_to_academic_system')" customClass="mt-4 w-full bg-purple-600 hover:bg-purple-700" @click="openAcademicExportForm">
                 <i class="fa-solid fa-file-export"></i>
                 Exportar para Sistema Acadêmico
+              </Button>
+
+              <Button :disabled="!can('occurrences', 'can_send_whatsapp') || !incident.student?.contact || whatsappSent || isSendingWhatsapp" customClass="mt-4 w-full bg-green-700 hover:bg-green-800" @click="sendIncidentToResponsible">
+                <i class="fa-brands fa-whatsapp pr-2"></i>
+                {{ isSendingWhatsapp ? 'Enviando...' : whatsappSent ? 'Enviado ao responsável' : 'Enviar ao responsável' }}
               </Button>
 
               <Button :disabled="!can('occurrences', 'destroy')" customClass="mt-4 w-full bg-red-600 hover:bg-red-700" @click="deleteIncident">

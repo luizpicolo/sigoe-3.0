@@ -66,6 +66,11 @@ describe('permissões', () => {
     expect(can('occurrences', 'attach_pdf')).toBe(true)
   })
 
+  it('permite envio via WhatsApp quando a permissão de ocorrência está ativa', () => {
+    permissionState.permissions = { occurrences: { can_send_whatsapp: true } }
+    expect(can('occurrences', 'can_send_whatsapp')).toBe(true)
+  })
+
   it('permite abrir ocorrências com leitura restrita, sem conceder edição', () => {
     permissionState.permissions = { occurrences: { can_read_restricted: true } }
     expect(can('occurrences', 'read')).toBe(true)

@@ -45,6 +45,11 @@ export const remove = async id => {
   }
 }
 
+export const sendWhatsapp = async id => {
+  const response = await axios.post(`${BASE_URL}/api/incidents/${id}/send_whatsapp`, {}, config())
+  return response.data
+}
+
 export const uploadAttachment = async (id, file) => {
   const formData = new FormData()
   formData.append('attachment[file]', file)

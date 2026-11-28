@@ -83,7 +83,8 @@ const add = () => {
     can_extras: false,
     can_sanction: false,
     can_export_to_academic_system: false,
-    can_attach_pdf: false
+    can_attach_pdf: false,
+    can_send_whatsapp: false
   })
 
   selected.value = ''
@@ -242,6 +243,14 @@ onMounted(load)
                 type="checkbox"
               />
               Enviar PDF
+            </label>
+
+            <label
+              v-if="permission.entity === 'occurrences'"
+              class="flex items-center gap-2 rounded-lg bg-gray-50 p-3 text-sm"
+            >
+              <input v-model="permission.can_send_whatsapp" type="checkbox" />
+              Envio via WhatsApp
             </label>
           </div>
         </div>

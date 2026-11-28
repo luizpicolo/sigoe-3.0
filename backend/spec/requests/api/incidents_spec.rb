@@ -63,5 +63,62 @@ RSpec.describe 'Api::Incidents', type: :request do
       expect(response).to have_http_status(:ok)
       expect(response.parsed_body.first['time_incident']).to eq('20:20')
     end
+
+    it 'não enfileira WhatsApp ao cadastrar ou atualizar ocorrência' do
+      student = create(:student, course: create(:course, polo: admin.polo))
+      type_incident = create(:type_incident)
+      attributes = {
+        assistant_id: admin.id,
+        student_ids: [student.id],
+        type_incident_id: type_incident.id,
+        date_incident: Date.current,
+        time_incident: '09:15',
+        description: 'Teste de não envio automático',
+        visibility: 'public'
+      }
+
+      expect do
+        post '/api/incidents', params: { incident: attributes }
+      end.not_to have_enqueued_job(SendIncidentWhatsappJob)
+      expect(response).to have_http_status(:created)
+
+      expect do
+        put "/api/incidents/#{incident.id}", params: { incident: { description: 'Atualizada' } }
+      end.not_to have_enqueued_job(SendIncidentWhatsappJob)
+      expect(response).to have_http_status(:ok)
+    end
+
+    it 'enfileira o envio manual autorizado se o responsável tem contato' do
+      create(:permission, user: admin, entity: 'Incident', can_send_whatsapp: true)
+      incident.student.update!(contact: '+55 (67) 99999-0000')
+
+      expect do
+        post "/api/incidents/#{incident.id}/send_whatsapp"
+      end.to have_enqueued_job(SendIncidentWhatsappJob).with(incident.id)
+      expect(response).to have_http_status(:accepted)
+    end
+
+    it 'não enfileira envio se o responsável não tem contato' do
+      create(:permission, user: admin, entity: 'Incident', can_send_whatsapp: true)
+      incident.student.update!(contact: nil)
+
+      expect do
+        post "/api/incidents/#{incident.id}/send_whatsapp"
+      end.not_to have_enqueued_job(SendIncidentWhatsappJob)
+      expect(response).to have_http_status(:unprocessable_content)
+      expect(response.parsed_body['errors'].first).to include('não possui contato')
+    end
+
+    it 'recusa o envio manual sem a permissão específica' do
+      user = create(:user, admin: false, polo: admin.polo)
+      create(:permission, user: user, entity: 'Incident', can_read: true)
+      incident.student.update!(contact: '+55 (67) 99999-0000')
+      sign_in user, scope: :user
+
+      expect do
+        post "/api/incidents/#{incident.id}/send_whatsapp"
+      end.not_to have_enqueued_job(SendIncidentWhatsappJob)
+      expect(response).to have_http_status(:forbidden)
+    end
   end
 end

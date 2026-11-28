@@ -7,7 +7,7 @@ class Api::IncidentsController < ApplicationController
   include ParamsSearch
 
   before_action :authenticate_user!
-  before_action :set_incident, only: %i[show update destroy]
+  before_action :set_incident, only: %i[show update destroy send_whatsapp]
 
   def index
     authorize! :read, Incident
@@ -81,11 +81,20 @@ class Api::IncidentsController < ApplicationController
       send_email_to(sector.email, @incident)
     end
 
-    SendIncidentWhatsappJob.perform_later(@incident.id)
-
     render json: { incident: incident_json(@incident) }
   rescue ActiveRecord::RecordInvalid => e
     render json: { errors: e.record.errors.full_messages }, status: :unprocessable_content
+  end
+
+  def send_whatsapp
+    authorize! :send_whatsapp, @incident
+
+    if @incident.student&.contact.blank?
+      return render json: { errors: ['O estudante não possui contato do responsável cadastrado.'] }, status: :unprocessable_content
+    end
+
+    SendIncidentWhatsappJob.perform_later(@incident.id)
+    render json: { message: 'Envio da ocorrência ao responsável iniciado.' }, status: :accepted
   end
 
   def destroy

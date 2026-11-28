@@ -22,3 +22,7 @@ dokku network:set baileys attach-post-deploy sigoe-internal
 
 dokku domains:clear baileys
 dokku config:set sigoe BAILEYS_URL=http://baileys.web:5051
+
+
+# Worker
+dokku ps:scale sigoe worker=1

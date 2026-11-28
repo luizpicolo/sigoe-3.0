@@ -11,7 +11,7 @@ class Api::PermissionsController < ApplicationController
     'occurrences' => { model: Incident, name: 'Ocorrências' }
   }.freeze
 
-  ACTIONS = %w[can_create can_read can_read_restricted can_update can_sanction can_destroy can_extras can_export_to_academic_system can_attach_pdf].freeze
+  ACTIONS = %w[can_create can_read can_read_restricted can_update can_sanction can_destroy can_extras can_export_to_academic_system can_attach_pdf can_send_whatsapp].freeze
 
   def current
     render json: permission_payload(current_user)
@@ -105,6 +105,7 @@ class Api::PermissionsController < ApplicationController
         entity: config[:model].name,
         **ACTIONS.index_with do |attribute|
           next false if attribute == 'can_attach_pdf' && entity_key != 'occurrences'
+          next false if attribute == 'can_send_whatsapp' && entity_key != 'occurrences'
 
           ActiveModel::Type::Boolean.new.cast(attributes[attribute])
         end

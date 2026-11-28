@@ -4,6 +4,7 @@ import IncidentShow from '@/views/incidents/show.vue'
 
 const mocks = vi.hoisted(() => ({
   find: vi.fn(),
+  sendWhatsapp: vi.fn(),
   route: { params: { id: '42' } },
   router: { push: vi.fn() }
 }))
@@ -15,7 +16,8 @@ vi.mock('vue-router', () => ({
 
 vi.mock('@/services/incidents', () => ({
   find: mocks.find,
-  remove: vi.fn()
+  remove: vi.fn(),
+  sendWhatsapp: mocks.sendWhatsapp
 }))
 
 vi.mock('@/services/permissions', () => ({ can: vi.fn(() => true) }))
@@ -30,7 +32,11 @@ const stubs = {
   Header: true,
   Sidebar: true,
   Breadcrumb: true,
-  Button: true,
+  Button: {
+    props: ['disabled', 'to'],
+    emits: ['click'],
+    template: '<button :disabled="disabled" @click="$emit(\'click\')"><slot /></button>'
+  },
   IncidentAttachments: true,
   AcademicExportForm: true,
   Card: {
@@ -57,6 +63,7 @@ describe('aceitação: visualização de ocorrência', () => {
     mocks.find.mockResolvedValue({
       incident: {
         id: 42,
+        student: { contact: '5567999990000' },
         is_resolved: isResolved,
         student: {},
         course: {},
@@ -73,5 +80,45 @@ describe('aceitação: visualização de ocorrência', () => {
     const verificationLabel = wrapper.findAll('dt').find(label => label.text() === 'Verificada')
     expect(resolvedLabel.element.nextElementSibling.textContent.trim()).toBe(expectedResolution)
     expect(verificationLabel.element.nextElementSibling.textContent.trim()).toBe(expectedVerification)
+  })
+
+  it('envia manualmente ao responsável com permissão e desabilita após o envio', async () => {
+    const { can } = await import('@/services/permissions')
+    can.mockReturnValue(true)
+    mocks.sendWhatsapp.mockResolvedValue({ message: 'enviado' })
+    mocks.find.mockResolvedValue({ incident: {
+      id: 42,
+      student: { contact: '5567999990000' },
+      course: {},
+      student_duties: [],
+      prohibition_and_responsibilities: [],
+      attachments: []
+    } })
+    const wrapper = mount(IncidentShow, { global: { stubs } })
+    await flushPromises()
+
+    const sendButton = wrapper.findAll('button').find(button => button.text().includes('Enviar ao responsável'))
+    expect(sendButton.attributes('disabled')).toBeUndefined()
+    await sendButton.trigger('click')
+    await flushPromises()
+
+    expect(mocks.sendWhatsapp).toHaveBeenCalledWith('42')
+    expect(wrapper.findAll('button').find(button => button.text().includes('Enviado ao responsável')).exists()).toBe(true)
+  })
+
+  it('não habilita envio sem contato do responsável', async () => {
+    mocks.find.mockResolvedValue({ incident: {
+      id: 42,
+      student: { contact: null },
+      course: {},
+      student_duties: [],
+      prohibition_and_responsibilities: [],
+      attachments: []
+    } })
+    const wrapper = mount(IncidentShow, { global: { stubs } })
+    await flushPromises()
+
+    const sendButton = wrapper.findAll('button').find(button => button.text().includes('Enviar ao responsável'))
+    expect(sendButton.attributes('disabled')).toBeDefined()
   })
 })

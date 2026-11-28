@@ -84,7 +84,8 @@ const addEntity = entityId => {
     can_extras: false,
     can_sanction: false,
     can_export_to_academic_system: false,
-    can_attach_pdf: false
+    can_attach_pdf: false,
+    can_send_whatsapp: false
   })
 
   selectedEntity.value = ''
@@ -249,6 +250,11 @@ onMounted(load)
                   <span class="text-sm text-gray-700">
                     Enviar PDF
                   </span>
+                </label>
+
+                <label v-if="isOccurrence(permission)" class="flex items-center gap-3 p-3 border border-gray-200 rounded-md cursor-pointer hover:bg-gray-50">
+                  <input v-model="permission.can_send_whatsapp" type="checkbox" class="w-5 h-5" />
+                  <span class="text-sm text-gray-700">Envio via WhatsApp</span>
                 </label>
               </div>
             </div>

@@ -25,6 +25,7 @@ class Ability
       can [:read], entity if permission.can_read_restricted?
       can [:read_restricted], entity if permission.can_read_restricted?
       can [:export_to_academic_system], entity if permission.can_export_to_academic_system?
+      can [:send_whatsapp], Incident if permission.can_send_whatsapp? && permission.entity == 'Incident'
       can [:read], entity if permission.can_read?
       can [:update], entity if permission.can_update?
       can [:destroy], entity if permission.can_destroy?
