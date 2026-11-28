@@ -36,6 +36,15 @@ RSpec.describe 'Api::Incidents', type: :request do
       )
     end
 
+    it 'retorna o contato do estudante para habilitar o envio ao responsável' do
+      incident.student.update!(contact: '+55 (67) 99999-0000')
+
+      get "/api/incidents/#{incident.id}"
+
+      expect(response).to have_http_status(:ok)
+      expect(response.parsed_body.dig('incident', 'student', 'contact')).to eq('+55 (67) 99999-0000')
+    end
+
     it 'filtra ocorrências por busca' do
       get '/api/incidents', params: { search: incident.id.to_s }
 
