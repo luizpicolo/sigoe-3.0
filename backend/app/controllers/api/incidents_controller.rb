@@ -79,10 +79,9 @@ class Api::IncidentsController < ApplicationController
     if incident_params[:sector_id].present?
       sector = Sector.find(incident_params[:sector_id])
       send_email_to(sector.email, @incident)
-      Thread.new do
-        send_whatsapp_to(@incident);
-      end
     end
+
+    SendIncidentWhatsappJob.perform_later(@incident.id)
 
     render json: { incident: incident_json(@incident) }
   rescue ActiveRecord::RecordInvalid => e
@@ -102,54 +101,6 @@ class Api::IncidentsController < ApplicationController
     InsidentMailer.send_mailer(sector, incident).deliver_later if sector.present?
   rescue StandardError => e
     Rails.logger.error("Erro ao enviar e-mail da ocorrência: #{e.message}")
-  end
-
-  def send_whatsapp_to(incident = nil)
-    return if Rails.env.test?
-
-    uri = URI.join("#{ENV.fetch('BAILEYS_URL').chomp('/')}/", 'messages')
-    # frontend_url = ENV.fetch('FRONTEND_URL').chomp('/')
-    student = incident&.student
-    phone = student&.contact.to_s.gsub(/\D/, '')
-    return if phone.blank?
-
-    phone = "55#{phone}" unless phone.start_with?('55')
-    date = incident&.date_incident&.strftime('%d/%m/%Y')
-
-    header = { 'Content-Type' => 'application/json' }
-    user = {
-      to: phone,
-      nome: student&.responsible,
-      data: date,
-      filho: student&.name,
-      descricao: incident&.description,
-      link: "https://sigoe.na.ifms.edu.br/ocorrencias/ocorrencias/visualizar/#{incident.id}"
-    }
-
-    missing_fields = user.select { |_field, value| value.blank? }.keys
-    if missing_fields.any?
-      Rails.logger.warn("WhatsApp não enviado para ocorrência #{incident&.id}: campos vazios #{missing_fields.join(', ')}")
-      return
-    end
-
-    http = Net::HTTP.new(uri.host, uri.port)
-    http.open_timeout = 5
-    http.read_timeout = 10
-
-    request = Net::HTTP::Post.new(uri.request_uri, header)
-    request.body = user.to_json
-
-    response = http.request(request)
-
-    return if response.is_a?(Net::HTTPSuccess)
-
-    Rails.logger.error("Erro ao enviar WhatsApp da ocorrência #{incident.id} (#{response.code}): #{response.body}")
-  rescue Net::OpenTimeout, Net::ReadTimeout
-    Rails.logger.error("Tempo esgotado ao enviar WhatsApp da ocorrência #{incident&.id}.")
-  rescue Errno::ECONNREFUSED, Errno::EHOSTUNREACH, SocketError
-    Rails.logger.error("Não foi possível conectar ao serviço de WhatsApp para a ocorrência #{incident&.id}.")
-  rescue StandardError => e
-    Rails.logger.error("Erro inesperado ao enviar WhatsApp da ocorrência #{incident&.id}: #{e.message}")
   end
 
   def set_incident
