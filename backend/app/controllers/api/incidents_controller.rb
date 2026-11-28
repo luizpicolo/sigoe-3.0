@@ -105,21 +105,32 @@ class Api::IncidentsController < ApplicationController
   end
 
   def send_whatsapp_to(incident = nil)
-    uri = URI.parse("#{BAILEYS_URL}/messages")
-    phone = incident&.student&.contact.to_s.gsub(/\D/, '')
+    return if Rails.env.test?
+
+    uri = URI.join("#{ENV.fetch('BAILEYS_URL').chomp('/')}/", 'messages')
+    # frontend_url = ENV.fetch('FRONTEND_URL').chomp('/')
+    student = incident&.student
+    phone = student&.contact.to_s.gsub(/\D/, '')
     return if phone.blank?
 
     phone = "55#{phone}" unless phone.start_with?('55')
+    date = incident&.date_incident&.strftime('%d/%m/%Y')
 
     header = { 'Content-Type' => 'application/json' }
     user = {
       to: phone,
-      nome: incident&.student&.responsible,
-      data: incident&.date_incident,
-      filho: incident&.student.name,
+      nome: student&.responsible,
+      data: date,
+      filho: student&.name,
       descricao: incident&.description,
-      link: "https://ocorrencias/12"
+      link: "https://sigoe.na.ifms.edu.br/ocorrencias/ocorrencias/visualizar/#{incident.id}"
     }
+
+    missing_fields = user.select { |_field, value| value.blank? }.keys
+    if missing_fields.any?
+      Rails.logger.warn("WhatsApp não enviado para ocorrência #{incident&.id}: campos vazios #{missing_fields.join(', ')}")
+      return
+    end
 
     http = Net::HTTP.new(uri.host, uri.port)
     http.open_timeout = 5
@@ -130,15 +141,15 @@ class Api::IncidentsController < ApplicationController
 
     response = http.request(request)
 
-    return nil if response.is_a?(Net::HTTPSuccess)
+    return if response.is_a?(Net::HTTPSuccess)
 
-    "Erro ao enviar mensagem (#{response.code}): #{response.body}"
+    Rails.logger.error("Erro ao enviar WhatsApp da ocorrência #{incident.id} (#{response.code}): #{response.body}")
   rescue Net::OpenTimeout, Net::ReadTimeout
-    "Tempo esgotado ao se comunicar com o serviço de mensagens."
+    Rails.logger.error("Tempo esgotado ao enviar WhatsApp da ocorrência #{incident&.id}.")
   rescue Errno::ECONNREFUSED, Errno::EHOSTUNREACH, SocketError
-    "Não foi possível conectar ao serviço de mensagens."
+    Rails.logger.error("Não foi possível conectar ao serviço de WhatsApp para a ocorrência #{incident&.id}.")
   rescue StandardError => e
-    "Erro inesperado ao enviar mensagem: #{e.message}"
+    Rails.logger.error("Erro inesperado ao enviar WhatsApp da ocorrência #{incident&.id}: #{e.message}")
   end
 
   def set_incident
