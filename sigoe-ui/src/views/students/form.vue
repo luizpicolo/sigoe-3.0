@@ -9,6 +9,7 @@ import Input from '@/components/ui/input.vue'
 import Header from '@/components/header.vue'
 import { find as findStudent, create as createStudent, update as updateStudent } from '@/services/students'
 import { success, error } from '@/utils/sweetPopup2'
+import { formatPhone } from '@/utils/phone'
 
 const route = useRoute()
 const router = useRouter()
@@ -109,6 +110,12 @@ const handleSubmit = async event => {
   }
 }
 
+const formatResponsibleContact = event => {
+  const formatted = formatPhone(event.target.value)
+  student.value.contact = formatted
+  event.target.value = formatted
+}
+
 onMounted(loadStudent)
 </script>
 
@@ -185,7 +192,7 @@ onMounted(loadStudent)
 
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Contato</label>
-                <Input v-model="student.contact" type="text" placeholder="Email / Telefone" />
+                <Input v-model="student.contact" type="text" inputmode="tel" placeholder="(99)99999-9999" @input="formatResponsibleContact" />
               </div>
             </div>
           </Card>
