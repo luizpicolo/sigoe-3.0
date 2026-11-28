@@ -1,0 +1,10 @@
+Olá, *{{nome}}*!
+
+Informamos que, no dia *{{data}}*, foi registrada uma ocorrência referente ao(à) aluno(a) *{{filho}}*.
+
+*Descrição da ocorrência:*
+{{descricao}}
+
+Para mais detalhes, acesse: {{link}}
+
+⚠️ Este é um canal exclusivo para envio de avisos. Não recebemos ligações nem respondemos mensagens neste número. Em caso de dúvidas, entre em contato com a coordenação.

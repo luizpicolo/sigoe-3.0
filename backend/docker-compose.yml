@@ -1,16 +1,26 @@
-version: '3.8'
 services:
   postgres:
-    image: postgres
+    image: postgres:latest
     container_name: sigoe_db
     ports:
-      - 5432:5432
+      - "5432:5432"
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: sigoe_production
     volumes:
       - ./postgres-data:/var/lib/postgresql/data
+
+  bailey:
+    build:
+      context: ./baileys
+      dockerfile: Dockerfile
+    container_name: bailey
+    restart: unless-stopped
+    expose:
+      - "5051"
+    volumes:
+      - auth_info:/app/auth_info
 
   web:
     build:
@@ -26,13 +36,16 @@ services:
       GEM_PATH: /usr/local/bundle/gems
       GEM_HOME: /usr/local/bundle/gems
       RAILS_ENV: production
+      BAILEYS_URL: http://baileys:5051
     ports:
-      - 3000:3000
-    command: /bin/bash -c "rm -f /tmp/server.pid && bundle exec rails server -b 0.0.0.0 -P /tmp/server.pid"
+      - "3000:3000"
+    command: >
+      /bin/bash -c
+      "rm -f /tmp/server.pid &&
+       bundle exec rails server -b 0.0.0.0 -P /tmp/server.pid"
     depends_on:
       - postgres
+      - bailey
 
-# volumes:
-#   postgres-data:
-  # gem_cache:
-  # node_modules:
+volumes:
+  auth_info:

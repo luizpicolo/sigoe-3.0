@@ -1,0 +1,17 @@
+{
+  "name": "baileys-whatsapp-api",
+  "module": "index.js",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "start": "bun run index.js"
+  },
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "dependencies": {
+    "@whiskeysockets/baileys": "^7.0.0-rc14",
+    "fastify": "^5.12.8",
+    "qrcode-terminal": "^0.12.0"
+  }
+}

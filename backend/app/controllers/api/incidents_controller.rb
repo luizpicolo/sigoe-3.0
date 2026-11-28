@@ -1,4 +1,7 @@
 # frozen_string_literal: true
+require 'net/http'
+require 'uri'
+require 'json'
 
 class Api::IncidentsController < ApplicationController
   include ParamsSearch
@@ -76,6 +79,9 @@ class Api::IncidentsController < ApplicationController
     if incident_params[:sector_id].present?
       sector = Sector.find(incident_params[:sector_id])
       send_email_to(sector.email, @incident)
+      Thread.new do
+        send_whatsapp_to(@incident);
+      end
     end
 
     render json: { incident: incident_json(@incident) }
@@ -96,6 +102,39 @@ class Api::IncidentsController < ApplicationController
     InsidentMailer.send_mailer(sector, incident).deliver_later if sector.present?
   rescue StandardError => e
     Rails.logger.error("Erro ao enviar e-mail da ocorrência: #{e.message}")
+  end
+
+  def send_whatsapp_to(incident = nil)
+    uri = URI.parse("http://bailey:5051/messages")
+
+    header = { 'Content-Type' => 'application/json' }
+    user = {
+      to: "556799088371",
+      nome: "nome do responsavel",
+      data: "13/12/2026",
+      filho: "nome do Estudante",
+      descricao: 'Há uma nova ocorrência.',
+      link: "https://ocorrencias/12"
+    }
+
+    http = Net::HTTP.new(uri.host, uri.port)
+    http.open_timeout = 5
+    http.read_timeout = 10
+
+    request = Net::HTTP::Post.new(uri.request_uri, header)
+    request.body = user.to_json
+
+    response = http.request(request)
+
+    return nil if response.is_a?(Net::HTTPSuccess)
+
+    "Erro ao enviar mensagem (#{response.code}): #{response.body}"
+  rescue Net::OpenTimeout, Net::ReadTimeout
+    "Tempo esgotado ao se comunicar com o serviço de mensagens."
+  rescue Errno::ECONNREFUSED, Errno::EHOSTUNREACH, SocketError
+    "Não foi possível conectar ao serviço de mensagens."
+  rescue StandardError => e
+    "Erro inesperado ao enviar mensagem: #{e.message}"
   end
 
   def set_incident
