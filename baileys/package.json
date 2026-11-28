@@ -12,6 +12,7 @@
   "dependencies": {
     "@whiskeysockets/baileys": "^7.0.0-rc14",
     "fastify": "^5.12.8",
+    "link-preview-js": "^6.0.0",
     "qrcode-terminal": "^0.12.0"
   }
 }
